@@ -1,0 +1,140 @@
+.re-gallery {
+
+    padding: 20px;
+    border-radius: 16px;
+    background: var(--o-view-background-color);
+    color: var(--in-color-foreground);
+    &-title {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: 16px;
+        font-weight: 600;
+    }
+
+    &-list {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    &-item {
+        width: 180px;
+        height: 180px;
+        flex-shrink: 0;
+        border-radius: 14px;
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+
+        img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            transition: transform .25s;
+        }
+
+        &:hover img {
+            transform: scale(1.04);
+        }
+    }
+
+    &-add {
+
+        border: 2px dashed var(--border-color);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: .5rem;
+        color: var(--in-color-foreground);
+
+        transition: .2s;
+
+        i {
+            font-size: 28px;
+        }
+
+        span {
+            font-size: .9rem;
+        }
+
+        &:hover {
+            border-color: var(--o-brand-primary);
+            background: rgba(255,255,255,.03);
+        }
+    }
+}
+
+.re-gallery-item {
+
+    position: relative;
+
+    .re-gallery-overlay {
+
+        position: absolute;
+        inset: 0;
+
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-start;
+
+        padding: .6rem;
+
+        opacity: 0;
+        transition: opacity .2s ease;
+
+        
+    }
+    &:hover {
+        .re-gallery-overlay {
+            opacity: 1;
+            }
+        }
+}
+
+.re-gallery-action {
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    background: rgba(255,255,255,.12);
+    color: white;
+
+    cursor: pointer;
+
+    transition: all .18s ease;
+
+    i {
+        font-size: .9rem;
+    }
+
+    &:hover {
+        transform: scale(1.08);
+    }
+
+    &:active {
+        transform: scale(.95);
+    }
+
+    &.danger {
+
+        background: rgba(220, 53, 69, .85);
+
+        &:hover {
+            background: rgb(220, 53, 69);
+            box-shadow: 0 8px 18px rgba(220,53,69,.35);
+        }
+    }
+}

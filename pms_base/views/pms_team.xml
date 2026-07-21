@@ -55,28 +55,35 @@
                 <field name="property_count" />
                 <templates>
                     <t t-name="card">
-                        <div class="o_kanban_card_header">
-                            <div class="o_kanban_card_header_title">
-                                <div class="o_primary fw-bold">
-                                    <field name="name" />
+                        <div class="o_team_card">
+                            <!-- Configuración -->
+                            <a type="open"
+                            class="o_team_settings"
+                            title="Editar equipo">
+                                <i class="fa fa-cog"/>
+                            </a>
+                            <!-- Toda la tarjeta -->
+                            <a type="action"
+                            name="451"
+                            class="o_team_link"
+                            t-att-context="{
+                                    'default_team_id': record.id.value,
+                                    'search_default_team_id': record.id.value
+                            }">
+                                <div class="o_team_name">
+                                    <field name="name"/>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="container o_kanban_card_content">
-                            <div class="row">
-                                <div class="col-5 o_kanban_primary_left">
-                                    <button
-                                        class="btn btn-primary"
-                                        name="%(pms_base.property_action_from_dashboard)d"
-                                        type="action"
-                                        t-att-context="{'default_team_id': record.id.value, 'search_default_team_id': record.id.value}"
-                                    >
-                                        <field name="property_count" />
-                                        <br />
-                                        Properties
-                                    </button>
+                                <div class="o_team_count">
+                                    <field name="property_count"/>
                                 </div>
-                            </div>
+                                <div class="o_team_label">
+                                    Propiedades
+                                </div>
+                                <div class="o_team_footer">
+                                    Ver propiedades
+                                    <i class="fa fa-arrow-right"/>
+                                </div>
+                            </a>
                         </div>
                     </t>
                 </templates>

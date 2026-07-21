@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+
+    <t t-name="pms_base.ImageGallery">
+
+        <div class="re-gallery">
+
+            <h5 class="re-gallery-title">
+                <i class="fa fa-image"/>
+                Multimedia
+            </h5>
+
+            <div class="re-gallery-list">
+
+                <t t-foreach="records" t-as="record" t-key="record.id">
+
+                    <div class="re-gallery-item">
+
+                        <img
+                            t-att-src="'/web/image/real.estate.property.image/' + record.resId + '/image'"
+                        />
+                        <div class="re-gallery-overlay">
+
+                            <button
+                                class="re-gallery-action danger"
+                                t-on-click="() => this.deleteImage(record)"
+                                title="Eliminar"
+                            >
+                                <i class="fa fa-trash"/>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </t>
+
+                <div
+                    class="re-gallery-item re-gallery-add"
+                    t-on-click="openFileDialog"
+                >
+                    <i class="fa fa-plus"/>
+                    <span>Agregar más</span>
+                </div>
+
+            </div>
+
+            <input
+                type="file"
+                class="d-none"
+                accept="image/*"
+                t-ref="fileInput"
+                t-on-change="onFileSelected"
+            />
+
+        </div>
+
+    </t>
+
+</templates>

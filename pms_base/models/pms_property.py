@@ -98,6 +98,12 @@ class PmsProperty(models.Model):
     qty_dining_room = fields.Integer(compute="_compute_qty_dining_room", store=True)
     qty_kitchen = fields.Integer(compute="_compute_qty_kitchen", store=True)
     qty_bedroom = fields.Integer(compute="_compute_qty_bedroom", store=True)
+    image_ids = fields.One2many(
+        "real.estate.property.image",
+        "property_id",
+        string="Imágenes",
+    )
+
 
     @api.depends("property_child_ids")
     def _compute_childs_property(self):

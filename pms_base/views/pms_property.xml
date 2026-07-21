@@ -31,8 +31,13 @@
                         <label for="name" />
                         <h1>
                             <field name="name" required="1" />
+
                             <field name="id" invisible="True" />
                         </h1>
+                         <field
+                                name="image_ids"
+                                widget="image_gallery_field"/>
+                        <field name="name"/>
                         <field name="ref" placeholder="Reference" />
                     </div>
                     <group id="main">

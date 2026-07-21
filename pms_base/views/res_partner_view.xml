@@ -13,7 +13,7 @@
             </xpath>
         </field>
     </record>
-
+    <!-- Inherit the partner tree view to add the is_property field 
     <record id="view_partner_tree_inherit_pms_base" model="ir.ui.view">
         <field name="name">res.partner.tree.inherit.pms.base</field>
         <field name="model">res.partner</field>
@@ -24,7 +24,7 @@
             </field>
         </field>
     </record>
-
+    -->
     <record id="view_res_partner_filter_inherit_pms_base" model="ir.ui.view">
         <field name="name">res.partner.search.inherit.pms.base</field>
         <field name="model">res.partner</field>

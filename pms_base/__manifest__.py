@@ -44,4 +44,15 @@
         "views/menu.xml",
         "views/res_partner_view.xml",
     ],
+    'assets': {
+    'web.assets_backend': [
+        'pms_base/static/src/scss/team_kanban.scss',
+        'pms_base/static/src/image_gallery/image_gallery.js',
+        'pms_base/static/src/image_gallery/image_gallery_field.js',
+        'pms_base/static/src/image_gallery/image_gallery.xml',
+        'pms_base/static/src/image_gallery/image_gallery.scss',
+        'pms_base/static/src/image_gallery/image_gallery_field.xml',
+        
+    ],
+},
 }
