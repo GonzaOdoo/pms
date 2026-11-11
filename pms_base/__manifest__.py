@@ -35,6 +35,7 @@
         "views/pms_amenity_type.xml",
         "views/pms_amenity.xml",
         "views/pms_room_type.xml",
+        "views/pms_accommodation_type.xml",
         "views/pms_room.xml",
         "views/pms_service.xml",
         "views/pms_property.xml",

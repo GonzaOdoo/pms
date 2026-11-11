@@ -31,14 +31,20 @@
                     <group id="main">
                         <group id="main-left">
                             <field name="property_id" />
+                            <field name="accommodation_type_id" />
                         </group>
                         <group id="main-right">
-                            <field name="type_id" />
+                            <field name="type_id" string="Space Type" />
+                            <field name="floor" />
                             <field name="capacity" />
                             <field name="area" />
                         </group>
                     </group>
-                    <notebook />
+                    <notebook>
+                        <page string="Amenities">
+                            <field name="amenity_ids" widget="many2many_tags" />
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -50,7 +56,8 @@
         <field name="arch" type="xml">
             <search string="Room">
                 <field name="name" />
-                <field name="type_id" />
+                <field name="type_id" string="Space Type" />
+                <field name="accommodation_type_id" />
                 <field name="capacity" />
                 <searchpanel>
                     <field
@@ -61,7 +68,7 @@
                     />
                     <field
                         name="type_id"
-                        string="Room Types"
+                        string="Space Types"
                         enable_counters="True"
                         icon="bed"
                         color="#784f73"
@@ -79,9 +86,11 @@
                 <field name="sequence" widget="handle" />
                 <field name="property_id" />
                 <field name="name" />
-                <field name="type_id" />
+                <field name="type_id" string="Space Type" />
+                <field name="accommodation_type_id" />
                 <field name="capacity" />
                 <field name="area" />
+                <field name="floor" />
             </list>
         </field>
     </record>

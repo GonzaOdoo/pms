@@ -19,6 +19,20 @@ class PmsAmenity(models.Model):
         column1="amenity_id",
         column2="property_id",
     )
+    accommodation_type_ids = fields.Many2many(
+        "pms.accommodation.type",
+        string="Accommodation Types",
+        relation="pms_accommodation_type_amenity_rel",
+        column1="amenity_id",
+        column2="accommodation_type_id",
+    )
+    room_ids = fields.Many2many(
+        "pms.room",
+        string="Rooms",
+        relation="pms_room_amenity_rel",
+        column1="amenity_id",
+        column2="room_id",
+    )
     type_id = fields.Many2one(
         string="Type",
         help="Organize amenities by type (multimedia, comfort, etc ...)",

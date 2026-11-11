@@ -137,9 +137,23 @@
                             <field name="room_ids">
                                 <list editable="bottom">
                                     <field name="name" />
-                                    <field name="type_id" />
+                                    <field name="type_id" string="Space Type" />
+                                    <field name="accommodation_type_id" />
                                     <field name="capacity" />
                                     <field name="area" />
+                                    <field name="floor" />
+                                </list>
+                            </field>
+                            <separator string="Bookable Accommodation Types" />
+                            <field name="accommodation_type_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="name" />
+                                    <field name="capacity" />
+                                    <field name="bedroom_count" />
+                                    <field name="bathroom_count" />
+                                    <field name="area" />
+                                    <field name="room_count" />
                                 </list>
                             </field>
                         </page>

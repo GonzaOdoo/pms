@@ -8,6 +8,7 @@ from . import (
     pms_tag,
     pms_team,
     pms_room_type,
+    pms_accommodation_type,
     pms_amenity_type,
     pms_room,
     pms_amenity,

@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0\n"
+"Project-Id-Version: Odoo Server 20.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-06-04 00:00+0000\n"
 "PO-Revision-Date: 2026-06-04 00:00+0000\n"
@@ -2578,3 +2578,78 @@ msgstr ""
 
 #~ msgid "Used for sending notification to registered devices"
 #~ msgstr "Utilizado para enviar notificaciones a dispositivos registrados"
+
+#. module: pms_base
+#: model:ir.model,name:pms_base.model_pms_accommodation_type
+#: model_terms:ir.ui.view,arch_db:pms_base.view_pms_accommodation_type_form
+msgid "Accommodation Type"
+msgstr "Tipo de alojamiento"
+
+#. module: pms_base
+#: model_terms:ir.ui.view,arch_db:pms_base.view_pms_accommodation_type_tree
+#: model_terms:ir.ui.view,arch_db:pms_base.view_pms_accommodation_type_search
+msgid "Accommodation Types"
+msgstr "Tipos de alojamiento"
+
+#. module: pms_base
+#: model:ir.model.fields,field_description:pms_base.field_pms_accommodation_type__capacity
+msgid "Maximum Occupancy"
+msgstr "Capacidad máxima"
+
+#. module: pms_base
+#: model:ir.model.fields,help:pms_base.field_pms_accommodation_type__capacity
+msgid "Maximum number of guests for an accommodation of this type."
+msgstr "Número máximo de huéspedes para un alojamiento de este tipo."
+
+#. module: pms_base
+#: model:ir.model.fields,field_description:pms_base.field_pms_accommodation_type__bedroom_count
+msgid "Bedrooms"
+msgstr "Dormitorios"
+
+#. module: pms_base
+#: model:ir.model.fields,field_description:pms_base.field_pms_accommodation_type__bathroom_count
+msgid "Bathrooms"
+msgstr "Baños"
+
+#. module: pms_base
+#: model_terms:ir.ui.view,arch_db:pms_base.view_pms_accommodation_type_form
+msgid "Physical Rooms"
+msgstr "Habitaciones físicas"
+
+#. module: pms_base
+#: model:ir.model.fields,field_description:pms_base.field_pms_accommodation_type__room_count
+msgid "Room Count"
+msgstr "Cantidad de habitaciones"
+
+#. module: pms_base
+#: model:ir.model.fields,field_description:pms_base.field_pms_room__type_id
+msgid "Space Type"
+msgstr "Tipo de espacio"
+
+#. module: pms_base
+#: model:ir.model.fields,help:pms_base.field_pms_room__type_id
+msgid "Classification of this physical space, separate from its bookable accommodation type."
+msgstr "Clasificación de este espacio físico, independiente de su tipo de alojamiento reservable."
+
+#. module: pms_base
+#: model:ir.model.fields,help:pms_base.field_pms_room__accommodation_type_id
+msgid "Bookable category this physical room belongs to."
+msgstr "Categoría reservable a la que pertenece esta habitación física."
+
+#. module: pms_base
+#. odoo-python
+#: code:addons/pms_base/models/pms_accommodation_type.py:0
+msgid "An accommodation type with this name already exists for this property."
+msgstr "Ya existe un tipo de alojamiento con este nombre para esta propiedad."
+
+#. module: pms_base
+#. odoo-python
+#: code:addons/pms_base/models/pms_accommodation_type.py:0
+msgid "An accommodation type cannot be moved to another property while it has physical rooms assigned."
+msgstr "No se puede trasladar un tipo de alojamiento a otra propiedad mientras tenga habitaciones físicas asignadas."
+
+#. module: pms_base
+#. odoo-python
+#: code:addons/pms_base/models/pms_room.py:0
+msgid "The accommodation type must belong to the same property as the physical room."
+msgstr "El tipo de alojamiento debe pertenecer a la misma propiedad que la habitación física."

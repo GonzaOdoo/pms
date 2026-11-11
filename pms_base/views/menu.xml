@@ -140,6 +140,14 @@
         groups="pms_base.group_pms_show_room"
     />
     <menuitem
+        id="menu_pms_config_accommodation_type"
+        name="Accommodation Types"
+        parent="pms_base.menu_config_property"
+        sequence="15"
+        action="action_pms_accommodation_type"
+        groups="pms_base.group_pms_show_room"
+    />
+    <menuitem
         id="menu_pms_config_property_amenity_type"
         name="Amenity Types"
         parent="pms_base.menu_config_property"

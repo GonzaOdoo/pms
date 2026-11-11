@@ -43,6 +43,9 @@ class PmsProperty(models.Model):
         comodel_name="pms.room",
         inverse_name="property_id",
     )
+    accommodation_type_ids = fields.One2many(
+        "pms.accommodation.type", "property_id", string="Accommodation Types"
+    )
     room_count = fields.Integer(string="Number of rooms", compute="_compute_room_count")
     amenity_ids = fields.Many2many(
         string="Amenities",

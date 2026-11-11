@@ -1,4 +1,5 @@
 from . import (
+    test_pms_accommodation_type,
     test_pms_property,
     test_pms_room,
     test_pms_stage,

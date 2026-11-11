@@ -22,7 +22,13 @@ Click on a property to open its form and access:
 
 If **Show Rooms** is enabled, navigate to **Properties ‣ Properties ‣
 Rooms** to manage rooms within a property. Each room has a type,
-capacity, and area.
+capacity, area, floor, and room-specific amenities.
+
+On the property's **Rooms** tab, define **Bookable Accommodation Types**
+such as "Standard Double" or "Suite". Each type stores its occupancy,
+bedroom and bathroom counts, area, and shared amenities. Link each
+physical room to one of these types; room-specific capacity, area, floor,
+and amenities can still be recorded on the physical room itself.
 
 ## Amenities
 
