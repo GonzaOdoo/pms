@@ -1,0 +1,7 @@
+<odoo>
+    <!-- Se asigna a los usuarios portal que representan a una mutual.
+         Quien no lo tenga sigue viendo el portal estándar de Odoo. -->
+    <record id="group_provider" model="res.groups">
+        <field name="name">Proveedor (mutual) del panel</field>
+    </record>
+</odoo>

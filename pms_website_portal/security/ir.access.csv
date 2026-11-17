@@ -1,0 +1,10 @@
+id,name,model_id,group_id/id,operation,domain
+access_ts_property_provider,Proveedor: sus propiedades,pms.property,ts_provider_portal.group_provider,r,"[('owner_id', 'child_of', user.commercial_partner_id.id)]"
+access_ts_room_provider,Proveedor: habitaciones de sus propiedades,pms.room,ts_provider_portal.group_provider,ru,"[('property_id.owner_id', 'child_of', user.commercial_partner_id.id)]"
+access_ts_reservation_provider,Proveedor: reservas de sus propiedades,pms.reservation,ts_provider_portal.group_provider,ru,"[('property_id.owner_id', 'child_of', user.commercial_partner_id.id)]"
+access_ts_guest_provider,Proveedor: huespedes de sus reservas,pms.reservation.guest,ts_provider_portal.group_provider,r,"[('reservation_id.property_id.owner_id', 'child_of', user.commercial_partner_id.id)]"
+access_ts_reservation_type_provider,Proveedor: tarifas de sus propiedades,pms.property.reservation,ts_provider_portal.group_provider,r,"[('property_id.owner_id', 'child_of', user.commercial_partner_id.id)]"
+access_ts_partner_property_provider,Proveedor: ficha de propiedades,res.partner,ts_provider_portal.group_provider,r,"[('is_property', '=', True)]"
+access_ts_stage_provider,Proveedor: etapas,pms.stage,ts_provider_portal.group_provider,r,
+access_ts_room_type_provider,Proveedor: tipos de habitacion,pms.room.type,ts_provider_portal.group_provider,r,
+access_ts_amenity_provider,Proveedor: amenities,pms.amenity,ts_provider_portal.group_provider,r,

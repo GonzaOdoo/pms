@@ -1,0 +1,62 @@
+<odoo>
+    <template id="page_reservations" name="Panel: reservas">
+        <t t-call="ts_provider_portal.layout">
+            <form class="ts-search" method="get" action="/my/reservations">
+                <input type="search" name="q" t-att-value="q" placeholder="Buscar por número"/>
+                <select name="stage" onchange="this.form.submit()">
+                    <option value="0">Todos los estados</option>
+                    <option t-foreach="stages" t-as="s" t-att-value="s.id" t-att-selected="s.id == filter_stage" t-out="s.name"/>
+                </select>
+                <button type="submit" class="ts-btn ts-btn-ghost">Filtrar</button>
+            </form>
+            <section class="ts-card">
+                <p t-if="not reservations" class="ts-empty">No hay reservas para mostrar.</p>
+                <div t-else="" class="ts-table-wrap">
+                    <table class="ts-table">
+                        <thead><tr><th>Reserva</th><th>Propiedad</th><th>Cliente</th><th>Ingreso</th><th>Egreso</th><th>Huéspedes</th><th>Estado</th></tr></thead>
+                        <tbody>
+                            <tr t-foreach="reservations" t-as="r">
+                                <td><a t-attf-href="/my/reservations/#{r.id}" t-out="r.name"/></td>
+                                <td t-out="r.property_id.name"/>
+                                <td t-out="r.sudo().partner_id.name or '—'"/>
+                                <td><span t-field="r.start" t-options='{"widget": "date"}'/></td>
+                                <td><span t-field="r.stop" t-options='{"widget": "date"}'/></td>
+                                <td t-out="r.no_of_guests"/>
+                                <td><t t-set="stage" t-value="r.stage_id"/><t t-call="ts_provider_portal.stage_pill"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </t>
+    </template>
+
+    <template id="page_reservation" name="Panel: detalle de reserva">
+        <t t-call="ts_provider_portal.layout">
+            <t t-set="ts_actions"><a href="/my/reservations" class="ts-btn ts-btn-ghost">Volver</a></t>
+            <section class="ts-card">
+                <dl class="ts-dl">
+                    <div><dt>Estado</dt><dd><t t-set="stage" t-value="res.stage_id"/><t t-call="ts_provider_portal.stage_pill"/></dd></div>
+                    <div><dt>Propiedad</dt><dd t-out="res.property_id.name"/></div>
+                    <div><dt>Cliente</dt><dd t-out="res.sudo().partner_id.name or '—'"/></div>
+                    <div><dt>Contacto</dt><dd><t t-out="res.sudo().partner_id.email or '—'"/> · <t t-out="res.sudo().partner_id.phone or '—'"/></dd></div>
+                    <div><dt>Ingreso</dt><dd><span t-field="res.start" t-options='{"widget": "date"}'/></dd></div>
+                    <div><dt>Egreso</dt><dd><span t-field="res.stop" t-options='{"widget": "date"}'/></dd></div>
+                    <div><dt>Noches</dt><dd t-out="res.duration"/></div>
+                    <div><dt>Huéspedes</dt><dd t-out="res.no_of_guests"/></div>
+                </dl>
+            </section>
+            <section class="ts-card" t-if="not res.stage_id.is_closed">
+                <h2>Acciones</h2>
+                <div class="ts-action-row">
+                    <form t-foreach="actions" t-as="a" method="post" t-attf-action="/my/reservations/#{res.id}/#{a}">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <button type="submit" t-attf-class="ts-btn #{'ts-btn-danger' if a == 'cancel' else 'ts-btn-ghost'}">
+                            <t t-out="{'book': 'Marcar reservada', 'confirm': 'Confirmar', 'check_in': 'Check-in', 'check_out': 'Check-out', 'cancel': 'Cancelar'}[a]"/>
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,54 @@
+<odoo>
+    <template id="page_rooms" name="Panel: habitaciones">
+        <t t-call="ts_provider_portal.layout">
+            <t t-set="ts_actions"><a href="/my/rooms/new" class="ts-btn">Nueva habitación</a></t>
+            <form class="ts-search" method="get" action="/my/rooms">
+                <select name="property_id" onchange="this.form.submit()">
+                    <option value="0">Todas las propiedades</option>
+                    <option t-foreach="properties" t-as="p" t-att-value="p.id" t-att-selected="p.id == filter_property" t-out="p.name"/>
+                </select>
+            </form>
+            <section class="ts-card">
+                <p t-if="not rooms" class="ts-empty">No hay habitaciones para mostrar.</p>
+                <div t-else="" class="ts-table-wrap">
+                    <table class="ts-table">
+                        <thead><tr><th>Habitación</th><th>Propiedad</th><th>Tipo</th><th>Capacidad</th><th>Superficie</th></tr></thead>
+                        <tbody>
+                            <tr t-foreach="rooms" t-as="r">
+                                <td><a t-attf-href="/my/rooms/#{r.id}" t-out="r.name"/></td>
+                                <td t-out="r.property_id.name"/>
+                                <td t-out="r.type_id.name or '—'"/>
+                                <td t-out="r.capacity or '—'"/>
+                                <td><t t-if="r.area"><t t-out="r.area"/> m²</t><t t-else="">—</t></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </t>
+    </template>
+
+    <template id="page_room_form" name="Panel: ficha de habitación">
+        <t t-call="ts_provider_portal.layout">
+            <t t-set="ts_actions"><a href="/my/rooms" class="ts-btn ts-btn-ghost">Volver</a></t>
+            <form class="ts-card ts-form" method="post" action="/my/rooms/save">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="room_id" t-att-value="room.id if room else 0"/>
+                <label class="ts-wide">Nombre<input name="name" required="required" t-att-value="room.name if room else ''"/></label>
+                <label>Propiedad
+                    <select name="property_id" required="required">
+                        <option t-foreach="properties" t-as="p" t-att-value="p.id" t-att-selected="room and room.property_id == p" t-out="p.name"/>
+                    </select>
+                </label>
+                <label>Tipo
+                    <select name="type_id" required="required">
+                        <option t-foreach="room_types" t-as="t" t-att-value="t.id" t-att-selected="room and room.type_id == t" t-out="t.name"/>
+                    </select>
+                </label>
+                <label>Capacidad (personas)<input name="capacity" type="number" min="0" t-att-value="room.capacity if room else ''"/></label>
+                <label>Superficie (m²)<input name="area" inputmode="decimal" t-att-value="room.area if room else ''"/></label>
+                <div class="ts-wide ts-form-actions"><button type="submit" class="ts-btn">Guardar</button></div>
+            </form>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,30 @@
+<odoo>
+    <template id="page_dashboard" name="Panel: resumen">
+        <t t-call="ts_provider_portal.layout">
+            <div class="ts-kpis">
+                <a class="ts-kpi" href="/my/properties"><b t-out="n_properties"/><span>Propiedades</span></a>
+                <a class="ts-kpi" href="/my/rooms"><b t-out="n_rooms"/><span>Habitaciones</span></a>
+                <a class="ts-kpi" href="/my/reservations"><b t-out="n_pending"/><span>Reservas por confirmar</span></a>
+                <a class="ts-kpi" href="/my/reservations"><b t-out="n_soon"/><span>Ingresos en 7 días</span></a>
+            </div>
+            <section class="ts-card">
+                <h2>Próximas reservas</h2>
+                <p t-if="not upcoming" class="ts-empty">Todavía no hay reservas abiertas.</p>
+                <div t-else="" class="ts-table-wrap">
+                    <table class="ts-table">
+                        <thead><tr><th>Reserva</th><th>Propiedad</th><th>Ingreso</th><th>Egreso</th><th>Estado</th></tr></thead>
+                        <tbody>
+                            <tr t-foreach="upcoming" t-as="r">
+                                <td><a t-attf-href="/my/reservations/#{r.id}" t-out="r.name"/></td>
+                                <td t-out="r.property_id.name"/>
+                                <td><span t-field="r.start" t-options='{"widget": "date"}'/></td>
+                                <td><span t-field="r.stop" t-options='{"widget": "date"}'/></td>
+                                <td><t t-set="stage" t-value="r.stage_id"/><t t-call="ts_provider_portal.stage_pill"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </t>
+    </template>
+</odoo>

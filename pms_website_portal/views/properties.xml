@@ -1,0 +1,47 @@
+<odoo>
+    <template id="page_properties" name="Panel: propiedades">
+        <t t-call="ts_provider_portal.layout">
+            <t t-set="ts_actions"><a href="/my/properties/new" class="ts-btn">Nueva propiedad</a></t>
+            <form class="ts-search" method="get" action="/my/properties">
+                <input type="search" name="q" t-att-value="q" placeholder="Buscar por nombre"/>
+                <button type="submit" class="ts-btn ts-btn-ghost">Buscar</button>
+            </form>
+            <section class="ts-card">
+                <p t-if="not properties" class="ts-empty">No hay propiedades. Creá la primera con “Nueva propiedad”.</p>
+                <div t-else="" class="ts-table-wrap">
+                    <table class="ts-table">
+                        <thead><tr><th>Nombre</th><th>Ciudad</th><th>Superficie</th><th>Habitaciones</th><th/></tr></thead>
+                        <tbody>
+                            <tr t-foreach="properties" t-as="p">
+                                <td><a t-attf-href="/my/properties/#{p.id}" t-out="p.name"/></td>
+                                <td t-out="p.city or '—'"/>
+                                <td><t t-if="p.area"><t t-out="p.area"/> m²</t><t t-else="">—</t></td>
+                                <td t-out="p.room_count"/>
+                                <td class="ts-right"><a t-attf-href="/my/rooms?property_id=#{p.id}">Ver habitaciones</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </t>
+    </template>
+
+    <template id="page_property_form" name="Panel: ficha de propiedad">
+        <t t-call="ts_provider_portal.layout">
+            <t t-set="ts_actions"><a href="/my/properties" class="ts-btn ts-btn-ghost">Volver</a></t>
+            <form class="ts-card ts-form" method="post" action="/my/properties/save">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="property_id" t-att-value="prop.id if prop else 0"/>
+                <label class="ts-wide">Nombre<input name="name" required="required" t-att-value="prop.name if prop else ''"/></label>
+                <label class="ts-wide">Dirección<input name="street" t-att-value="prop.street if prop else ''"/></label>
+                <label>Ciudad<input name="city" t-att-value="prop.city if prop else ''"/></label>
+                <label>Código postal<input name="zip" t-att-value="prop.zip if prop else ''"/></label>
+                <label>Superficie (m²)<input name="area" inputmode="decimal" t-att-value="prop.area if prop else ''"/></label>
+                <label>Capacidad (huéspedes)<input name="no_of_guests" type="number" min="0" t-att-value="prop.no_of_guests if prop else ''"/></label>
+                <label>Mínimo de noches<input name="min_nights" type="number" min="0" t-att-value="prop.min_nights if prop else 1"/></label>
+                <label>Máximo de noches<input name="max_nights" type="number" min="1" t-att-value="prop.max_nights if prop else 30"/></label>
+                <div class="ts-wide ts-form-actions"><button type="submit" class="ts-btn">Guardar</button></div>
+            </form>
+        </t>
+    </template>
+</odoo>

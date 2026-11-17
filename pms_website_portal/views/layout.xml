@@ -1,0 +1,46 @@
+<odoo>
+    <!-- Layout del panel: sin cabecera ni pie del sitio, con menú lateral. -->
+    <template id="layout" name="Panel del proveedor">
+        <t t-call="website.layout">
+            <t t-set="no_header" t-value="True"/>
+            <t t-set="no_footer" t-value="True"/>
+            <t t-set="additional_title" t-value="ts_title or 'Panel'"/>
+            <div id="wrap" class="ts-app">
+                <input type="checkbox" id="ts-nav-toggle" class="ts-nav-toggle"/>
+                <header class="ts-topbar">
+                    <label for="ts-nav-toggle" class="ts-burger" aria-label="Menú">☰</label>
+                    <span class="ts-brand">Turismo Social</span>
+                </header>
+                <aside class="ts-side">
+                    <div class="ts-brand">Turismo Social</div>
+                    <nav class="ts-nav">
+                        <a href="/my" t-att-class="'is-active' if ts_active == 'dashboard' else ''">Panel</a>
+                        <a href="/my/properties" t-att-class="'is-active' if ts_active == 'properties' else ''">Propiedades</a>
+                        <a href="/my/rooms" t-att-class="'is-active' if ts_active == 'rooms' else ''">Habitaciones</a>
+                        <a href="/my/reservations" t-att-class="'is-active' if ts_active == 'reservations' else ''">Administrar reservas</a>
+                    </nav>
+                    <div class="ts-side-foot">
+                        <div class="ts-user" t-out="request.env.user.commercial_partner_id.name"/>
+                        <a href="/my/account">Mi cuenta</a>
+                        <a href="/web/session/logout?redirect=/">Salir</a>
+                    </div>
+                </aside>
+                <main class="ts-main">
+                    <div class="ts-head">
+                        <h1 t-out="ts_title"/>
+                        <div class="ts-actions"><t t-out="ts_actions"/></div>
+                    </div>
+                    <div t-if="ts_msg" class="ts-flash" role="status" t-out="ts_msg"/>
+                    <t t-out="0"/>
+                </main>
+            </div>
+        </t>
+    </template>
+
+    <!-- Pastilla de etapa de una reserva -->
+    <template id="stage_pill" name="Etapa de reserva">
+        <span class="ts-pill" t-att-style="'--c:%s' % (stage.custom_color or '#8a948f')">
+            <i class="ts-dot"/><t t-out="stage.name"/>
+        </span>
+    </template>
+</odoo>
