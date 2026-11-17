@@ -16,7 +16,7 @@
         "demo/pms_property.xml",
     ],
     "data": [
-        "security/ir.model.access.csv",
+        "security/ir.access.csv",
         "data/rule.xml",
         "views/website_menu.xml",
         "views/pms_property_template.xml",

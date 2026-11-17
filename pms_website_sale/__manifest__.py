@@ -16,7 +16,7 @@
     ],
     "data": [
         "data/website_menu.xml",
-        "security/ir.model.access.csv",
+        "security/ir.access.csv",
         "security/pms_website_sale.xml",
         "views/templates.xml",
     ],

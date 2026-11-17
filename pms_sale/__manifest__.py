@@ -19,7 +19,7 @@
         "demo/pms_reservation.xml",
     ],
     "data": [
-        "security/ir.model.access.csv",
+        "security/ir.access.csv",
         "data/ir_sequence.xml",
         "data/product_data.xml",
         "data/pms_stage.xml",
