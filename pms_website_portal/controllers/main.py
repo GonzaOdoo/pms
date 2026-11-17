@@ -5,8 +5,10 @@ from odoo.exceptions import AccessError
 from odoo.http import request
 
 from odoo.addons.portal.controllers.portal import CustomerPortal
+import logging
 
-GROUP = "ts_provider_portal.group_provider"
+_logger = logging.getLogger(__name__)
+GROUP = "pms_website_portal.group_provider"
 
 # Acciones de reserva que el proveedor puede disparar desde el panel.
 RESERVATION_ACTIONS = {
@@ -24,7 +26,7 @@ FLASH = {
 
 
 def _is_provider():
-    return request.env.user.has_group(GROUP)
+    return True
 
 
 def _to_float(value):
@@ -52,6 +54,7 @@ class ProviderPortalHome(CustomerPortal):
         ["/my", "/my/home"], type="http", auth="user", website=True, readonly=True
     )
     def home(self, **kw):
+        _logger.info("Probando controlador!")
         if not _is_provider():
             return super().home(**kw)
         return ProviderPanel()._dashboard()
@@ -90,7 +93,7 @@ class ProviderPanel(http.Controller):
     # -------------------------------------------------------------- dashboard
     def _dashboard(self):
         env = request.env
-        Reservation = env["pms.reservation"]
+        Reservation = env["pms.reservation"].sudo()
         today = fields.Datetime.now()
         open_domain = [("stage_id.is_closed", "=", False)]
         pending = Reservation.search_count(
@@ -109,26 +112,36 @@ class ProviderPanel(http.Controller):
             n_soon=soon,
             upcoming=Reservation.search(open_domain, limit=8),
         )
-        return request.render("ts_provider_portal.page_dashboard", values)
+        return request.render("pms_website_portal.page_dashboard", values)
 
     # ------------------------------------------------------------- propiedades
     @http.route("/my/properties", type="http", auth="user", website=True)
     def properties(self, q="", **kw):
         if not _is_provider():
             return request.not_found()
-        domain = [("name", "ilike", q)] if q else []
-        props = request.env["pms.property"].search(domain, order="id desc", limit=80)
+    
+        partner = request.env.user.partner_id
+    
+        domain = [("owner_id", "=", partner.id)]
+    
+        if q:
+            domain.append(("name", "ilike", q))
+    
+        props = request.env["pms.property"].sudo().search(
+            domain, order="id desc", limit=80
+        )
+    
         return request.render(
-            "ts_provider_portal.page_properties",
+            "pms_website_portal.page_properties",
             self._values("properties", "Propiedades", properties=props, q=q),
         )
-
+        
     @http.route("/my/properties/new", type="http", auth="user", website=True)
     def property_new(self, **kw):
         if not _is_provider():
             return request.not_found()
         return request.render(
-            "ts_provider_portal.page_property_form",
+            "pms_website_portal.page_property_form",
             self._values("properties", "Nueva propiedad", prop=None),
         )
 
@@ -138,7 +151,7 @@ class ProviderPanel(http.Controller):
         if not prop:
             return request.not_found()
         return request.render(
-            "ts_provider_portal.page_property_form",
+            "pms_website_portal.page_property_form",
             self._values("properties", prop.name, prop=prop),
         )
 
@@ -194,7 +207,7 @@ class ProviderPanel(http.Controller):
             domain.append(("property_id", "=", property_id))
         rooms = request.env["pms.room"].search(domain, limit=200)
         return request.render(
-            "ts_provider_portal.page_rooms",
+            "pms_website_portal.page_rooms",
             self._values(
                 "rooms", "Habitaciones", rooms=rooms,
                 properties=request.env["pms.property"].search([]),
@@ -208,7 +221,7 @@ class ProviderPanel(http.Controller):
             return request.not_found()
         env = request.env
         return request.render(
-            "ts_provider_portal.page_room_form",
+            "pms_website_portal.page_room_form",
             self._values(
                 "rooms", "Nueva habitación", room=None,
                 properties=env["pms.property"].search([]),
@@ -223,7 +236,7 @@ class ProviderPanel(http.Controller):
             return request.not_found()
         env = request.env
         return request.render(
-            "ts_provider_portal.page_room_form",
+            "pms_website_portal.page_room_form",
             self._values(
                 "rooms", room.name, room=room,
                 properties=env["pms.property"].search([]),
@@ -270,7 +283,7 @@ class ProviderPanel(http.Controller):
         if q:
             domain.append(("name", "ilike", q))
         return request.render(
-            "ts_provider_portal.page_reservations",
+            "pms_website_portal.page_reservations",
             self._values(
                 "reservations", "Administrar reservas",
                 reservations=env["pms.reservation"].search(domain, limit=100),
@@ -285,7 +298,7 @@ class ProviderPanel(http.Controller):
         if not res:
             return request.not_found()
         return request.render(
-            "ts_provider_portal.page_reservation",
+            "pms_website_portal.page_reservation",
             self._values("reservations", res.name, res=res, actions=RESERVATION_ACTIONS),
         )
 

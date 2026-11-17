@@ -1,6 +1,6 @@
 <odoo>
     <template id="page_rooms" name="Panel: habitaciones">
-        <t t-call="ts_provider_portal.layout">
+        <t t-call="pms_website_portal.layout">
             <t t-set="ts_actions"><a href="/my/rooms/new" class="ts-btn">Nueva habitación</a></t>
             <form class="ts-search" method="get" action="/my/rooms">
                 <select name="property_id" onchange="this.form.submit()">
@@ -29,7 +29,7 @@
     </template>
 
     <template id="page_room_form" name="Panel: ficha de habitación">
-        <t t-call="ts_provider_portal.layout">
+        <t t-call="pms_website_portal.layout">
             <t t-set="ts_actions"><a href="/my/rooms" class="ts-btn ts-btn-ghost">Volver</a></t>
             <form class="ts-card ts-form" method="post" action="/my/rooms/save">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>

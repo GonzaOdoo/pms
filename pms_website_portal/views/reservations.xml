@@ -1,6 +1,6 @@
 <odoo>
     <template id="page_reservations" name="Panel: reservas">
-        <t t-call="ts_provider_portal.layout">
+        <t t-call="pms_website_portal.layout">
             <form class="ts-search" method="get" action="/my/reservations">
                 <input type="search" name="q" t-att-value="q" placeholder="Buscar por número"/>
                 <select name="stage" onchange="this.form.submit()">
@@ -32,7 +32,7 @@
     </template>
 
     <template id="page_reservation" name="Panel: detalle de reserva">
-        <t t-call="ts_provider_portal.layout">
+        <t t-call="pms_website_portal.layout">
             <t t-set="ts_actions"><a href="/my/reservations" class="ts-btn ts-btn-ghost">Volver</a></t>
             <section class="ts-card">
                 <dl class="ts-dl">

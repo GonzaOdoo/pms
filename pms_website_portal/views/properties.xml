@@ -1,6 +1,6 @@
 <odoo>
     <template id="page_properties" name="Panel: propiedades">
-        <t t-call="ts_provider_portal.layout">
+        <t t-call="pms_website_portal.layout">
             <t t-set="ts_actions"><a href="/my/properties/new" class="ts-btn">Nueva propiedad</a></t>
             <form class="ts-search" method="get" action="/my/properties">
                 <input type="search" name="q" t-att-value="q" placeholder="Buscar por nombre"/>
@@ -27,7 +27,7 @@
     </template>
 
     <template id="page_property_form" name="Panel: ficha de propiedad">
-        <t t-call="ts_provider_portal.layout">
+        <t t-call="pms_website_portal.layout">
             <t t-set="ts_actions"><a href="/my/properties" class="ts-btn ts-btn-ghost">Volver</a></t>
             <form class="ts-card ts-form" method="post" action="/my/properties/save">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>

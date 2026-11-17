@@ -1,6 +1,6 @@
 <odoo>
     <template id="page_dashboard" name="Panel: resumen">
-        <t t-call="ts_provider_portal.layout">
+        <t t-call="pms_website_portal.layout">
             <div class="ts-kpis">
                 <a class="ts-kpi" href="/my/properties"><b t-out="n_properties"/><span>Propiedades</span></a>
                 <a class="ts-kpi" href="/my/rooms"><b t-out="n_rooms"/><span>Habitaciones</span></a>

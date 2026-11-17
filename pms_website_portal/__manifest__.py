@@ -18,7 +18,7 @@
     ],
     "assets": {
         "web.assets_frontend": [
-            "ts_provider_portal/static/src/css/panel.css",
+            "pms_website_portal/static/src/css/panel.css",
         ],
     },
     "installable": True,
