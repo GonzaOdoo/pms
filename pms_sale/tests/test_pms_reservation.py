@@ -76,6 +76,26 @@ class TestPMSReservation(TransactionCase):
     def test_check_no_of_reservations(self):
         self.reservation._check_no_of_reservations()
 
+    def test_setup_draft_rejects_reservations(self):
+        self.property.setup_state = "draft"
+        self.assertFalse(
+            self.env["pms.reservation"].is_accommodation_type_available(
+                self.property.id,
+                False,
+                "2031-06-01 15:00:00",
+                "2031-06-02 11:00:00",
+            )
+        )
+        with self.assertRaises(ValidationError):
+            with self.env.cr.savepoint():
+                self.env["pms.reservation"].create(
+                    {
+                        "property_id": self.property.id,
+                        "start": "2031-06-01 15:00:00",
+                        "stop": "2031-06-02 11:00:00",
+                    }
+                )
+
     def test_check_no_of_nights(self):
         self.reservation._check_no_of_nights()
 

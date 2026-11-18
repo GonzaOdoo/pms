@@ -29,6 +29,38 @@ class PmsProperty(models.Model):
         comodel_name="res.partner",
         required=True,
     )
+    property_type = fields.Selection(
+        [
+            ("house", "House"),
+            ("hotel", "Hotel"),
+        ],
+        string="Property Type",
+        required=True,
+        default="house",
+        tracking=True,
+    )
+    setup_state = fields.Selection(
+        [
+            ("draft", "Setup in Progress"),
+            ("ready", "Setup Complete"),
+        ],
+        string="Setup Status",
+        required=True,
+        default="ready",
+        copy=False,
+        tracking=True,
+    )
+    setup_step = fields.Selection(
+        [
+            ("address", "Address"),
+            ("amenities", "Amenities"),
+            ("inventory", "Rooms"),
+            ("rate", "Rates"),
+            ("review", "Review"),
+        ],
+        string="Setup Step",
+        copy=False,
+    )
     parent_id = fields.Many2one(string="Parent Property", comodel_name="pms.property")
     property_child_ids = fields.One2many(
         "pms.property", "parent_id", string="Children Property"
@@ -91,6 +123,8 @@ class PmsProperty(models.Model):
     )
     floors_num = fields.Integer(string="Floor")
     unit_floor = fields.Integer()
+    bedroom_count = fields.Integer(string="Bedrooms")
+    bathroom_count = fields.Integer(string="Bathrooms")
     balcony = fields.Boolean(compute="_compute_balcony", store=True)
     laundry_room = fields.Boolean(compute="_compute_laundry_room", store=True)
     parking_lot = fields.Boolean(compute="_compute_parking_lot", store=True)
@@ -236,9 +270,12 @@ class PmsProperty(models.Model):
                 rec.room_ids.filtered(lambda x, _t=type_id: x.type_id == _t)
             )
 
-    @api.depends("room_ids")
+    @api.depends("room_ids", "property_type", "bedroom_count")
     def _compute_qty_bedroom(self):
         for rec in self:
+            if rec.property_type == "house" and rec.bedroom_count:
+                rec.qty_bedroom = rec.bedroom_count
+                continue
             type_id = self.env.ref(
                 "pms_base.pms_room_type_bed", raise_if_not_found=False
             )

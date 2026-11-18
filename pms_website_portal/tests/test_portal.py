@@ -7,7 +7,7 @@ class TestProviderPortal(HttpCase):
     def setUpClass(cls):
         super().setUpClass()
         env = cls.env
-        group = env.ref("ts_provider_portal.group_provider")
+        group = env.ref("pms_website_portal.group_provider")
         portal = env.ref("base.group_portal")
         cls.rtype = env["pms.room.type"].create({"name": "Doble"})
         cls.mutual = {}
@@ -43,6 +43,32 @@ class TestProviderPortal(HttpCase):
         data = dict(data, csrf_token=self.csrf_token())
         return self.url_open(path, data=data, allow_redirects=False)
 
+    def _start_wizard(self, name, property_type, login="op_a"):
+        response = self._post(
+            "/my/properties/wizard/start",
+            {"name": name, "property_type": property_type},
+            login=login,
+        )
+        self.assertEqual(response.status_code, 303)
+        property_id = int(
+            response.headers["Location"]
+            .split("/my/properties/")[1]
+            .split("/")[0]
+        )
+        return self.env["pms.property"].browse(property_id)
+
+    def test_wizard_draft_can_be_resumed_and_is_private(self):
+        own_draft = self._start_wizard("Borrador A", "house")
+        self.assertEqual(
+            self._get(f"/my/properties/{own_draft.id}/wizard/address").status_code,
+            200,
+        )
+        foreign_draft = self._start_wizard("Borrador B", "hotel", login="op_b")
+        self.assertEqual(
+            self._get(f"/my/properties/{foreign_draft.id}/wizard/address").status_code,
+            404,
+        )
+
     def test_dashboard_replaces_portal_for_provider(self):
         r = self._get("/my")
         self.assertEqual(r.status_code, 200)
@@ -66,12 +92,83 @@ class TestProviderPortal(HttpCase):
         self.assertNotIn("Cliente b", self._get("/my/reservations").text)
 
     def test_create_property_forces_owner(self):
-        r = self._post("/my/properties/save", {"name": "Cabaña Nueva", "city": "Salta", "area": "55,5"})
-        self.assertEqual(r.status_code, 303)
-        prop = self.env["pms.property"].search([("name", "=", "Cabaña Nueva")])
+        prop = self._start_wizard("Cabaña Nueva", "house")
+        self.assertEqual(prop.setup_state, "draft")
+        self.assertFalse(prop.is_published)
+        self._post(
+            f"/my/properties/{prop.id}/wizard/address/save",
+            {"street": "Calle 1", "city": "Salta"},
+        )
+        self._post(
+            f"/my/properties/{prop.id}/wizard/amenities/save",
+            {
+                "area": "55,5",
+                "no_of_guests": "4",
+                "min_nights": "1",
+                "max_nights": "30",
+            },
+        )
+        self._post(
+            f"/my/properties/{prop.id}/wizard/inventory/save",
+            {"bedroom_count": "2", "bathroom_count": "1"},
+        )
+        self._post(
+            f"/my/properties/{prop.id}/wizard/rate/save",
+            {"reservation_name": "Tarifa estándar", "price": "120"},
+        )
+        self._post(f"/my/properties/{prop.id}/wizard/complete", {})
+        prop.invalidate_recordset()
         self.assertEqual(prop.owner_id, self.mutual["a"]["partner"])
         self.assertEqual(prop.area, 55.5)
         self.assertEqual(prop.max_nights, 30)
+        self.assertEqual(prop.property_type, "house")
+        self.assertEqual(prop.setup_state, "ready")
+        self.assertFalse(prop.accommodation_type_ids)
+        self.assertFalse(prop.reservation_ids.accommodation_type_id)
+
+    def test_hotel_wizard_creates_room_inventory_and_rate(self):
+        prop = self._start_wizard("Hotel Nuevo", "hotel")
+        self._post(
+            f"/my/properties/{prop.id}/wizard/address/save",
+            {"street": "Calle 2", "city": "Salta"},
+        )
+        self._post(
+            f"/my/properties/{prop.id}/wizard/amenities/save",
+            {
+                "area": "120",
+                "no_of_guests": "30",
+                "min_nights": "1",
+                "max_nights": "30",
+            },
+        )
+        self._post(
+            f"/my/properties/{prop.id}/wizard/inventory/save",
+            {
+                "accommodation_name": "Doble",
+                "room_count": "2",
+                "capacity": "2",
+                "bedroom_count": "1",
+                "bathroom_count": "1",
+                "area": "25",
+            },
+        )
+        self._post(
+            f"/my/properties/{prop.id}/wizard/rate/save",
+            {"reservation_name": "Tarifa doble", "price": "150"},
+        )
+        self._post(f"/my/properties/{prop.id}/wizard/complete", {})
+        prop.invalidate_recordset()
+        self.assertEqual(prop.setup_state, "ready")
+        self.assertEqual(prop.property_type, "hotel")
+        accommodation_type = prop.accommodation_type_ids
+        self.assertEqual(accommodation_type.name, "Doble")
+        self.assertEqual(len(accommodation_type.room_ids.filtered("active")), 2)
+        self.assertEqual(
+            prop.reservation_ids.filtered(
+                lambda offer: offer.accommodation_type_id == accommodation_type
+            ).price,
+            150,
+        )
 
     def test_cannot_edit_or_room_into_foreign_property(self):
         b = self.mutual["b"]

@@ -28,6 +28,7 @@ class Website(Website):
         return Domain.AND(
             [
                 [("is_published", "=", True)],
+                [("setup_state", "=", "ready")],
                 request.website.website_domain(),
             ]
         )
@@ -150,7 +151,10 @@ class Website(Website):
         sitemap=True,
     )
     def product(self, pms_property, category="", search="", **kwargs):
-        if not pms_property.can_access_from_current_website():
+        if (
+            pms_property.setup_state != "ready"
+            or not pms_property.can_access_from_current_website()
+        ):
             raise NotFound()
         return request.render(
             "pms_website.property",

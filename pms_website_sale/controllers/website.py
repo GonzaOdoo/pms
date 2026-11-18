@@ -77,11 +77,13 @@ class PropertyTableCompute:
 class WebsiteSale(WebsiteSale):
     def _get_property_search_domain(self, search, category, guest, args):
         domain = []
+        domain += [("is_published", "=", True)]
         if search:
             domain += [("city", "ilike", search)]
         if category:
             domain += [("property_category_ids", "child_of", category.id)]
         domain += [("property_child_ids", "=", False)]
+        domain += [("setup_state", "=", "ready")]
 
         try:
             guest_count = int(guest) if guest else 0
@@ -314,6 +316,8 @@ class PmsWebsiteSale(PmsPropertyWebsite):
         property_rec = request.env["pms.property"].sudo().browse(property_id).exists()
         if not property_rec or not property_rec.can_access_from_current_website():
             return {"available": False, "error": _("Property not found")}
+        if property_rec.setup_state != "ready":
+            return {"available": False, "error": _("Property setup is not complete")}
 
         Reservation = request.env["pms.reservation"].sudo()
         if reservation_type_id:
@@ -344,6 +348,8 @@ class PmsWebsiteSale(PmsPropertyWebsite):
                 start,
                 end,
             )
+        elif property_rec.property_type == "hotel":
+            available = False
         elif property_rec.accommodation_type_ids:
             available = any(
                 Reservation.is_accommodation_type_available(
@@ -377,6 +383,7 @@ class PmsWebsiteSale(PmsPropertyWebsite):
         pms_property = request.env["pms.property"].sudo().browse(property_id)
         if (
             not pms_property.exists()
+            or pms_property.setup_state != "ready"
             or not pms_property.can_access_from_current_website()
         ):
             return {"error": _("Property not found"), "redirect": "/property"}
@@ -409,6 +416,8 @@ class PmsWebsiteSale(PmsPropertyWebsite):
         if reservation_type.property_id and reservation_type.property_id != pms_property:
             return {"error": _("Invalid reservation type")}
         accommodation_type = reservation_type.accommodation_type_id
+        if pms_property.property_type == "hotel" and not accommodation_type:
+            return {"error": _("Hotel reservation offers must specify an accommodation type")}
         if (
             accommodation_type
             and accommodation_type.property_id != pms_property

@@ -29,6 +29,7 @@ class PmsProperty(models.Model):
     def get_property_information(self, vals, domain=False):
         domain = domain or []
         domain.append(("property_child_ids", "=", False))
+        domain.append(("setup_state", "=", "ready"))
         if vals.get("city_value") and vals.get("city_value") != "Select City":
             domain += [("city", "=", vals.get("city_value"))]
         if vals.get("bedrooms_value") and vals.get("bedrooms_value") != 0:

@@ -295,7 +295,15 @@ class PmsReservation(models.Model):
         accommodation_type = self.env["pms.accommodation.type"].browse(
             accommodation_type_id
         ).exists()
-        if not property_rec or not start or not stop or start >= stop:
+        if (
+            not property_rec
+            or property_rec.setup_state != "ready"
+            or not start
+            or not stop
+            or start >= stop
+        ):
+            return False
+        if property_rec.property_type == "hotel" and not accommodation_type_id:
             return False
 
         domain = self._get_active_overlap_domain(property_rec.id, start, stop)
@@ -345,6 +353,12 @@ class PmsReservation(models.Model):
         for rec in self:
             if not (rec.property_id and rec.start and rec.stop):
                 continue
+            if rec.property_id.setup_state != "ready":
+                raise ValidationError(
+                    self.env._(
+                        "Reservations are unavailable until the property setup is complete."
+                    )
+                )
             if rec.start >= rec.stop:
                 raise ValidationError(
                     self.env._("The check-out date must be after the check-in date.")
@@ -444,6 +458,12 @@ class PmsReservation(models.Model):
                             "for these dates."
                         )
                     )
+            elif rec.property_id.property_type == "hotel":
+                raise ValidationError(
+                    self.env._(
+                        "Hotel reservations must be linked to an accommodation type."
+                    )
+                )
             elif self.search_count(overlap_domain):
                 raise ValidationError(
                     self.env._(

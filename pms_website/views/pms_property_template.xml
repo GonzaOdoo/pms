@@ -115,7 +115,7 @@
                         </div>
                         <div
                             class="col-sm-6 col-md-3"
-                            t-if="show_rooms and property.qty_half_bathroom"
+                            t-if="show_rooms and (property.bathroom_count or property.qty_half_bathroom)"
                         >
                             <div
                                 class="d-flex align-items-center p-3 border rounded h-100"
@@ -124,7 +124,7 @@
                                 <div>
                                     <div
                                         class="fs-4 fw-bold"
-                                        t-esc="property.qty_half_bathroom"
+                                        t-esc="property.bathroom_count or property.qty_half_bathroom"
                                     />
                                     <div class="text-muted">Bathrooms</div>
                                 </div>

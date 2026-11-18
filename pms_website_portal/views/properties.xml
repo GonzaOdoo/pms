@@ -10,14 +10,27 @@
                 <p t-if="not properties" class="ts-empty">No hay propiedades. Creá la primera con “Nueva propiedad”.</p>
                 <div t-else="" class="ts-table-wrap">
                     <table class="ts-table">
-                        <thead><tr><th>Nombre</th><th>Ciudad</th><th>Superficie</th><th>Habitaciones</th><th/></tr></thead>
+                        <thead><tr><th>Nombre</th><th>Ciudad</th><th>Superficie</th><th>Habitaciones</th><th>Configuración</th><th>Acciones</th></tr></thead>
                         <tbody>
                             <tr t-foreach="properties" t-as="p">
                                 <td><a t-attf-href="/my/properties/#{p.id}" t-out="p.name"/></td>
                                 <td t-out="p.city or '—'"/>
                                 <td><t t-if="p.area"><t t-out="p.area"/> m²</t><t t-else="">—</t></td>
-                                <td t-out="p.room_count"/>
-                                <td class="ts-right"><a t-attf-href="/my/rooms?property_id=#{p.id}">Ver habitaciones</a></td>
+                                <td t-out="p.bedroom_count if p.property_type == 'house' else p.room_count"/>
+                                <td>
+                                    <span
+                                        t-if="p.setup_state == 'draft'"
+                                        class="ts-pill ts-pill-warning"
+                                    >Borrador</span>
+                                    <span t-else="" class="ts-pill ts-pill-ready">Lista</span>
+                                </td>
+                                <td class="ts-right">
+                                    <a
+                                        t-if="p.setup_state == 'draft'"
+                                        t-attf-href="/my/properties/#{p.id}/wizard/#{p.setup_step or 'address'}"
+                                    >Continuar configuración</a>
+                                    <a t-else="" t-attf-href="/my/rooms?property_id=#{p.id}">Ver habitaciones</a>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

@@ -74,6 +74,26 @@
 .ts-dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 24px;margin:0}
 .ts-dl dt{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ts-muted)}
 .ts-dl dd{margin:2px 0 0}
+.ts-muted{color:var(--ts-muted)}
+.ts-wizard{max-width:900px;margin-inline:auto}
+.ts-wizard-property{display:flex;align-items:center;gap:12px;margin:0 0 20px;font-size:18px}
+.ts-wizard-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:28px}
+.ts-wizard-steps a,.ts-wizard-steps>span{display:flex;align-items:center;gap:8px;padding:8px;border-bottom:2px solid var(--ts-line);color:var(--ts-muted);font-size:13px}
+.ts-wizard-steps a>span:first-child,.ts-wizard-steps>span>span:first-child{display:grid;place-items:center;flex:0 0 24px;height:24px;border-radius:50%;background:var(--ts-bg);font-weight:700}
+.ts-wizard-steps a.is-active{border-color:var(--ts-accent);color:var(--ts-accent);font-weight:700}
+.ts-wizard-steps a.is-complete{border-color:var(--ts-accent);color:var(--ts-fg)}
+.ts-wizard-steps .is-disabled{opacity:.55}
+.ts-wizard h2{margin-bottom:6px}
+.ts-type-options,.ts-amenities{display:flex;flex-wrap:wrap;gap:10px;border:0;padding:0;margin:0}
+.ts-type-options legend,.ts-amenities legend{width:100%;font-weight:700;margin-bottom:4px}
+.ts-type-card{display:flex!important;align-items:center;gap:12px;flex:1 1 260px;padding:14px;border:1px solid var(--ts-line);border-radius:8px;cursor:pointer}
+.ts-type-card input,.ts-amenities input{width:auto!important}
+.ts-type-card span{display:grid}
+.ts-type-card small{font-weight:400;color:var(--ts-muted)}
+.ts-amenities label{display:flex!important;align-items:center;gap:8px;border:1px solid var(--ts-line);border-radius:999px;padding:6px 12px;font-weight:400!important}
+.ts-wizard-note{padding:12px 14px;margin:20px 0;background:var(--ts-accent-soft);color:var(--ts-accent);border-radius:8px}
+.ts-pill-warning{--c:#bc7d21}
+.ts-pill-ready{--c:#2d5d52}
 
 /* Móvil: el menú pasa a un panel desplegable */
 @media (max-width:860px){
@@ -84,6 +104,8 @@
   .ts-side{display:none;position:fixed;inset:0 auto 0 0;width:min(280px,85vw);z-index:10;height:100vh;box-shadow:0 0 40px rgba(0,0,0,.2)}
   .ts-nav-toggle:checked ~ .ts-side{display:flex}
   .ts-form{grid-template-columns:1fr}
+  .ts-wizard-steps{grid-template-columns:1fr}
+  .ts-wizard-steps a,.ts-wizard-steps>span{padding:6px 2px}
 }
 @media (prefers-color-scheme:dark){
   .ts-app{--ts-bg:#151a18;--ts-surface:#1d2321;--ts-fg:#e6ebe8;--ts-muted:#9aa6a0;--ts-line:#34403b;--ts-accent:#8cc5b5;--ts-accent-soft:#233531;--ts-danger:#ef8c80}

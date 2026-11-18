@@ -1,3 +1,5 @@
+import logging
+import math
 from datetime import timedelta
 
 from odoo import fields, http
@@ -5,10 +7,10 @@ from odoo.exceptions import AccessError
 from odoo.http import request
 
 from odoo.addons.portal.controllers.portal import CustomerPortal
-import logging
 
 _logger = logging.getLogger(__name__)
 GROUP = "pms_website_portal.group_provider"
+WIZARD_STEPS = ("address", "amenities", "inventory", "rate", "review")
 
 # Acciones de reserva que el proveedor puede disparar desde el panel.
 RESERVATION_ACTIONS = {
@@ -21,26 +23,32 @@ RESERVATION_ACTIONS = {
 FLASH = {
     "saved": "Cambios guardados",
     "created": "Registro creado",
+    "completed": "La propiedad quedó configurada y lista para revisión.",
     "error": "Revisá los datos: falta un campo obligatorio o hay un valor inválido",
 }
 
 
 def _is_provider():
-    return True
+    return request.env.user.has_group(GROUP)
 
 
 def _to_float(value):
-    try:
-        return float(str(value).replace(",", ".")) if value not in (None, "") else 0.0
-    except ValueError:
+    if value in (None, ""):
         return 0.0
+    try:
+        result = float(str(value).replace(",", "."))
+        return result if math.isfinite(result) else None
+    except (TypeError, ValueError):
+        return None
 
 
 def _to_int(value):
-    try:
-        return int(value) if value not in (None, "") else 0
-    except ValueError:
+    if value in (None, ""):
         return 0
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
 
 
 class ProviderPortalHome(CustomerPortal):
@@ -90,6 +98,50 @@ class ProviderPanel(http.Controller):
     def _redirect(self, path, msg):
         return request.redirect(f"{path}?msg={msg}")
 
+    def _wizard_path(self, prop, step=None):
+        return f"/my/properties/{prop.id}/wizard/{step or prop.setup_step}"
+
+    def _wizard_property(self, property_id, step):
+        if step not in WIZARD_STEPS:
+            return None
+        prop = self._own("pms.property", property_id)
+        if not prop or prop.setup_state != "draft":
+            return None
+        return prop
+
+    def _wizard_values(self, prop, step, **extra):
+        current_index = WIZARD_STEPS.index(prop.setup_step or WIZARD_STEPS[0])
+        values = self._values(
+            "properties",
+            "Configurar propiedad",
+            prop=prop,
+            wizard_step=step,
+            wizard_steps=[
+                {
+                    "key": key,
+                    "label": label,
+                    "url": self._wizard_path(prop, key),
+                    "active": key == step,
+                    "complete": index < current_index,
+                    "disabled": index > current_index,
+                }
+                for index, (key, label) in enumerate(
+                    zip(
+                        WIZARD_STEPS,
+                        (
+                            "Dirección",
+                            "Servicios",
+                            "Habitaciones",
+                            "Tarifas",
+                            "Revisión",
+                        ),
+                    )
+                )
+            ],
+        )
+        values.update(extra)
+        return values
+
     # -------------------------------------------------------------- dashboard
     def _dashboard(self):
         env = request.env
@@ -120,9 +172,9 @@ class ProviderPanel(http.Controller):
         if not _is_provider():
             return request.not_found()
     
-        partner = request.env.user.partner_id
-    
-        domain = [("owner_id", "=", partner.id)]
+        partner = request.env.user.commercial_partner_id
+
+        domain = [("owner_id", "child_of", partner.id)]
     
         if q:
             domain.append(("name", "ilike", q))
@@ -141,15 +193,327 @@ class ProviderPanel(http.Controller):
         if not _is_provider():
             return request.not_found()
         return request.render(
-            "pms_website_portal.page_property_form",
-            self._values("properties", "Nueva propiedad", prop=None),
+            "pms_website_portal.page_property_wizard_type",
+            self._values("properties", "Nueva propiedad"),
         )
+
+    @http.route(
+        "/my/properties/wizard/start",
+        type="http",
+        auth="user",
+        website=True,
+        methods=["POST"],
+    )
+    def property_wizard_start(self, **post):
+        if not _is_provider():
+            return request.not_found()
+        name = (post.get("name") or "").strip()
+        property_type = post.get("property_type")
+        if not name or property_type not in ("house", "hotel"):
+            return self._redirect("/my/properties/new", "error")
+        user = request.env.user
+        prop = request.env["pms.property"].sudo().create(
+            {
+                "name": name,
+                "owner_id": user.commercial_partner_id.id,
+                "company_id": request.env.company.id,
+                "tz": user.tz or "America/Argentina/Buenos_Aires",
+                "property_type": property_type,
+                "setup_state": "draft",
+                "setup_step": "address",
+                "max_nights": 30,
+                "is_published": False,
+            }
+        )
+        return request.redirect(self._wizard_path(prop))
+
+    @http.route(
+        "/my/properties/<int:property_id>/wizard/<string:step>",
+        type="http",
+        auth="user",
+        website=True,
+    )
+    def property_wizard_step(self, property_id, step, **kw):
+        if not _is_provider():
+            return request.not_found()
+        prop = self._wizard_property(property_id, step)
+        if not prop:
+            return request.not_found()
+        current_index = WIZARD_STEPS.index(prop.setup_step or WIZARD_STEPS[0])
+        if WIZARD_STEPS.index(step) > current_index:
+            return request.redirect(self._wizard_path(prop))
+        accommodation_type = prop.sudo().accommodation_type_ids[:1]
+        values = self._wizard_values(
+            prop,
+            step,
+            accommodation_type=accommodation_type,
+            reservation_offer=prop.reservation_ids.filtered(
+                lambda offer: (
+                    offer.accommodation_type_id
+                    == accommodation_type
+                    if prop.property_type == "hotel"
+                    else not offer.accommodation_type_id
+                )
+            )[:1],
+        )
+        if step == "amenities":
+            values["amenities"] = request.env["pms.amenity"].search(
+                [("active", "=", True)], order="name"
+            )
+        elif step == "inventory" and prop.property_type == "hotel":
+            values["room_amenities"] = request.env["pms.amenity"].search(
+                [("active", "=", True)], order="name"
+            )
+        return request.render(
+            "pms_website_portal.page_property_wizard_step",
+            values,
+        )
+
+    @http.route(
+        "/my/properties/<int:property_id>/wizard/<string:step>/save",
+        type="http",
+        auth="user",
+        website=True,
+        methods=["POST"],
+    )
+    def property_wizard_save(self, property_id, step, **post):
+        if not _is_provider():
+            return request.not_found()
+        prop = self._wizard_property(property_id, step)
+        if not prop:
+            return request.not_found()
+        current_index = WIZARD_STEPS.index(prop.setup_step or WIZARD_STEPS[0])
+        step_index = WIZARD_STEPS.index(step)
+        if step_index > current_index:
+            return request.redirect(self._wizard_path(prop))
+        vals = {}
+        if step == "address":
+            vals = {
+                "street": (post.get("street") or "").strip(),
+                "street2": (post.get("street2") or "").strip(),
+                "city": (post.get("city") or "").strip(),
+                "zip": (post.get("zip") or "").strip(),
+            }
+            if not vals["street"] or not vals["city"]:
+                return self._redirect(self._wizard_path(prop, step), "error")
+        elif step == "amenities":
+            area = _to_float(post.get("area"))
+            no_of_guests = _to_int(post.get("no_of_guests"))
+            min_nights = _to_int(post.get("min_nights"))
+            max_nights = _to_int(post.get("max_nights"))
+            max_nights = 30 if max_nights in (None, 0) else max_nights
+            if (
+                area is None
+                or no_of_guests is None
+                or min_nights is None
+                or area < 0
+                or no_of_guests <= 0
+                or min_nights < 0
+                or max_nights < 1
+                or min_nights > max_nights
+            ):
+                return self._redirect(self._wizard_path(prop, step), "error")
+            vals = {
+                "area": area,
+                "no_of_guests": no_of_guests,
+                "min_nights": min_nights,
+                "max_nights": max_nights,
+                "amenity_ids": [
+                    (
+                        6,
+                        0,
+                        request.env["pms.amenity"]
+                        .sudo()
+                        .search(
+                            [
+                                ("active", "=", True),
+                                (
+                                    "id",
+                                    "in",
+                                    [
+                                        _to_int(value)
+                                        for value in request.httprequest.form.getlist(
+                                            "amenity_ids"
+                                        )
+                                    ],
+                                ),
+                            ]
+                        )
+                        .ids,
+                    )
+                ],
+            }
+        elif step == "inventory":
+            if prop.property_type == "house":
+                bedroom_count = _to_int(post.get("bedroom_count"))
+                bathroom_count = _to_int(post.get("bathroom_count"))
+                if (
+                    bedroom_count is None
+                    or bathroom_count is None
+                    or bedroom_count < 0
+                    or bathroom_count < 0
+                ):
+                    return self._redirect(self._wizard_path(prop, step), "error")
+                vals = {
+                    "bedroom_count": bedroom_count,
+                    "bathroom_count": bathroom_count,
+                }
+            else:
+                name = (post.get("accommodation_name") or "").strip()
+                room_count = _to_int(post.get("room_count"))
+                capacity = _to_int(post.get("capacity"))
+                bedroom_count = _to_int(post.get("bedroom_count"))
+                bathroom_count = _to_int(post.get("bathroom_count"))
+                area = _to_float(post.get("area"))
+                if (
+                    not name
+                    or room_count is None
+                    or capacity is None
+                    or bedroom_count is None
+                    or bathroom_count is None
+                    or area is None
+                    or not 1 <= room_count <= 100
+                    or capacity <= 0
+                    or bedroom_count < 0
+                    or bathroom_count < 0
+                    or area < 0
+                ):
+                    return self._redirect(self._wizard_path(prop, step), "error")
+                amenities = request.env["pms.amenity"].sudo().search(
+                    [
+                        ("active", "=", True),
+                        (
+                            "id",
+                            "in",
+                            [
+                                _to_int(value)
+                                for value in request.httprequest.form.getlist(
+                                    "room_amenity_ids"
+                                )
+                            ],
+                        ),
+                    ]
+                )
+                accommodation_type = prop.sudo().accommodation_type_ids[:1]
+                accommodation_vals = {
+                    "name": name,
+                    "capacity": capacity,
+                    "bedroom_count": bedroom_count,
+                    "bathroom_count": bathroom_count,
+                    "area": area,
+                    "amenity_ids": [(6, 0, amenities.ids)],
+                }
+                if accommodation_type:
+                    accommodation_type.write(accommodation_vals)
+                else:
+                    accommodation_type = request.env[
+                        "pms.accommodation.type"
+                    ].sudo().create(
+                        dict(accommodation_vals, property_id=prop.id)
+                    )
+                rooms = accommodation_type.room_ids.sorted("id")
+                room_type = request.env.ref("pms_base.pms_room_type_bed")
+                for index in range(room_count):
+                    room_vals = {
+                        "name": f"Habitación {index + 1}",
+                        "property_id": prop.id,
+                        "type_id": room_type.id,
+                        "accommodation_type_id": accommodation_type.id,
+                        "capacity": capacity,
+                        "area": area,
+                    }
+                    if index < len(rooms):
+                        rooms[index].sudo().write(dict(room_vals, active=True))
+                    else:
+                        request.env["pms.room"].sudo().create(room_vals)
+                if len(rooms) > room_count:
+                    rooms[room_count:].sudo().write({"active": False})
+        elif step == "rate":
+            name = (post.get("reservation_name") or "").strip()
+            price = _to_float(post.get("price"))
+            if price is None:
+                return self._redirect(self._wizard_path(prop, step), "error")
+            if not name or price < 0:
+                return self._redirect(self._wizard_path(prop, step), "error")
+            product = request.env.ref(
+                "pms_sale.product_product_reservation", raise_if_not_found=False
+            )
+            if not product:
+                return self._redirect(self._wizard_path(prop, step), "error")
+            accommodation_type = (
+                prop.sudo().accommodation_type_ids[:1]
+                if prop.property_type == "hotel"
+                else request.env["pms.accommodation.type"]
+            )
+            offer_domain = [
+                ("property_id", "=", prop.id),
+                (
+                    "accommodation_type_id",
+                    "=",
+                    accommodation_type.id or False,
+                ),
+            ]
+            offer = request.env["pms.property.reservation"].sudo().search(
+                offer_domain, limit=1
+            )
+            offer_vals = {
+                "name": name,
+                "product_id": product.id,
+                "property_id": prop.id,
+                "accommodation_type_id": accommodation_type.id or False,
+                "price": price,
+            }
+            if offer:
+                offer.write(offer_vals)
+            else:
+                offer = request.env["pms.property.reservation"].sudo().create(
+                    offer_vals
+                )
+            if offer.price != price:
+                offer.write({"price": price})
+
+        next_index = max(current_index, step_index + 1)
+        next_step = WIZARD_STEPS[next_index]
+        prop.sudo().write({"setup_step": next_step})
+        return request.redirect(self._wizard_path(prop, next_step))
+
+    @http.route(
+        "/my/properties/<int:property_id>/wizard/complete",
+        type="http",
+        auth="user",
+        website=True,
+        methods=["POST"],
+    )
+    def property_wizard_complete(self, property_id, **post):
+        if not _is_provider():
+            return request.not_found()
+        prop = self._own("pms.property", property_id)
+        if not prop or prop.setup_state != "draft":
+            return request.not_found()
+        if prop.setup_step != "review" or not prop.street or not prop.city:
+            return request.redirect(self._wizard_path(prop))
+        if prop.property_type == "hotel":
+            accommodation_type = prop.sudo().accommodation_type_ids.filtered(
+                lambda item: item.active and item.room_ids.filtered("active")
+            )[:1]
+            if not accommodation_type or not prop.reservation_ids.filtered(
+                lambda offer: offer.accommodation_type_id == accommodation_type
+            ):
+                return request.redirect(self._wizard_path(prop, "inventory"))
+        elif not prop.reservation_ids.filtered(
+            lambda offer: not offer.accommodation_type_id
+        ):
+            return request.redirect(self._wizard_path(prop, "rate"))
+        prop.sudo().write({"setup_state": "ready"})
+        return request.redirect(f"/my/properties/{prop.id}?msg=completed")
 
     @http.route("/my/properties/<int:property_id>", type="http", auth="user", website=True)
     def property_edit(self, property_id, **kw):
         prop = self._own("pms.property", property_id) if _is_provider() else None
         if not prop:
             return request.not_found()
+        if prop.setup_state == "draft":
+            return request.redirect(self._wizard_path(prop))
         return request.render(
             "pms_website_portal.page_property_form",
             self._values("properties", prop.name, prop=prop),
@@ -163,6 +527,9 @@ class ProviderPanel(http.Controller):
         if not _is_provider():
             return request.not_found()
         name = (post.get("name") or "").strip()
+        max_nights = _to_int(post.get("max_nights"))
+        if max_nights is None:
+            return self._redirect("/my/properties", "error")
         vals = {
             "name": name,
             "street": (post.get("street") or "").strip(),
@@ -172,11 +539,10 @@ class ProviderPanel(http.Controller):
             "no_of_guests": _to_int(post.get("no_of_guests")),
             "min_nights": _to_int(post.get("min_nights")),
             # pms_sale rechaza toda reserva si max_nights es 0 (valor por defecto)
-            "max_nights": _to_int(post.get("max_nights")) or 30,
+            "max_nights": max_nights or 30,
         }
-        if not name:
+        if not name or any(value is None for value in vals.values()):
             return self._redirect("/my/properties", "error")
-        user = request.env.user
         property_id = _to_int(property_id)
         if property_id:
             prop = self._own("pms.property", property_id)
@@ -186,15 +552,7 @@ class ProviderPanel(http.Controller):
             # propiedad delega nombre y dirección en res.partner.
             prop.sudo().write(vals)
             return self._redirect(f"/my/properties/{prop.id}", "saved")
-        prop = request.env["pms.property"].sudo().create(
-            dict(
-                vals,
-                owner_id=user.commercial_partner_id.id,
-                company_id=request.env.company.id,
-                tz=user.tz or "America/Argentina/Buenos_Aires",
-            )
-        )
-        return self._redirect(f"/my/properties/{prop.id}", "created")
+        return request.redirect("/my/properties/new")
 
     # ------------------------------------------------------------ habitaciones
     @http.route("/my/rooms", type="http", auth="user", website=True)
@@ -260,6 +618,8 @@ class ProviderPanel(http.Controller):
             "capacity": _to_int(post.get("capacity")),
             "area": _to_float(post.get("area")),
         }
+        if any(value is None for value in vals.values()) or vals["capacity"] < 0:
+            return self._redirect("/my/rooms", "error")
         room_id = _to_int(room_id)
         if room_id:
             room = self._own("pms.room", room_id, "write")

@@ -19,7 +19,7 @@
                                 <td t-out="r.property_id.name"/>
                                 <td><span t-field="r.start" t-options='{"widget": "date"}'/></td>
                                 <td><span t-field="r.stop" t-options='{"widget": "date"}'/></td>
-                                <td><t t-set="stage" t-value="r.stage_id"/><t t-call="ts_provider_portal.stage_pill"/></td>
+                                <td><t t-set="stage" t-value="r.stage_id"/><t t-call="pms_website_portal.stage_pill"/></td>
                             </tr>
                         </tbody>
                     </table>

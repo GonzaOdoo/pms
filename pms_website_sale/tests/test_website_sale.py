@@ -73,6 +73,22 @@ class TestWebsiteSaleControllers(HttpCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Website Sale Property", response.content)
 
+    def test_property_listing_hides_setup_drafts(self):
+        self.env["pms.property"].create(
+            {
+                "name": "Unfinished Property",
+                "owner_id": self.partner_owner.id,
+                "website_id": self.website.id,
+                "is_published": True,
+                "setup_state": "draft",
+                "city": "Boston",
+            }
+        )
+        self.authenticate(None, None)
+        response = self.url_open("/property")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(b"Unfinished Property", response.content)
+
     def test_property_search_by_city(self):
         self.authenticate(None, None)
         response = self.url_open("/property?search=Boston")
