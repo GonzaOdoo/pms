@@ -190,9 +190,9 @@ class WebsiteSale(WebsiteSale):
             except ValueError:
                 ppg = False
         if not ppg:
-            ppg = request.env["website"].get_current_website().shop_ppg or 20
+            ppg = request.website.shop_ppg or 20
 
-        ppr = request.env["website"].get_current_website().shop_ppr or 4
+        ppr = request.website.shop_ppr or 4
 
         domain = self._get_property_search_domain(
             search=search, category=category, guest=guest_select, args=post

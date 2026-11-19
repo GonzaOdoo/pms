@@ -477,6 +477,16 @@ class TestPmsWebsiteHttp(HttpCase):
             }
         )
 
+    def test_homepage_contains_centered_property_search(self):
+        response = self.url_open("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"amu-homepage", response.content)
+        self.assertIn(b'action="/property"', response.content)
+        self.assertIn(b'name="search"', response.content)
+        self.assertIn(b'name="date_range"', response.content)
+        self.assertIn(b'name="guest_select"', response.content)
+
     def test_property_page_public(self):
         response = self.url_open(self.property.website_url)
         self.assertEqual(response.status_code, 200)

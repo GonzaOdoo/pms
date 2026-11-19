@@ -1,0 +1,91 @@
+<odoo>
+    <template
+        id="homepage"
+        inherit_id="website.homepage"
+        name="PMS travel homepage"
+    >
+        <xpath expr="//div[@id='wrap']" position="replace">
+            <main id="wrap" class="oe_structure amu-homepage">
+                <section class="amu-hero">
+                    <div class="amu-hero-grid">
+                        <div class="amu-hero-copy">
+                            <p class="amu-eyebrow">
+                                ALOJAMIENTOS CON CARÁCTER
+                            </p>
+                            <h1>Un lugar nuevo. Una forma distinta de viajar.</h1>
+                            <p class="amu-intro">
+                                Encontrá espacios especiales para descubrir cada
+                                destino a tu manera.
+                            </p>
+                        </div>
+                        <div class="amu-hero-visual">
+                            <img
+                                class="amu-hero-image"
+                                src="/pms_website/static/img/demo_property_suburban.jpg"
+                                alt="Casa de vacaciones con piscina"
+                                fetchpriority="high"
+                            />
+                            <div class="amu-image-caption">
+                                <span>Tu próxima historia empieza acá</span>
+                                <span class="amu-caption-mark" aria-hidden="true">✳</span>
+                            </div>
+                            <img
+                                class="amu-inset-image"
+                                src="/pms_website/static/img/demo_property_downtown.jpg"
+                                alt="Interior luminoso de un alojamiento"
+                                loading="lazy"
+                            />
+                        </div>
+                    </div>
+
+                    <form
+                        class="amu-search"
+                        action="/property"
+                        method="get"
+                        role="search"
+                    >
+                        <div class="amu-search-field amu-search-destination">
+                            <label for="amu-search-destination">Destino</label>
+                            <input
+                                id="amu-search-destination"
+                                type="search"
+                                name="search"
+                                placeholder="¿A dónde querés ir?"
+                            />
+                        </div>
+                        <div class="amu-search-field amu-search-dates">
+                            <label for="amu-search-dates">Fechas</label>
+                            <input
+                                id="amu-search-dates"
+                                class="field_date_range_filtter"
+                                type="text"
+                                name="date_range"
+                                placeholder="Entrada — salida"
+                                autocomplete="off"
+                            />
+                        </div>
+                        <div class="amu-search-field amu-search-guests">
+                            <label for="amu-search-guests">Huéspedes</label>
+                            <input
+                                id="amu-search-guests"
+                                type="number"
+                                name="guest_select"
+                                min="1"
+                                max="99"
+                                value="2"
+                            />
+                        </div>
+                        <button class="amu-search-submit" type="submit">
+                            <span>Buscar alojamientos</span>
+                            <i class="fa fa-arrow-right" aria-hidden="true" />
+                        </button>
+                    </form>
+
+                    <p class="amu-hero-footnote">
+                        Del paisaje que imaginás al lugar que vas a recordar.
+                    </p>
+                </section>
+            </main>
+        </xpath>
+    </template>
+</odoo>
