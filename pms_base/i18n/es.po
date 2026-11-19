@@ -2457,6 +2457,261 @@ msgstr ""
 msgid "eInvoice format"
 msgstr ""
 
+#. module: pms_base
+#: model:pms.amenity.type,name:pms_base.pms_amenity_type_6
+msgid "Climate control"
+msgstr "Climatización"
+
+#. module: pms_base
+#: model:pms.amenity.type,name:pms_base.pms_amenity_type_7
+msgid "Wellness and fitness"
+msgstr "Bienestar y actividad física"
+
+#. module: pms_base
+#: model:pms.amenity.type,name:pms_base.pms_amenity_type_8
+msgid "Outdoor"
+msgstr "Exterior"
+
+#. module: pms_base
+#: model:pms.amenity.type,name:pms_base.pms_amenity_type_9
+msgid "Family"
+msgstr "Familiar"
+
+#. module: pms_base
+#: model:pms.amenity.type,name:pms_base.pms_amenity_type_10
+msgid "Safety"
+msgstr "Seguridad"
+
+#. module: pms_base
+#: model:pms.amenity.type,name:pms_base.pms_amenity_type_11
+msgid "Accessibility"
+msgstr "Accesibilidad"
+
+#. module: pms_base
+#: model:pms.amenity.type,name:pms_base.pms_amenity_type_12
+msgid "Bathroom"
+msgstr "Baño"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.demo_amenity_wifi
+msgid "Wi-Fi"
+msgstr "Wi-Fi"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.demo_amenity_tv
+msgid "Smart TV"
+msgstr "Televisor inteligente"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.demo_amenity_shampoo
+msgid "Shampoo"
+msgstr "Champú"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.demo_amenity_towels
+msgid "Towels"
+msgstr "Toallas"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.demo_amenity_microwave
+msgid "Microwave"
+msgstr "Microondas"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.demo_amenity_coffee
+msgid "Coffee Maker"
+msgstr "Cafetera"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_bed_linens
+msgid "Bed linens"
+msgstr "Ropa de cama"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_body_soap
+msgid "Body soap"
+msgstr "Jabón corporal"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_hot_water
+msgid "Hot water"
+msgstr "Agua caliente"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_hair_dryer
+msgid "Hair dryer"
+msgstr "Secador de pelo"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_toilet_paper
+msgid "Toilet paper"
+msgstr "Papel higiénico"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_private_bathroom
+msgid "Private bathroom"
+msgstr "Baño privado"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_kitchen
+msgid "Kitchen"
+msgstr "Cocina"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_refrigerator
+msgid "Refrigerator"
+msgstr "Refrigerador"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_dishes_silverware
+msgid "Dishes and silverware"
+msgstr "Vajilla y cubiertos"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_cooking_basics
+msgid "Cooking basics"
+msgstr "Elementos básicos para cocinar"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_oven
+msgid "Oven"
+msgstr "Horno"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_stove
+msgid "Stove"
+msgstr "Cocina"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_kettle
+msgid "Electric kettle"
+msgstr "Pava eléctrica"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_washer
+msgid "Washer"
+msgstr "Lavarropas"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_dryer
+msgid "Dryer"
+msgstr "Secadora"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_iron
+msgid "Iron"
+msgstr "Plancha"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_free_parking
+msgid "Free parking on premises"
+msgstr "Estacionamiento gratuito en el alojamiento"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_pets_allowed
+msgid "Pets allowed"
+msgstr "Se permiten mascotas"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_air_conditioning
+msgid "Air conditioning"
+msgstr "Aire acondicionado"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_heating
+msgid "Heating"
+msgstr "Calefacción"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_fan
+msgid "Ceiling fan"
+msgstr "Ventilador de techo"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_pool
+msgid "Swimming pool"
+msgstr "Piscina"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_hot_tub
+msgid "Hot tub"
+msgstr "Jacuzzi"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_gym
+msgid "Gym"
+msgstr "Gimnasio"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_balcony
+msgid "Balcony"
+msgstr "Balcón"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_patio
+msgid "Patio"
+msgstr "Patio"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_garden
+msgid "Garden"
+msgstr "Jardín"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_bbq_grill
+msgid "BBQ grill"
+msgstr "Parrilla"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_crib
+msgid "Crib"
+msgstr "Cuna"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_high_chair
+msgid "High chair"
+msgstr "Silla alta para bebés"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_smoke_alarm
+msgid "Smoke alarm"
+msgstr "Detector de humo"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_co_alarm
+msgid "Carbon monoxide alarm"
+msgstr "Detector de monóxido de carbono"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_fire_extinguisher
+msgid "Fire extinguisher"
+msgstr "Extintor de incendios"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_first_aid_kit
+msgid "First aid kit"
+msgstr "Botiquín de primeros auxilios"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_elevator
+msgid "Elevator"
+msgstr "Ascensor"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_step_free_access
+msgid "Step-free access"
+msgstr "Acceso sin escalones"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_dishwasher
+msgid "Dishwasher"
+msgstr "Lavavajillas"
+
+#. module: pms_base
+#: model:pms.amenity,name:pms_base.pms_amenity_dedicated_workspace
+msgid "Dedicated workspace"
+msgstr "Espacio de trabajo dedicado"
+
 #~ msgid ""
 #~ "<br/>\n"
 #~ "                                                Properties"

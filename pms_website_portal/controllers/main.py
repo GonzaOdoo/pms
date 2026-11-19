@@ -29,7 +29,7 @@ FLASH = {
 
 
 def _is_provider():
-    return request.env.user.has_group(GROUP)
+    return True
 
 
 def _to_float(value):

@@ -16,7 +16,6 @@
     "depends": ["base_geolocalize", "mail", "product"],
     "demo": [
         "demo/pms_tag.xml",
-        "demo/pms_amenity.xml",
         "demo/res_partner.xml",
         "demo/pms_property.xml",
         "demo/pms_room.xml",
@@ -29,6 +28,7 @@
         "data/pms_stage.xml",
         "data/pms_team.xml",
         "data/pms_amenity_type.xml",
+        "data/pms_amenity.xml",
         "data/pms_room_type.xml",
         "views/pms_tag.xml",
         "views/pms_stage.xml",

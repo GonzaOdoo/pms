@@ -22,4 +22,32 @@
     <record id="pms_amenity_type_5" model="pms.amenity.type">
         <field name="name">Pets</field>
     </record>
+
+    <record id="pms_amenity_type_6" model="pms.amenity.type">
+        <field name="name">Climate control</field>
+    </record>
+
+    <record id="pms_amenity_type_7" model="pms.amenity.type">
+        <field name="name">Wellness and fitness</field>
+    </record>
+
+    <record id="pms_amenity_type_8" model="pms.amenity.type">
+        <field name="name">Outdoor</field>
+    </record>
+
+    <record id="pms_amenity_type_9" model="pms.amenity.type">
+        <field name="name">Family</field>
+    </record>
+
+    <record id="pms_amenity_type_10" model="pms.amenity.type">
+        <field name="name">Safety</field>
+    </record>
+
+    <record id="pms_amenity_type_11" model="pms.amenity.type">
+        <field name="name">Accessibility</field>
+    </record>
+
+    <record id="pms_amenity_type_12" model="pms.amenity.type">
+        <field name="name">Bathroom</field>
+    </record>
 </odoo>
