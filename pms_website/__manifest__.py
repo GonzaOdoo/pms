@@ -18,6 +18,7 @@
     "data": [
         "security/ir.access.csv",
         "data/rule.xml",
+        "views/website_layout.xml",
         "views/homepage.xml",
         "views/website_menu.xml",
         "views/pms_property_template.xml",

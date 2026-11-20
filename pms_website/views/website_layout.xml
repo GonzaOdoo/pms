@@ -1,0 +1,35 @@
+<odoo>
+    <template
+        id="amu_website_footer"
+        inherit_id="website.layout"
+        name="AMU website footer"
+    >
+        <xpath expr="//footer[@id='bottom']" position="replace">
+            <footer
+                id="bottom"
+                t-attf-class="amu-footer #{'d-none o_snippet_invisible' if main_object and 'footer_visible' in main_object and not main_object.sudo().footer_visible else ''}"
+                t-att-data-invisible="'1' if main_object and 'footer_visible' in main_object and not main_object.sudo().footer_visible else None"
+                data-name="Footer"
+            >
+                <div class="amu-footer-main">
+                    <a class="amu-footer-brand" href="/" aria-label="Turismo Social, inicio">
+                        <span class="amu-footer-mark" aria-hidden="true">✳</span>
+                        <span>TURISMO<br />SOCIAL</span>
+                    </a>
+                    <p class="amu-footer-message">
+                        Lugares con carácter para descubrir el mundo de otra manera.
+                    </p>
+                    <nav class="amu-footer-links" aria-label="Enlaces del pie de página">
+                        <a href="/">Inicio</a>
+                        <a href="/property">Alojamientos</a>
+                        <a href="/contactus">Contacto</a>
+                    </nav>
+                </div>
+                <div class="amu-footer-bottom">
+                    <span>Turismo Social</span>
+                    <span>Viajar también es encontrarse.</span>
+                </div>
+            </footer>
+        </xpath>
+    </template>
+</odoo>

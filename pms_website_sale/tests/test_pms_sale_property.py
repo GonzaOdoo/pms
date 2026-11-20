@@ -11,7 +11,7 @@ class TestWebsiteSaleCartRecovery(HttpCaseWithUserPortal):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.website = cls.env["website"].get_current_website()
+        cls.website = cls.env.ref("website.default_website")
         cls.partner_owner = cls.env["res.partner"].create({"name": "Tour Owner"})
 
     def _create_published_property(self, name):

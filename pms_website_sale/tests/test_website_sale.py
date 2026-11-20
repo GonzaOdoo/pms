@@ -11,7 +11,7 @@ class TestWebsiteSaleControllers(HttpCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.website = cls.env["website"].get_current_website()
+        cls.website = cls.env.ref("website.default_website")
         cls.product = cls.env.ref("pms_sale.product_product_reservation")
         cls.partner_owner = cls.env["res.partner"].create({"name": "Website Owner"})
         cls.property = cls.env["pms.property"].create(
@@ -100,6 +100,63 @@ class TestWebsiteSaleControllers(HttpCase):
         response = self.url_open("/property?guest_select=6")
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Website Sale Property", response.content)
+
+    def test_property_search_filters_by_property_type(self):
+        hotel = self.env["pms.property"].create(
+            {
+                "name": "Boston Hotel",
+                "owner_id": self.partner_owner.id,
+                "website_id": self.website.id,
+                "is_published": True,
+                "city": "Boston",
+                "property_type": "hotel",
+            }
+        )
+        self.authenticate(None, None)
+
+        response = self.url_open("/property?search=Boston&property_type=hotel")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Boston Hotel", response.content)
+        self.assertNotIn(b"Website Sale Property", response.content)
+
+    def test_property_search_filters_by_amenity(self):
+        amenity = self.env["pms.amenity"].create({"name": "Private garden"})
+        self.property.amenity_ids = [(4, amenity.id)]
+        self.env["pms.property"].create(
+            {
+                "name": "Boston Without Garden",
+                "owner_id": self.partner_owner.id,
+                "website_id": self.website.id,
+                "is_published": True,
+                "city": "Boston",
+            }
+        )
+        self.authenticate(None, None)
+
+        response = self.url_open(
+            f"/property?search=Boston&amenity_ids={amenity.id}"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Website Sale Property", response.content)
+        self.assertNotIn(b"Boston Without Garden", response.content)
+
+    def test_property_search_displays_and_preserves_filters(self):
+        amenity = self.env["pms.amenity"].create({"name": "Private balcony"})
+        self.authenticate(None, None)
+
+        response = self.url_open(
+            f"/property?search=Boston&date_range=12/10/2026%20-%2012/15/2026"
+            f"&guest_select=3&property_type=house&amenity_ids={amenity.id}"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'name="search"', response.content)
+        self.assertIn(b'name="date_range"', response.content)
+        self.assertIn(b'name="guest_select"', response.content)
+        self.assertIn(b'name="amenity_ids"', response.content)
+        self.assertIn(b"Private balcony", response.content)
 
     def test_property_search_hides_parent_with_children(self):
         self.env["pms.property"].create(

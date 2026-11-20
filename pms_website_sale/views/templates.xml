@@ -196,111 +196,249 @@
     <!-- /property listing -->
     <template id="properties" name="Properties">
         <t t-call="website.layout">
-            <t t-set="additional_title">Properties</t>
-            <div id="wrap" class="js_sale">
-                <div
-                    class="oe_structure oe_empty"
-                    id="oe_structure_website_sale_products_1"
-                />
-                <div class="container oe_website_sale">
-                    <div
-                        class="products_pager oe_property_filtter form-inline flex-md-nowrap justify-content-between justify-content-md-center"
+            <t t-set="additional_title">Buscar alojamientos</t>
+            <div id="wrap" class="oe_website_sale amu-search-page">
+                <section class="amu-results">
+                    <form
+                        class="amu-search amu-results-search"
+                        action="/property"
+                        method="get"
+                        role="search"
                     >
-                        <t t-call="pms_website_sale.search">
-                            <t t-set="_classes" t-valuef="w-100 w-md-auto mt-2" />
-                        </t>
-                        <t t-call="website.pager">
-                            <t t-set="_classes" t-valuef="mt-2 ml-md-2" />
-                        </t>
-                    </div>
-                    <div class="row o_wsale_products_main_row">
-                        <div
-                            t-if="enable_left_column"
-                            id="products_grid_before"
-                            class="col-lg-3"
+                        <div class="amu-search-field amu-search-destination">
+                            <label for="amu-results-destination">Destino</label>
+                            <input
+                                id="amu-results-destination"
+                                type="search"
+                                name="search"
+                                placeholder="¿A dónde querés ir?"
+                                t-att-value="search_city"
+                            />
+                        </div>
+                        <div class="amu-search-field amu-search-dates">
+                            <label for="amu-results-dates">Fechas</label>
+                            <input
+                                id="amu-results-dates"
+                                class="field_date_range_filtter"
+                                type="text"
+                                name="date_range"
+                                placeholder="Entrada — salida"
+                                autocomplete="off"
+                                t-att-value="search_raneg"
+                            />
+                        </div>
+                        <div class="amu-search-field amu-search-guests">
+                            <label for="amu-results-guests">Huéspedes</label>
+                            <input
+                                id="amu-results-guests"
+                                type="number"
+                                name="guest_select"
+                                min="1"
+                                max="99"
+                                placeholder="2"
+                                t-att-value="search_guest or 2"
+                            />
+                        </div>
+                        <input
+                            type="hidden"
+                            name="property_type"
+                            t-att-value="selected_property_type"
                         />
-                        <div
-                            id="products_grid"
-                            t-attf-class="col #{'o_wsale_layout_list' if layout_mode == 'list' else ''}"
-                        >
-                            <div
-                                t-if="bins"
-                                class="o_wsale_products_grid_table_wrapper"
-                            >
-                                <table
-                                    class="table table-borderless m-0"
-                                    t-att-data-ppg="ppg"
-                                    t-att-data-ppr="ppr"
-                                >
-                                    <colgroup t-ignore="true">
-                                        <col t-foreach="ppr" t-as="p" />
-                                    </colgroup>
+                        <input
+                            t-if="category"
+                            type="hidden"
+                            name="category"
+                            t-att-value="category.id"
+                        />
+                        <input
+                            t-foreach="selected_amenity_ids"
+                            t-as="selected_amenity_id"
+                            type="hidden"
+                            name="amenity_ids"
+                            t-att-value="selected_amenity_id"
+                        />
+                        <button class="amu-search-submit" type="submit">
+                            <span>Actualizar búsqueda</span>
+                            <i class="fa fa-arrow-right" aria-hidden="true" />
+                        </button>
+                    </form>
 
-                                    <tbody>
-                                        <tr t-foreach="bins" t-as="tr_product">
-                                            <t t-foreach="tr_product" t-as="td_product">
-                                                <t
-                                                    t-set="product"
-                                                    t-value="td_product['product']"
-                                                />
-                                                <td
-                                                    t-attf-class="oe_product"
-                                                    t-att-colspan="td_product['x'] != 1 and td_product['x']"
-                                                    t-att-rowspan="td_product['y'] != 1 and td_product['y']"
-                                                >
-                                                    <div
-                                                        t-attf-class="o_wsale_product_grid_wrapper o_wsale_product_grid_wrapper_1_1"
-                                                    >
-                                                        <t
-                                                            t-call="pms_website_sale.property_item"
-                                                        >
-                                                            <t
-                                                                t-set="product_image_big"
-                                                                t-value="1 + 1 &gt;                                        2"
-                                                            />
-                                                        </t>
-                                                    </div>
-                                                </td>
-                                            </t>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <t t-else="">
-                                <div class="text-center text-muted">
-                                    <t t-if="not search">
-                                        <h3 class="mt8">No Property defined</h3>
-                                        <p
-                                            t-if="category"
-                                        >No property defined in category "<strong
-                                            t-esc="category.display_name"
-                                        />".</p>
-                                    </t>
-                                    <t t-else="">
-                                        <h3 class="mt8">No results</h3>
-                                        <p>No results for "<strong t-esc='search' />"<t
-                                            t-if="category"
-                                        > in category "<strong
-                                            t-esc="category.display_name"
-                                        />"</t>.</p>
-                                    </t>
-                                    <p
-                                        t-ignore="true"
-                                        groups="sales_team.group_sale_manager"
-                                    >Click <i
-                                    >'New'</i> in the top-right corner to create your first property.</p>
+                    <div class="amu-results-heading">
+                        <div>
+                            <p class="amu-eyebrow">ENCONTRÁ TU PRÓXIMA ESTADÍA</p>
+                            <h1>
+                                <t t-if="search_city">Alojamientos en <t t-out="search_city" /></t>
+                                <t t-else="">Explorá nuestros alojamientos</t>
+                            </h1>
+                            <p class="amu-results-count">
+                                <t t-out="search_count" /> alojamientos disponibles
+                            </p>
+                        </div>
+                        <a class="amu-results-reset" href="/property">Limpiar búsqueda</a>
+                    </div>
+
+                    <div class="amu-results-layout">
+                        <aside class="amu-filter-sidebar">
+                            <form action="/property" method="get" class="amu-filter-form">
+                                <input
+                                    type="hidden"
+                                    name="search"
+                                    t-att-value="search_city"
+                                />
+                                <input
+                                    type="hidden"
+                                    name="date_range"
+                                    t-att-value="search_raneg"
+                                />
+                                <input
+                                    type="hidden"
+                                    name="guest_select"
+                                    t-att-value="search_guest"
+                                />
+                                <input
+                                    t-if="category"
+                                    type="hidden"
+                                    name="category"
+                                    t-att-value="category.id"
+                                />
+                                <h2>Filtros</h2>
+                                <fieldset class="amu-filter-group">
+                                    <legend>Tipo de alojamiento</legend>
+                                    <label class="amu-filter-option">
+                                        <input
+                                            type="radio"
+                                            name="property_type"
+                                            value=""
+                                            t-att-checked="not selected_property_type"
+                                        />
+                                        <span>Todos</span>
+                                    </label>
+                                    <label
+                                        t-foreach="property_types"
+                                        t-as="property_type_option"
+                                        class="amu-filter-option"
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="property_type"
+                                            t-att-value="property_type_option[0]"
+                                            t-att-checked="selected_property_type == property_type_option[0]"
+                                        />
+                                        <span t-out="property_type_option[1]" />
+                                    </label>
+                                </fieldset>
+                                <div class="amu-amenity-filters">
+                                    <h3>Características y amenidades</h3>
+                                    <fieldset
+                                        t-foreach="amenity_filter_groups"
+                                        t-as="amenity_group"
+                                        class="amu-filter-group"
+                                    >
+                                        <legend t-out="amenity_group['name']" />
+                                        <label
+                                            t-foreach="amenity_group['amenities']"
+                                            t-as="amenity_option"
+                                            class="amu-filter-option"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                name="amenity_ids"
+                                                t-att-value="amenity_option.id"
+                                                t-att-checked="amenity_option.id in selected_amenity_ids"
+                                            />
+                                            <span t-out="amenity_option.name" />
+                                        </label>
+                                    </fieldset>
                                 </div>
-                            </t>
+                                <button class="amu-filter-submit" type="submit">
+                                    Aplicar filtros
+                                </button>
+                                <a class="amu-filter-reset" href="/property">
+                                    Quitar filtros
+                                </a>
+                            </form>
+                            <div id="products_grid_before" />
+                        </aside>
+
+                        <div class="amu-results-list">
+                            <article
+                                t-foreach="properties"
+                                t-as="property"
+                                class="amu-property-card"
+                            >
+                                <a
+                                    class="amu-property-image"
+                                    t-att-href="property.website_url"
+                                    t-att-aria-label="property.name"
+                                >
+                                    <span
+                                        t-field="property.image_1920"
+                                        t-options="{'widget': 'image', 'preview_image': 'image_1024', 'class': 'w-100 h-100', 'alt-field': 'name'}"
+                                    />
+                                    <span
+                                        class="amu-property-type"
+                                        t-out="'Hotel' if property.property_type == 'hotel' else 'Casa o apartamento'"
+                                    />
+                                </a>
+                                <div class="amu-property-info">
+                                    <div class="amu-property-title-row">
+                                        <div>
+                                            <p class="amu-property-location">
+                                                <i class="fa fa-map-marker" aria-hidden="true" />
+                                                <span t-out="property.city or 'Argentina'" />
+                                            </p>
+                                            <h2>
+                                                <a t-att-href="property.website_url" t-out="property.name" />
+                                            </h2>
+                                        </div>
+                                        <span
+                                            t-if="property.no_of_guests"
+                                            class="amu-property-guests"
+                                        >
+                                            <i class="fa fa-user-o" aria-hidden="true" />
+                                            Hasta <t t-out="property.no_of_guests" /> huéspedes
+                                        </span>
+                                    </div>
+                                    <p class="amu-property-description">
+                                        <t t-if="property.property_type == 'hotel'">
+                                            Habitaciones preparadas para disfrutar tu estadía.
+                                        </t>
+                                        <t t-else="">
+                                            Un espacio para vivir el destino a tu manera.
+                                        </t>
+                                    </p>
+                                    <div class="amu-property-meta">
+                                        <span t-if="property.qty_bedroom">
+                                            <i class="fa fa-bed" aria-hidden="true" />
+                                            <t t-out="property.qty_bedroom" /> dormitorios
+                                        </span>
+                                        <span t-if="property.bathroom_count">
+                                            <i class="fa fa-bath" aria-hidden="true" />
+                                            <t t-out="property.bathroom_count" /> baños
+                                        </span>
+                                        <span t-if="property.area">
+                                            <i class="fa fa-arrows-alt" aria-hidden="true" />
+                                            <t t-out="property.area" /> m²
+                                        </span>
+                                    </div>
+                                    <a class="amu-property-link" t-att-href="property.website_url">
+                                        Ver alojamiento
+                                        <i class="fa fa-arrow-right" aria-hidden="true" />
+                                    </a>
+                                </div>
+                            </article>
+                            <div t-if="not properties" class="amu-empty-results">
+                                <span class="amu-empty-mark" aria-hidden="true">✳</span>
+                                <h2>No encontramos alojamientos con esos criterios</h2>
+                                <p>Probá con otro destino o quitá alguno de los filtros.</p>
+                                <a href="/property" class="amu-filter-submit">Ver todos los alojamientos</a>
+                            </div>
+                            <div class="amu-results-pager" t-if="pager">
+                                <t t-call="website.pager" />
+                            </div>
                         </div>
                     </div>
-                    <div class="products_pager form-inline justify-content-center py-3">
-                        <t t-call="website.pager" />
-                    </div>
-                </div>
-                <div
-                    class="oe_structure oe_empty"
-                    id="oe_structure_website_sale_products_2"
-                />
+                </section>
             </div>
         </t>
     </template>
@@ -529,8 +667,8 @@
             <button
                 type="button"
                 class="btn btn-link d-lg-none"
-                data-target="#wsale_products_categories_collapse"
-                data-toggle="collapse"
+                data-bs-target="#wsale_products_categories_collapse"
+                data-bs-toggle="collapse"
             >
                 Show categories
             </button>

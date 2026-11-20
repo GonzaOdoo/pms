@@ -80,6 +80,28 @@ class WebsiteSale(WebsiteSale):
         domain += [("is_published", "=", True)]
         if search:
             domain += [("city", "ilike", search)]
+        property_type = args.get("property_type")
+        if property_type in ("house", "hotel"):
+            domain.append(("property_type", "=", property_type))
+        amenity_ids = args.get("amenity_ids", [])
+        if not isinstance(amenity_ids, (list, tuple)):
+            amenity_ids = [amenity_ids] if amenity_ids else []
+        valid_amenity_ids = []
+        for amenity_id in amenity_ids:
+            try:
+                valid_amenity_ids.append(int(amenity_id))
+            except (TypeError, ValueError):
+                continue
+        for amenity_id in valid_amenity_ids:
+            domain.extend(
+                [
+                    "|",
+                    "|",
+                    ("amenity_ids", "in", [amenity_id]),
+                    ("accommodation_type_ids.amenity_ids", "in", [amenity_id]),
+                    ("room_ids.amenity_ids", "in", [amenity_id]),
+                ]
+            )
         if category:
             domain += [("property_category_ids", "child_of", category.id)]
         domain += [("property_child_ids", "=", False)]
@@ -92,7 +114,9 @@ class WebsiteSale(WebsiteSale):
 
         start = stop = False
         if args.get("date_range"):
-            date_range = args["date_range"].split("-")
+            date_range = args["date_range"].split(" - ", 1)
+            if len(date_range) != 2:
+                date_range = args["date_range"].split("-", 1)
             if len(date_range) != 2:
                 return domain + [("id", "=", 0)]
             try:
@@ -221,12 +245,38 @@ class WebsiteSale(WebsiteSale):
             search_categories = Category
         categs = Category.search(categs_domain)
 
+        raw_amenity_ids = request.httprequest.args.getlist("amenity_ids")
+        selected_amenity_ids = []
+        for raw_id in raw_amenity_ids or (
+            post.get("amenity_ids", [])
+            if isinstance(post.get("amenity_ids", []), (list, tuple))
+            else [post.get("amenity_ids")]
+        ):
+            try:
+                selected_amenity_ids.append(int(raw_id))
+            except (TypeError, ValueError):
+                continue
+
         if category:
-            url = f"/shop/category/{request.env['ir.http']._slug(category)}"
+            url = f"/property/category/{request.env['ir.http']._slug(category)}"
 
         product_count = len(search_property)
+        url_args = dict(post)
+        if search:
+            url_args["search"] = search
+        if guest_select:
+            url_args["guest_select"] = guest_select
+        if category:
+            url_args["category"] = category.id
+        if raw_amenity_ids:
+            url_args["amenity_ids"] = selected_amenity_ids
         pager = request.website.pager(
-            url=url, total=product_count, page=page, step=ppg, scope=7, url_args=post
+            url=url,
+            total=product_count,
+            page=page,
+            step=ppg,
+            scope=7,
+            url_args=url_args,
         )
         offset = pager["offset"]
         properties = search_property[offset : offset + ppg]
@@ -234,6 +284,25 @@ class WebsiteSale(WebsiteSale):
         layout_mode = "grid"
 
         values = self._update_property_values(Property=Property, post=post)
+        amenity_options = request.env["pms.amenity"].sudo().search(
+            [("active", "=", True)], order="type_id, name"
+        )
+        amenity_filter_groups = [
+            {
+                "name": amenity_type.name,
+                "amenities": amenity_options.filtered(
+                    lambda amenity, item=amenity_type: amenity.type_id == item
+                ),
+            }
+            for amenity_type in amenity_options.mapped("type_id")
+        ]
+        ungrouped_amenities = amenity_options.filtered(
+            lambda amenity: not amenity.type_id
+        )
+        if ungrouped_amenities:
+            amenity_filter_groups.append(
+                {"name": "Otros", "amenities": ungrouped_amenities}
+            )
         # properties
         values.update(
             {
@@ -241,6 +310,13 @@ class WebsiteSale(WebsiteSale):
                 "search_city": search,
                 "search_guest": guest_select,
                 "search_raneg": post.get("date_range"),
+                "selected_property_type": post.get("property_type", ""),
+                "selected_amenity_ids": selected_amenity_ids,
+                "amenity_filter_groups": amenity_filter_groups,
+                "property_types": [
+                    ("house", "Casa o apartamento"),
+                    ("hotel", "Hotel"),
+                ],
                 "pager": pager,
                 "pricelist": pricelist,
                 "properties": properties,

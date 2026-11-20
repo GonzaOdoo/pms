@@ -246,6 +246,407 @@
     text-align: center;
 }
 
+.amu-footer {
+    padding: 54px max(24px, calc((100% - 1240px) / 2)) 18px;
+    background: var(--amu-ink);
+    color: #f3f0e9;
+    font-family: "AMU Oswald", sans-serif;
+}
+
+.amu-footer-main {
+    display: grid;
+    grid-template-columns: minmax(180px, 0.7fr) minmax(220px, 1fr) minmax(220px, 0.8fr);
+    align-items: center;
+    gap: 40px;
+    padding-bottom: 38px;
+}
+
+.amu-footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: fit-content;
+    color: #f3f0e9 !important;
+    font-family: "AMU Gravitas", Georgia, serif;
+    font-size: 15px;
+    line-height: 1.45;
+    letter-spacing: 0.04em;
+}
+
+.amu-footer-brand:hover {
+    text-decoration: none;
+}
+
+.amu-footer-mark {
+    color: var(--amu-glacier);
+    font-family: "AMU Oswald", sans-serif;
+    font-size: 40px;
+    line-height: 1;
+}
+
+.amu-footer-message {
+    max-width: 320px;
+    margin: 0;
+    color: rgba(243, 240, 233, 0.74);
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.amu-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px 24px;
+}
+
+.amu-footer-links a {
+    color: #f3f0e9;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.amu-footer-links a:hover,
+.amu-footer-links a:focus-visible {
+    color: var(--amu-glacier);
+}
+
+.amu-footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(243, 240, 233, 0.22);
+    color: rgba(243, 240, 233, 0.62);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+}
+
+.amu-results {
+    width: min(1320px, calc(100% - 48px));
+    margin-inline: auto;
+    padding: 30px 0 72px;
+}
+
+.amu-results-search {
+    grid-template-columns: 1.15fr 1fr 0.65fr auto;
+    margin: 0 0 42px;
+    border: 1px solid var(--amu-line);
+    box-shadow: 0 10px 32px rgba(37, 43, 53, 0.08);
+}
+
+.amu-results-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.amu-results-heading .amu-eyebrow {
+    margin-bottom: 8px;
+}
+
+.amu-results-heading h1 {
+    margin: 0;
+    font-family: "AMU Gravitas", Georgia, serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+.amu-results-count {
+    margin: 8px 0 0;
+    color: #62676b;
+}
+
+.amu-results-reset,
+.amu-filter-reset {
+    color: var(--amu-sea);
+    font-size: 14px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.amu-results-layout {
+    display: grid;
+    grid-template-columns: 270px minmax(0, 1fr);
+    align-items: start;
+    gap: 30px;
+}
+
+.amu-filter-sidebar {
+    position: sticky;
+    top: 20px;
+    padding: 22px;
+    border: 1px solid var(--amu-line);
+    background: #fff;
+}
+
+.amu-filter-form h2 {
+    margin: 0 0 18px;
+    font-family: "AMU Gravitas", Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.amu-filter-group {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 18px 0;
+    border: 0;
+    border-top: 1px solid var(--amu-line);
+}
+
+.amu-amenity-filters {
+    max-height: 65vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.amu-amenity-filters h3 {
+    margin: 0;
+    padding: 18px 0 0;
+    border-top: 1px solid var(--amu-line);
+    color: var(--amu-ink);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.amu-filter-group legend {
+    float: none;
+    width: auto;
+    margin: 0 0 4px;
+    padding: 0;
+    color: var(--amu-ink);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.amu-filter-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: #4e5559;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.amu-filter-option input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--amu-nature);
+}
+
+.amu-filter-submit {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    border: 0;
+    background: var(--amu-nature);
+    color: #fff !important;
+    cursor: pointer;
+    font: 500 14px/1.3 "AMU Oswald", sans-serif;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-decoration: none !important;
+    text-transform: uppercase;
+}
+
+.amu-filter-submit:hover,
+.amu-filter-submit:focus-visible {
+    background: var(--amu-ink);
+}
+
+.amu-filter-reset {
+    display: block;
+    margin-top: 14px;
+    text-align: center;
+}
+
+.amu-results-list {
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+}
+
+.amu-property-card {
+    display: grid;
+    grid-template-columns: minmax(220px, 34%) minmax(0, 1fr);
+    min-height: 260px;
+    border: 1px solid var(--amu-line);
+    background: #fff;
+    transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.amu-property-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(37, 43, 53, 0.1);
+}
+
+.amu-property-image {
+    position: relative;
+    display: block;
+    min-height: 260px;
+    overflow: hidden;
+    background: #e8e4dc;
+}
+
+.amu-property-image img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 220ms ease;
+}
+
+.amu-property-card:hover .amu-property-image img {
+    transform: scale(1.025);
+}
+
+.amu-property-type {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 6px 10px;
+    background: var(--amu-paper);
+    color: var(--amu-ink);
+    font-size: 12px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.amu-property-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px;
+}
+
+.amu-property-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+}
+
+.amu-property-location {
+    margin: 0 0 6px;
+    color: var(--amu-mountain);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.amu-property-title-row h2 {
+    margin: 0;
+    font-family: "AMU Gravitas", Georgia, serif;
+    font-size: clamp(20px, 2.4vw, 28px);
+    font-weight: 400;
+    line-height: 1.25;
+}
+
+.amu-property-title-row h2 a {
+    color: var(--amu-ink);
+}
+
+.amu-property-title-row h2 a:hover {
+    color: var(--amu-clay);
+}
+
+.amu-property-guests {
+    flex: 0 0 auto;
+    color: #62676b;
+    font-size: 14px;
+}
+
+.amu-property-description {
+    margin: 14px 0;
+    color: #62676b;
+    font-size: 16px;
+    line-height: 1.45;
+}
+
+.amu-property-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    color: var(--amu-sea);
+    font-size: 14px;
+}
+
+.amu-property-meta i {
+    margin-right: 5px;
+}
+
+.amu-property-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 20px;
+    color: var(--amu-clay);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.amu-property-link:hover {
+    color: var(--amu-ink);
+}
+
+.amu-empty-results {
+    padding: 64px 24px;
+    background: #fff;
+    text-align: center;
+}
+
+.amu-empty-mark {
+    color: var(--amu-clay);
+    font-size: 38px;
+}
+
+.amu-empty-results h2 {
+    margin: 16px 0 8px;
+    font-family: "AMU Gravitas", Georgia, serif;
+    font-size: 26px;
+    font-weight: 400;
+}
+
+.amu-empty-results p {
+    margin-bottom: 24px;
+    color: #62676b;
+}
+
+.amu-empty-results .amu-filter-submit {
+    width: fit-content;
+    margin-inline: auto;
+}
+
+.amu-results-pager {
+    display: flex;
+    justify-content: center;
+    padding-top: 12px;
+}
+
+#products_grid_before {
+    margin-top: 24px;
+}
+
+#products_grid_before .nav-link {
+    color: var(--amu-sea);
+}
+
 @media (max-width: 991.98px) {
     .amu-hero-grid {
         grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -267,6 +668,23 @@
 
     .amu-search-field + .amu-search-field {
         border-left: 0;
+    }
+
+    .amu-results-search {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .amu-results-layout {
+        grid-template-columns: 230px minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .amu-property-card {
+        grid-template-columns: minmax(180px, 34%) minmax(0, 1fr);
+    }
+
+    .amu-property-info {
+        padding: 18px;
     }
 }
 
@@ -336,6 +754,67 @@
     .amu-search-submit {
         width: 100%;
         margin-top: 4px;
+    }
+
+    .amu-footer {
+        padding: 38px 20px 16px;
+    }
+
+    .amu-footer-main {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        padding-bottom: 28px;
+    }
+
+    .amu-footer-links {
+        justify-content: flex-start;
+    }
+
+    .amu-footer-bottom {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .amu-results {
+        width: min(100% - 32px, 560px);
+        padding-top: 20px;
+    }
+
+    .amu-results-search {
+        grid-template-columns: 1fr;
+        margin-bottom: 30px;
+    }
+
+    .amu-results-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .amu-results-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .amu-filter-sidebar {
+        position: static;
+    }
+
+    .amu-amenity-filters {
+        max-height: 300px;
+    }
+
+    .amu-property-card {
+        grid-template-columns: 1fr;
+    }
+
+    .amu-property-image {
+        min-height: 240px;
+        aspect-ratio: 16 / 10;
+    }
+
+    .amu-property-title-row {
+        flex-direction: column;
+        gap: 8px;
     }
 }
 
