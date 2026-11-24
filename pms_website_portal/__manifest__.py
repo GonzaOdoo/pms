@@ -21,7 +21,7 @@
     "assets": {
         "web.assets_frontend": [
             "pms_website_portal/static/src/css/panel.css",
-            "pms_website_portal/static/src/scss/panel_wizard.scss",
+            "pms_website_portal/static/src/scss/panel_theme.scss",
         ],
     },
     "installable": True,

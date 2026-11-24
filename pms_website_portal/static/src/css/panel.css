@@ -1,5 +1,4 @@
-/* Panel del proveedor: diseño provisorio, limpio y neutro.
-   Todos los colores salen de variables para reemplazarlos con la hoja de diseño. */
+/* Base estructural del panel; panel_theme.scss aplica la identidad visual AMU. */
 .ts-app{
   --ts-bg:#f5f7f6; --ts-surface:#fff; --ts-fg:#1d2420; --ts-muted:#5d6862;
   --ts-line:#dde3df; --ts-accent:#2d5d52; --ts-accent-soft:#e3eeea; --ts-danger:#a83a2f;

@@ -1,0 +1,409 @@
+.ts-app {
+    --ts-bg: var(--amu-paper, #f3f0e9);
+    --ts-surface: #fff;
+    --ts-fg: var(--amu-ink, #252b35);
+    --ts-muted: #62676b;
+    --ts-line: var(--amu-line, rgba(37, 43, 53, 0.16));
+    --ts-accent: var(--amu-sea, #315d73);
+    --ts-accent-soft: #e5edf0;
+    --ts-danger: var(--amu-clay, #b75f50);
+    --ts-radius: 0;
+    background: var(--amu-paper, #f3f0e9);
+    color: var(--amu-ink, #252b35);
+    font-family: "AMU Oswald", "Arial Narrow", sans-serif;
+
+    a {
+        color: var(--amu-sea, #315d73);
+        text-underline-offset: 3px;
+    }
+
+    .ts-side {
+        border: 0;
+        background: var(--amu-ink, #252b35);
+        color: #f3f0e9;
+    }
+
+    .ts-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #f3f0e9;
+        font-family: "AMU Gravitas", Georgia, serif;
+        font-size: 15px;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+    }
+
+    .ts-brand-mark {
+        color: var(--amu-glacier, #a7c3d3);
+        font-family: "AMU Oswald", sans-serif;
+        font-size: 32px;
+        line-height: 1;
+    }
+
+    .ts-nav {
+        gap: 5px;
+        margin-top: 12px;
+    }
+
+    .ts-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .ts-nav a {
+        padding: 11px 12px;
+        border-left: 3px solid transparent;
+        border-radius: 0;
+        color: rgba(243, 240, 233, 0.78);
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        transition: background-color 160ms ease, color 160ms ease;
+    }
+
+    .ts-nav a:hover,
+    .ts-nav a.is-active {
+        border-left-color: var(--amu-clay, #b75f50);
+        background: rgba(167, 195, 211, 0.12);
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .ts-side-foot {
+        border-color: rgba(243, 240, 233, 0.2);
+        color: rgba(243, 240, 233, 0.76);
+    }
+
+    .ts-side-foot a {
+        color: #f3f0e9;
+    }
+
+    .ts-main {
+        background: var(--amu-paper, #f3f0e9);
+    }
+
+    .ts-head h1 {
+        color: var(--amu-ink, #252b35);
+        font-family: "AMU Gravitas", Georgia, serif;
+        font-size: clamp(26px, 3vw, 38px);
+        font-weight: 400;
+        letter-spacing: 0;
+        line-height: 1.2;
+    }
+
+    .ts-card,
+    .ts-kpi {
+        border: 1px solid var(--amu-line, rgba(37, 43, 53, 0.16));
+        border-radius: 0;
+        background: #fff;
+        box-shadow: 0 10px 32px rgba(37, 43, 53, 0.06);
+    }
+
+    .ts-card {
+        padding: clamp(18px, 2.4vw, 30px);
+    }
+
+    .ts-card h2 {
+        color: var(--amu-ink, #252b35);
+        font-family: "AMU Gravitas", Georgia, serif;
+        font-size: 22px;
+        font-weight: 400;
+    }
+
+    .ts-kpi {
+        border-top: 4px solid var(--amu-nature, #315747);
+        transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .ts-kpi:hover {
+        transform: translateY(-2px);
+        border-color: var(--amu-nature, #315747);
+        box-shadow: 0 14px 32px rgba(37, 43, 53, 0.1);
+        text-decoration: none;
+    }
+
+    .ts-kpi b {
+        color: var(--amu-sea, #315d73);
+        font-family: "AMU Gravitas", Georgia, serif;
+        font-size: 34px;
+        font-weight: 400;
+    }
+
+    .ts-kpi span {
+        color: var(--ts-muted);
+        font-size: 14px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .ts-table th {
+        border-color: var(--amu-ink, #252b35);
+        background: var(--amu-nature, #315747);
+        color: #fff;
+        font-family: "AMU Oswald", sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+    }
+
+    .ts-table td {
+        border-color: var(--amu-line, rgba(37, 43, 53, 0.16));
+    }
+
+    .ts-table tbody tr:hover {
+        background: #f7f5f0;
+    }
+
+    .ts-btn {
+        min-height: 42px;
+        padding: 11px 18px;
+        border: 1px solid var(--amu-clay, #b75f50);
+        border-radius: 0;
+        background: var(--amu-clay, #b75f50);
+        color: #fff !important;
+        font-family: "AMU Oswald", sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.09em;
+        text-align: center;
+        text-transform: uppercase;
+        transition: background-color 160ms ease, border-color 160ms ease;
+    }
+
+    .ts-btn:hover,
+    .ts-btn:focus-visible {
+        border-color: var(--amu-ink, #252b35);
+        background: var(--amu-ink, #252b35);
+        filter: none;
+        text-decoration: none;
+    }
+
+    .ts-btn-ghost {
+        border-color: var(--amu-sea, #315d73);
+        background: transparent;
+        color: var(--amu-sea, #315d73) !important;
+    }
+
+    .ts-btn-ghost:hover,
+    .ts-btn-ghost:focus-visible {
+        border-color: var(--amu-sea, #315d73);
+        background: var(--amu-sea, #315d73);
+        color: #fff !important;
+    }
+
+    .ts-btn-danger {
+        border-color: var(--amu-clay, #b75f50);
+        background: transparent;
+        color: var(--amu-clay, #b75f50) !important;
+    }
+
+    .ts-search input,
+    .ts-search select,
+    input:not([type="checkbox"]):not([type="hidden"]),
+    select {
+        border-color: var(--amu-line, rgba(37, 43, 53, 0.16));
+        border-radius: 0;
+        background: #fff;
+        font-family: "AMU Oswald", sans-serif;
+    }
+
+    .ts-burger {
+        color: var(--amu-ink, #252b35);
+        font-family: "AMU Oswald", sans-serif;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus,
+    .ts-nav a:focus-visible,
+    .ts-btn:focus-visible {
+        outline: 2px solid var(--amu-glacier, #a7c3d3);
+        outline-offset: 2px;
+    }
+
+    .ts-form label,
+    .ts-amenities legend,
+    .ts-type-options legend {
+        color: var(--amu-ink, #252b35);
+        font-size: 13px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .ts-form input,
+    .ts-form select {
+        min-height: 46px;
+    }
+
+    .ts-pill {
+        border-radius: 0;
+        background: rgba(49, 93, 115, 0.1);
+        color: var(--amu-sea, #315d73);
+        font-size: 12px;
+        letter-spacing: 0.04em;
+    }
+
+    .ts-pill-warning {
+        --c: var(--amu-clay, #b75f50);
+    }
+
+    .ts-pill-ready {
+        --c: var(--amu-nature, #315747);
+    }
+
+    .ts-flash {
+        border-left: 4px solid var(--amu-nature, #315747);
+        border-radius: 0;
+        background: #e6ece7;
+        color: var(--amu-nature, #315747);
+    }
+
+    .ts-wizard-note {
+        border-left: 4px solid var(--amu-glacier, #a7c3d3);
+        border-radius: 0;
+        background: #eaf0f1;
+        color: var(--amu-ink, #252b35);
+    }
+
+    .ts-type-card,
+    .ts-amenities label {
+        border-color: var(--amu-line, rgba(37, 43, 53, 0.16));
+        border-radius: 0;
+        background: #fff;
+    }
+
+    .ts-type-card:focus-within,
+    .ts-amenities label:focus-within {
+        border-color: var(--amu-sea, #315d73);
+        box-shadow: 0 0 0 2px rgba(167, 195, 211, 0.45);
+    }
+
+    .ts-type-card:hover,
+    .ts-amenities label:hover {
+        border-color: var(--amu-glacier, #a7c3d3);
+    }
+
+    .ts-type-card input,
+    .ts-amenities input {
+        accent-color: var(--amu-nature, #315747);
+    }
+}
+
+.ts-main-wizard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: none;
+    min-height: calc(100vh - 64px);
+    padding: clamp(20px, 4vw, 48px) 0;
+
+    .ts-head,
+    .ts-flash,
+    .ts-wizard {
+        width: #{'min(1240px, calc(100% - 48px))'};
+        margin-inline: auto;
+    }
+
+    .ts-head {
+        margin-bottom: 18px;
+    }
+
+    .ts-wizard {
+        max-width: 1240px;
+        min-height: calc(100vh - 184px);
+        padding: clamp(24px, 4vw, 56px);
+        border-radius: 18px;
+        box-shadow: 0 18px 48px rgba(37, 43, 53, 0.09);
+
+        h2 {
+            margin-bottom: 8px;
+            font-size: clamp(22px, 2.4vw, 30px);
+            letter-spacing: -0.02em;
+        }
+
+        .ts-muted {
+            max-width: 720px;
+            margin-bottom: 24px;
+        }
+    }
+
+    .ts-wizard-steps {
+        gap: 12px;
+        margin-bottom: clamp(28px, 5vh, 52px);
+
+        a,
+        > span {
+            min-height: 48px;
+            padding: 10px 12px;
+            border-bottom-width: 3px;
+        }
+    }
+
+    .ts-form {
+        gap: 18px 24px;
+
+        label {
+            gap: 8px;
+        }
+    }
+
+    .ts-form-actions {
+        margin-top: 8px;
+
+        .ts-btn {
+            min-width: 160px;
+            padding: 11px 20px;
+        }
+    }
+}
+
+@media (max-width: 860px) {
+    .ts-app {
+        .ts-topbar {
+            border-color: var(--amu-line, rgba(37, 43, 53, 0.16));
+            background: var(--amu-paper, #f3f0e9);
+        }
+
+        .ts-topbar .ts-brand {
+            color: var(--amu-ink, #252b35);
+        }
+
+        .ts-side {
+            box-shadow: 8px 0 32px rgba(37, 43, 53, 0.22);
+        }
+    }
+
+    .ts-main-wizard {
+        min-height: calc(100vh - 52px);
+        padding: 20px 0;
+
+        .ts-head,
+        .ts-flash,
+        .ts-wizard {
+            width: calc(100% - 32px);
+        }
+
+        .ts-wizard {
+            min-height: 0;
+            padding: 24px 18px;
+        }
+
+        .ts-wizard-steps {
+            gap: 2px;
+            margin-bottom: 28px;
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ts-app,
+    .ts-app *,
+    .ts-app *::before,
+    .ts-app *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
