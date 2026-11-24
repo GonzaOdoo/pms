@@ -50,6 +50,18 @@
                                 <small>Los huéspedes reservan por tipo de habitación.</small>
                             </span>
                         </label>
+                        <label class="ts-type-card">
+                            <input
+                                type="radio"
+                                name="property_type"
+                                value="camping"
+                                required="required"
+                            />
+                            <span>
+                                <strong>Camping</strong>
+                                <small>Los huéspedes reservan toda la propiedad.</small>
+                            </span>
+                        </label>
                     </fieldset>
                     <div class="ts-wide ts-form-actions">
                         <button type="submit" class="ts-btn">Comenzar</button>

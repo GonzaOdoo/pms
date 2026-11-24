@@ -79,7 +79,7 @@
 }
 
 .amu-hero {
-    width: min(1240px, calc(100% - 48px));
+    width: #{'min(1240px, calc(100% - 48px))'};
     margin-inline: auto;
     padding: clamp(42px, 7vw, 88px) 0 34px;
 }
@@ -142,7 +142,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    width: min(74%, 350px);
+    width: #{'min(74%, 350px)'};
     min-height: 68px;
     padding: 12px 18px;
     background: var(--amu-nature);
@@ -246,8 +246,187 @@
     text-align: center;
 }
 
+@media (max-width: 991.98px) {
+    .amu-hero-grid {
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        gap: 28px;
+    }
+
+    .amu-hero-visual {
+        padding-left: 28px;
+    }
+
+    .amu-search {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .amu-search-field {
+        padding-inline: 12px;
+    }
+
+    .amu-search-field + .amu-search-field {
+        border-left: 0;
+    }
+    .amu-results-search {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .amu-results-layout {
+        grid-template-columns: 230px minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .amu-property-card {
+        grid-template-columns: minmax(180px, 34%) minmax(0, 1fr);
+    }
+
+    .amu-property-info {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    #top .navbar {
+        min-height: 68px;
+    }
+
+    .amu-hero {
+        width: #{'min(calc(100% - 32px), 560px)'};
+        padding-top: 40px;
+    }
+
+    .amu-hero-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .amu-hero-copy {
+        padding-bottom: 12px;
+    }
+
+    .amu-hero-copy h1 {
+        max-width: 540px;
+        font-size: clamp(38px, 11vw, 58px);
+    }
+
+    .amu-intro {
+        margin-top: 16px;
+        font-size: 18px;
+    }
+
+    .amu-hero-visual {
+        min-height: 310px;
+        padding: 0 0 32px 26px;
+    }
+
+    .amu-hero-image {
+        height: 280px;
+    }
+
+    .amu-inset-image {
+        top: 26px;
+        height: 142px;
+        border-width: 6px;
+    }
+
+    .amu-image-caption {
+        width: #{'min(82%, 330px)'};
+        min-height: 58px;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .amu-search {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-top: 14px;
+        padding: 14px;
+    }
+
+    .amu-search-field {
+        padding: 8px 8px 12px;
+        border-bottom: 1px solid var(--amu-line);
+    }
+
+    .amu-search-submit {
+        width: 100%;
+        margin-top: 4px;
+    }
+    .amu-footer {
+        padding: 38px 20px 16px;
+    }
+
+    .amu-footer-main {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        padding-bottom: 28px;
+    }
+
+    .amu-footer-links {
+        justify-content: flex-start;
+    }
+
+    .amu-footer-bottom {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .amu-results {
+        width: #{'min(calc(100% - 32px), 560px)'};
+        padding-top: 20px;
+    }
+
+    .amu-results-search {
+        grid-template-columns: 1fr;
+        margin-bottom: 30px;
+    }
+
+    .amu-results-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .amu-results-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .amu-filter-sidebar {
+        position: static;
+    }
+
+    .amu-amenity-filters {
+        max-height: 300px;
+    }
+
+    .amu-property-card {
+        grid-template-columns: 1fr;
+    }
+
+    .amu-property-image {
+        min-height: 240px;
+        aspect-ratio: 16 / 10;
+    }
+
+    .amu-property-title-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .amu-search-submit {
+        transition: none;
+    }
+}
+
+
+#Footer
+
+
 .amu-footer {
-    padding: 54px max(24px, calc((100% - 1240px) / 2)) 18px;
+    padding: 54px #{'max(24px, calc((100% - 1240px) / 2))'} 18px;
     background: var(--amu-ink);
     color: #f3f0e9;
     font-family: "AMU Oswald", sans-serif;
@@ -323,7 +502,7 @@
 }
 
 .amu-results {
-    width: min(1320px, calc(100% - 48px));
+    width: #{'min(1320px, calc(100% - 48px))'};
     margin-inline: auto;
     padding: 30px 0 72px;
 }
@@ -645,181 +824,4 @@
 
 #products_grid_before .nav-link {
     color: var(--amu-sea);
-}
-
-@media (max-width: 991.98px) {
-    .amu-hero-grid {
-        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-        gap: 28px;
-    }
-
-    .amu-hero-visual {
-        padding-left: 28px;
-    }
-
-    .amu-search {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
-
-    .amu-search-field {
-        padding-inline: 12px;
-    }
-
-    .amu-search-field + .amu-search-field {
-        border-left: 0;
-    }
-
-    .amu-results-search {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .amu-results-layout {
-        grid-template-columns: 230px minmax(0, 1fr);
-        gap: 18px;
-    }
-
-    .amu-property-card {
-        grid-template-columns: minmax(180px, 34%) minmax(0, 1fr);
-    }
-
-    .amu-property-info {
-        padding: 18px;
-    }
-}
-
-@media (max-width: 767.98px) {
-    #top .navbar {
-        min-height: 68px;
-    }
-
-    .amu-hero {
-        width: min(100% - 32px, 560px);
-        padding-top: 40px;
-    }
-
-    .amu-hero-grid {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
-
-    .amu-hero-copy {
-        padding-bottom: 12px;
-    }
-
-    .amu-hero-copy h1 {
-        max-width: 540px;
-        font-size: clamp(38px, 11vw, 58px);
-    }
-
-    .amu-intro {
-        margin-top: 16px;
-        font-size: 18px;
-    }
-
-    .amu-hero-visual {
-        min-height: 310px;
-        padding: 0 0 32px 26px;
-    }
-
-    .amu-hero-image {
-        height: 280px;
-    }
-
-    .amu-inset-image {
-        top: 26px;
-        height: 142px;
-        border-width: 6px;
-    }
-
-    .amu-image-caption {
-        width: min(82%, 330px);
-        min-height: 58px;
-        padding: 10px 14px;
-        font-size: 14px;
-    }
-
-    .amu-search {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-top: 14px;
-        padding: 14px;
-    }
-
-    .amu-search-field {
-        padding: 8px 8px 12px;
-        border-bottom: 1px solid var(--amu-line);
-    }
-
-    .amu-search-submit {
-        width: 100%;
-        margin-top: 4px;
-    }
-
-    .amu-footer {
-        padding: 38px 20px 16px;
-    }
-
-    .amu-footer-main {
-        grid-template-columns: 1fr;
-        gap: 22px;
-        padding-bottom: 28px;
-    }
-
-    .amu-footer-links {
-        justify-content: flex-start;
-    }
-
-    .amu-footer-bottom {
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .amu-results {
-        width: min(100% - 32px, 560px);
-        padding-top: 20px;
-    }
-
-    .amu-results-search {
-        grid-template-columns: 1fr;
-        margin-bottom: 30px;
-    }
-
-    .amu-results-heading {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .amu-results-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .amu-filter-sidebar {
-        position: static;
-    }
-
-    .amu-amenity-filters {
-        max-height: 300px;
-    }
-
-    .amu-property-card {
-        grid-template-columns: 1fr;
-    }
-
-    .amu-property-image {
-        min-height: 240px;
-        aspect-ratio: 16 / 10;
-    }
-
-    .amu-property-title-row {
-        flex-direction: column;
-        gap: 8px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .amu-search-submit {
-        transition: none;
-    }
 }

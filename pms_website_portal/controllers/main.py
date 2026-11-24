@@ -277,6 +277,7 @@ class ProviderPanel(http.Controller):
         methods=["POST"],
     )
     def property_wizard_save(self, property_id, step, **post):
+        _logger.info("Start save!")
         if not _is_provider():
             return request.not_found()
         prop = self._wizard_property(property_id, step)
@@ -288,12 +289,14 @@ class ProviderPanel(http.Controller):
             return request.redirect(self._wizard_path(prop))
         vals = {}
         if step == "address":
+            _logger.info("Step address")
             vals = {
                 "street": (post.get("street") or "").strip(),
                 "street2": (post.get("street2") or "").strip(),
                 "city": (post.get("city") or "").strip(),
                 "zip": (post.get("zip") or "").strip(),
             }
+            _logger.info(vals)
             if not vals["street"] or not vals["city"]:
                 return self._redirect(self._wizard_path(prop, step), "error")
         elif step == "amenities":
@@ -471,7 +474,8 @@ class ProviderPanel(http.Controller):
                 )
             if offer.price != price:
                 offer.write({"price": price})
-
+        if vals:
+            prop.sudo().write(vals)
         next_index = max(current_index, step_index + 1)
         next_step = WIZARD_STEPS[next_index]
         prop.sudo().write({"setup_step": next_step})

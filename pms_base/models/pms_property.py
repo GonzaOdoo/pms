@@ -32,6 +32,7 @@ class PmsProperty(models.Model):
     property_type = fields.Selection(
         [
             ("house", "House"),
+            ("camping", "Camping"),
             ("hotel", "Hotel"),
         ],
         string="Property Type",

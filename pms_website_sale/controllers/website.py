@@ -201,6 +201,7 @@ class WebsiteSale(WebsiteSale):
     def property(
         self, page=0, ppg=False, category=None, search="", guest_select="", **post
     ):
+        website = request.env.website
         Category = request.env["pms.website.category"]
         if category:
             category = Category.search([("id", "=", int(category))], limit=1)
@@ -214,9 +215,9 @@ class WebsiteSale(WebsiteSale):
             except ValueError:
                 ppg = False
         if not ppg:
-            ppg = request.website.shop_ppg or 20
+            ppg = website.shop_ppg or 20
 
-        ppr = request.website.shop_ppr or 4
+        ppr = website.shop_ppr or 4
 
         domain = self._get_property_search_domain(
             search=search, category=category, guest=guest_select, args=post
@@ -270,7 +271,7 @@ class WebsiteSale(WebsiteSale):
             url_args["category"] = category.id
         if raw_amenity_ids:
             url_args["amenity_ids"] = selected_amenity_ids
-        pager = request.website.pager(
+        pager = website.pager(
             url=url,
             total=product_count,
             page=page,
@@ -545,7 +546,8 @@ class PmsWebsiteSale(PmsPropertyWebsite):
                 }
             )
         )
-        order = request.cart or request.website._create_cart()
+        website = request.env.website
+        order = request.cart or website._create_cart()
         request.env["sale.order.line"].sudo().create(
             {
                 "order_id": order.id,
