@@ -286,3 +286,29 @@ class TestWebsiteSaleControllers(HttpCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Nightly Rate", response.content)
         self.assertIn(b"Global Rate", response.content)
+
+    def test_hotel_uses_general_rates_for_types_without_a_specific_rate(self):
+        self.property.property_type = "hotel"
+        accommodation_type = self.env["pms.accommodation.type"].create(
+            {
+                "name": "Double Room",
+                "property_id": self.property.id,
+                "capacity": 2,
+            }
+        )
+        self.env["pms.room"].create(
+            {
+                "name": "Room 201",
+                "property_id": self.property.id,
+                "type_id": self.env.ref("pms_base.pms_room_type_bed").id,
+                "accommodation_type_id": accommodation_type.id,
+            }
+        )
+        self.authenticate("admin", "admin")
+        slug = self.env["ir.http"]._slug(self.property)
+        response = self.url_open(f"/property/{slug}")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Double Room - Nightly Rate", response.content)
+        self.assertIn(b"Double Room - Global Rate", response.content)
+        self.assertIn(b"tarifa general", response.content)

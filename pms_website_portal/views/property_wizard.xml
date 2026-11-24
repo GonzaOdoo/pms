@@ -81,7 +81,7 @@
                     <strong t-out="prop.name" />
                     <span
                         class="ts-pill"
-                        t-out="'Hotel' if prop.property_type == 'hotel' else 'Casa o apartamento'"
+                        t-out="'Hotel' if prop.property_type == 'hotel' else ('Camping' if prop.property_type == 'camping' else 'Casa o apartamento')"
                     />
                 </p>
                 <nav class="ts-wizard-steps" aria-label="Pasos de configuración">
@@ -215,7 +215,7 @@
                     </form>
                 </t>
 
-                <t t-if="wizard_step == 'inventory' and prop.property_type == 'house'">
+                <t t-if="wizard_step == 'inventory' and prop.property_type in ('house', 'camping')">
                     <h2>Detalles de la casa o apartamento</h2>
                     <p class="ts-muted">
                         Esta opción se ofrecerá como una sola propiedad; no se reservará
@@ -258,8 +258,8 @@
                 <t t-if="wizard_step == 'inventory' and prop.property_type == 'hotel'">
                     <h2>Tipo de habitación</h2>
                     <p class="ts-muted">
-                        Por ahora puedes configurar un tipo de habitación y la cantidad
-                        de habitaciones físicas disponibles.
+                        Define las características de esta categoría. Después podrás
+                        agregar las habitaciones físicas que pertenecen a ella.
                     </p>
                     <form
                         class="ts-form"
@@ -277,17 +277,6 @@
                                 name="accommodation_name"
                                 required="required"
                                 t-att-value="accommodation_type.name if accommodation_type else 'Habitación estándar'"
-                            />
-                        </label>
-                        <label>
-                            Cantidad de habitaciones
-                            <input
-                                type="number"
-                                name="room_count"
-                                min="1"
-                                max="100"
-                                required="required"
-                                t-att-value="len(accommodation_type.room_ids.filtered('active')) if accommodation_type else 1"
                             />
                         </label>
                         <label>
@@ -344,14 +333,46 @@
                             <button type="submit" class="ts-btn">Continuar</button>
                         </div>
                     </form>
+                    <div class="ts-wizard-note" t-if="accommodation_types">
+                        <strong>Tipos configurados:</strong>
+                        <ul>
+                            <li t-foreach="accommodation_types" t-as="item">
+                                <span t-out="item.name"/> —
+                                <span t-out="item.room_count"/> habitaciones
+                            </li>
+                        </ul>
+                    </div>
+                    <a
+                        t-if="accommodation_type"
+                        t-attf-href="/my/rooms/new?property_id=#{prop.id}"
+                        class="ts-btn ts-btn-ghost"
+                    >Agregar habitaciones</a>
+                    <a
+                        t-if="accommodation_type"
+                        t-attf-href="/my/accommodation-types/new?property_id=#{prop.id}"
+                        class="ts-btn ts-btn-ghost"
+                    >Agregar otro tipo de alojamiento</a>
                 </t>
 
                 <t t-if="wizard_step == 'rate'">
                     <h2>Tarifa de reserva</h2>
-                    <p class="ts-muted">
-                        Define una opción inicial. Podrás agregar más tarifas desde la
-                        administración.
+                    <p t-if="prop.property_type == 'hotel'" class="ts-muted">
+                        La tarifa propia de este tipo de habitación es opcional. Si
+                        queda vacía, se utilizará una tarifa general disponible.
                     </p>
+                    <p t-else="" class="ts-muted">
+                        Define el precio por noche de la propiedad.
+                    </p>
+                    <div t-if="prop.property_type == 'hotel'" class="ts-action-row ts-wide">
+                        <a
+                            t-attf-href="/my/rooms/new?property_id=#{prop.id}"
+                            class="ts-btn ts-btn-ghost"
+                        >Agregar habitaciones</a>
+                        <a
+                            t-attf-href="/my/accommodation-types/new?property_id=#{prop.id}"
+                            class="ts-btn ts-btn-ghost"
+                        >Agregar otro tipo de alojamiento</a>
+                    </div>
                     <form
                         class="ts-form"
                         method="post"
@@ -366,7 +387,7 @@
                             Nombre de la tarifa
                             <input
                                 name="reservation_name"
-                                required="required"
+                                t-att-required="prop.property_type != 'hotel'"
                                 t-att-value="reservation_offer.name if reservation_offer else 'Tarifa estándar'"
                             />
                         </label>
@@ -377,10 +398,14 @@
                                 name="price"
                                 min="0"
                                 step="0.01"
-                                required="required"
-                                t-att-value="reservation_offer.price if reservation_offer else 0"
+                                t-att-required="prop.property_type != 'hotel'"
+                                t-att-value="reservation_offer.price if reservation_offer else ''"
                             />
                         </label>
+                        <p class="ts-wide ts-muted">
+                            Si no defines una tarifa para este tipo de habitación,
+                            se utilizará una tarifa general disponible.
+                        </p>
                         <div class="ts-wide ts-form-actions">
                             <button type="submit" class="ts-btn">Continuar</button>
                         </div>
@@ -390,13 +415,25 @@
                 <t t-if="wizard_step == 'review'">
                     <h2>Revisa tu propiedad</h2>
                     <dl class="ts-dl">
-                        <div><dt>Tipo</dt><dd t-out="'Hotel' if prop.property_type == 'hotel' else 'Casa o apartamento'"/></div>
+                        <div><dt>Tipo</dt><dd t-out="'Hotel' if prop.property_type == 'hotel' else ('Camping' if prop.property_type == 'camping' else 'Casa o apartamento')"/></div>
                         <div><dt>Dirección</dt><dd><span t-out="prop.street"/>, <span t-out="prop.city"/></dd></div>
                         <div><dt>Capacidad</dt><dd><span t-out="prop.no_of_guests"/> huéspedes</dd></div>
-                        <div t-if="prop.property_type == 'house'"><dt>Dormitorios</dt><dd t-out="prop.bedroom_count"/></div>
-                        <div t-if="prop.property_type == 'house'"><dt>Baños</dt><dd t-out="prop.bathroom_count"/></div>
-                        <div t-if="prop.property_type == 'hotel' and accommodation_type"><dt>Tipo de habitación</dt><dd t-out="accommodation_type.name"/></div>
-                        <div t-if="prop.property_type == 'hotel' and accommodation_type"><dt>Habitaciones disponibles</dt><dd t-out="len(accommodation_type.room_ids.filtered('active'))"/></div>
+                        <div t-if="prop.property_type in ('house', 'camping')"><dt>Dormitorios</dt><dd t-out="prop.bedroom_count"/></div>
+                        <div t-if="prop.property_type in ('house', 'camping')"><dt>Baños</dt><dd t-out="prop.bathroom_count"/></div>
+                        <div
+                            t-if="prop.property_type == 'hotel'"
+                            t-foreach="accommodation_types"
+                            t-as="item"
+                        >
+                            <dt t-out="item.name"/>
+                            <dd>
+                                <span t-out="len(item.room_ids.filtered('active'))"/>
+                                habitaciones ·
+                                <span t-out="item.capacity"/> personas ·
+                                <span t-out="item.bedroom_count"/> dormitorios ·
+                                <span t-out="item.bathroom_count"/> baños
+                            </dd>
+                        </div>
                         <div t-if="reservation_offer"><dt>Tarifa por noche</dt><dd><span t-out="reservation_offer.price"/> <span t-out="reservation_offer.currency_id.symbol"/></dd></div>
                     </dl>
                     <div class="ts-wizard-note">

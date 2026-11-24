@@ -13,6 +13,7 @@
         "views/layout.xml",
         "views/dashboard.xml",
         "views/properties.xml",
+        "views/accommodation_types.xml",
         "views/property_wizard.xml",
         "views/rooms.xml",
         "views/reservations.xml",
@@ -20,6 +21,7 @@
     "assets": {
         "web.assets_frontend": [
             "pms_website_portal/static/src/css/panel.css",
+            "pms_website_portal/static/src/scss/panel_wizard.scss",
         ],
     },
     "installable": True,

@@ -175,6 +175,58 @@ class TestPropertyBooking(HttpCase):
                 datetime.strptime(self.dates_cart[1], "%Y-%m-%d"),
             )
         )
+        fallback_response = self._jsonrpc(
+            f"/property/{self.property.id}/add_to_cart",
+            {
+                **params,
+                "reservation_type_id": self.reservation_type.id,
+            },
+        ).json()["result"]
+        self.assertEqual(fallback_response["error"], "Invalid reservation type")
+
+    def test_booking_uses_general_offer_when_type_has_no_specific_rate(self):
+        self.property.property_type = "hotel"
+        accommodation_type = self.env["pms.accommodation.type"].create(
+            {
+                "name": "Website Double",
+                "property_id": self.property.id,
+                "capacity": 2,
+            }
+        )
+        self.env["pms.room"].create(
+            {
+                "name": "Website Room 2",
+                "property_id": self.property.id,
+                "type_id": self.env.ref("pms_base.pms_room_type_bed").id,
+                "accommodation_type_id": accommodation_type.id,
+            }
+        )
+        self.authenticate("admin", "admin")
+        params = {
+            "date_start": self.dates_cart[0],
+            "date_end": self.dates_cart[1],
+            "reservation_type_id": self.reservation_type.id,
+            "accommodation_type_id": accommodation_type.id,
+            "guests": [{"name": "Alice"}],
+        }
+        response = self._jsonrpc(
+            f"/property/{self.property.id}/add_to_cart", params
+        ).json()["result"]
+
+        self.assertEqual(response.get("redirect"), "/shop/cart")
+        reservation = self.env["pms.reservation"].search(
+            [
+                ("property_id", "=", self.property.id),
+                ("start", "=", self.dates_cart[0]),
+                ("accommodation_type_id", "=", accommodation_type.id),
+            ],
+            limit=1,
+        )
+        self.assertEqual(reservation.reservation_type_id, self.reservation_type)
+        line = self.env["sale.order.line"].search(
+            [("pms_reservation_id", "=", reservation.id)], limit=1
+        )
+        self.assertEqual(line.price_unit, self.reservation_type.price)
 
     def test_add_to_cart_requires_login(self):
         """Public user attempting to add to cart receives a redirect to login."""

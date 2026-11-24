@@ -1,7 +1,14 @@
 <odoo>
     <template id="page_rooms" name="Panel: habitaciones">
         <t t-call="pms_website_portal.layout">
-            <t t-set="ts_actions"><a href="/my/rooms/new" class="ts-btn">Nueva habitación</a></t>
+            <t t-set="ts_actions">
+                <a
+                    t-if="filter_property"
+                    t-attf-href="/my/rooms/new?property_id=#{filter_property}"
+                    class="ts-btn"
+                >Nueva habitación</a>
+                <a t-else="" href="/my/rooms/new" class="ts-btn">Nueva habitación</a>
+            </t>
             <form class="ts-search" method="get" action="/my/rooms">
                 <select name="property_id" onchange="this.form.submit()">
                     <option value="0">Todas las propiedades</option>
@@ -12,12 +19,12 @@
                 <p t-if="not rooms" class="ts-empty">No hay habitaciones para mostrar.</p>
                 <div t-else="" class="ts-table-wrap">
                     <table class="ts-table">
-                        <thead><tr><th>Habitación</th><th>Propiedad</th><th>Tipo</th><th>Capacidad</th><th>Superficie</th></tr></thead>
+                        <thead><tr><th>Habitación</th><th>Propiedad</th><th>Tipo de alojamiento</th><th>Capacidad</th><th>Superficie</th></tr></thead>
                         <tbody>
                             <tr t-foreach="rooms" t-as="r">
                                 <td><a t-attf-href="/my/rooms/#{r.id}" t-out="r.name"/></td>
                                 <td t-out="r.property_id.name"/>
-                                <td t-out="r.type_id.name or '—'"/>
+                                <td t-out="r.accommodation_type_id.name or r.type_id.name or '—'"/>
                                 <td t-out="r.capacity or '—'"/>
                                 <td><t t-if="r.area"><t t-out="r.area"/> m²</t><t t-else="">—</t></td>
                             </tr>
@@ -36,17 +43,45 @@
                 <input type="hidden" name="room_id" t-att-value="room.id if room else 0"/>
                 <label class="ts-wide">Nombre<input name="name" required="required" t-att-value="room.name if room else ''"/></label>
                 <label>Propiedad
-                    <select name="property_id" required="required">
+                    <select
+                        t-if="not room"
+                        name="property_id"
+                        required="required"
+                        onchange="if (this.value) { window.location.href = '/my/rooms/new?property_id=' + this.value; }"
+                    >
+                        <option value="">Selecciona una propiedad</option>
+                        <option t-foreach="properties" t-as="p" t-att-value="p.id" t-att-selected="property and property == p" t-out="p.name"/>
+                    </select>
+                    <select t-else="" name="property_id" required="required">
                         <option t-foreach="properties" t-as="p" t-att-value="p.id" t-att-selected="room and room.property_id == p" t-out="p.name"/>
                     </select>
                 </label>
-                <label>Tipo
+                <label>Tipo de alojamiento
+                    <select name="accommodation_type_id" t-att-required="property and property.property_type == 'hotel'">
+                        <option value="">Selecciona un tipo</option>
+                        <option
+                            t-foreach="accommodation_types"
+                            t-as="accommodation_type"
+                            t-att-value="accommodation_type.id"
+                            t-att-selected="(room and room.accommodation_type_id == accommodation_type) or (not room and accommodation_type == selected_accommodation_type)"
+                            t-out="'%s — %s personas, %s m², %s dormitorios, %s baños' % (accommodation_type.name, accommodation_type.capacity, accommodation_type.area, accommodation_type.bedroom_count, accommodation_type.bathroom_count)"
+                        />
+                    </select>
+                </label>
+                <p
+                    t-if="property and property.property_type == 'hotel'"
+                    class="ts-wide ts-muted"
+                >
+                    La capacidad, superficie y servicios de la habitación se heredan
+                    del tipo de alojamiento seleccionado.
+                </p>
+                <label>Tipo de espacio
                     <select name="type_id" required="required">
                         <option t-foreach="room_types" t-as="t" t-att-value="t.id" t-att-selected="room and room.type_id == t" t-out="t.name"/>
                     </select>
                 </label>
-                <label>Capacidad (personas)<input name="capacity" type="number" min="0" t-att-value="room.capacity if room else ''"/></label>
-                <label>Superficie (m²)<input name="area" inputmode="decimal" t-att-value="room.area if room else ''"/></label>
+                <label t-if="not property or property.property_type != 'hotel'">Capacidad (personas)<input name="capacity" type="number" min="0" t-att-value="room.capacity if room else ''"/></label>
+                <label t-if="not property or property.property_type != 'hotel'">Superficie (m²)<input name="area" inputmode="decimal" t-att-value="room.area if room else ''"/></label>
                 <div class="ts-wide ts-form-actions"><button type="submit" class="ts-btn">Guardar</button></div>
             </form>
         </t>

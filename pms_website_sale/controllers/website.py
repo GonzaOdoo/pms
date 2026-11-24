@@ -336,29 +336,104 @@ class WebsiteSale(WebsiteSale):
 
 
 class PmsWebsiteSale(PmsPropertyWebsite):
+    def _effective_reservation_types(self, property_rec):
+        Offer = request.env["pms.property.reservation"].sudo()
+        property_scope = [("property_id", "in", [False, property_rec.id])]
+
+        def scoped_offers(domain):
+            return Offer.search(property_scope + domain, order="property_id desc, id")
+
+        accommodation_types = property_rec.sudo().accommodation_type_ids.filtered(
+            "active"
+        )
+        options = []
+        if accommodation_types:
+            general_offers = scoped_offers([("accommodation_type_id", "=", False)])
+            for accommodation_type in accommodation_types:
+                offers = scoped_offers(
+                    [("accommodation_type_id", "=", accommodation_type.id)]
+                )
+                is_fallback = not offers
+                for offer in offers or general_offers:
+                    options.append(
+                        {
+                            "offer": offer,
+                            "accommodation_type": accommodation_type,
+                            "is_fallback": is_fallback,
+                        }
+                    )
+            return options
+        if property_rec.property_type == "hotel":
+            return options
+
+        return [
+            {
+                "offer": offer,
+                "accommodation_type": request.env["pms.accommodation.type"],
+                "is_fallback": False,
+            }
+            for offer in scoped_offers([("accommodation_type_id", "=", False)])
+        ]
+
+    def _resolve_reservation_offer(
+        self, property_rec, reservation_type_id, accommodation_type_id=None
+    ):
+        offer = (
+            request.env["pms.property.reservation"]
+            .sudo()
+            .browse(reservation_type_id)
+            .exists()
+        )
+        if not offer or (offer.property_id and offer.property_id != property_rec):
+            return None, None
+
+        if offer.accommodation_type_id:
+            accommodation_type = offer.accommodation_type_id
+            if (
+                not accommodation_type.active
+                or (
+                    accommodation_type_id
+                    and accommodation_type.id != accommodation_type_id
+                )
+            ):
+                return None, None
+        elif property_rec.property_type == "hotel":
+            accommodation_type = (
+                request.env["pms.accommodation.type"]
+                .sudo()
+                .browse(accommodation_type_id)
+                .exists()
+            )
+            if (
+                not accommodation_type
+                or not accommodation_type.active
+                or accommodation_type.property_id != property_rec
+            ):
+                return None, None
+            specific_offer = request.env["pms.property.reservation"].sudo().search(
+                [
+                    ("property_id", "in", [False, property_rec.id]),
+                    ("accommodation_type_id", "=", accommodation_type.id),
+                ],
+                limit=1,
+            )
+            if specific_offer:
+                return None, None
+        else:
+            accommodation_type = request.env["pms.accommodation.type"]
+
+        if (
+            accommodation_type
+            and accommodation_type.property_id != property_rec
+        ):
+            return None, None
+        return offer, accommodation_type
+
     def _prepare_property_values(self, pms_property, category, search, **kwargs):
         values = super()._prepare_property_values(
             pms_property, category, search, **kwargs
         )
-        reservation_types = (
-            request.env["pms.property.reservation"]
-            .sudo()
-            .search(
-                [
-                    ("property_id", "in", [False, pms_property.id]),
-                    "|",
-                    ("accommodation_type_id", "=", False),
-                    ("accommodation_type_id.property_id", "=", pms_property.id),
-                ]
-            )
-            .filtered(
-                lambda reservation_type: (
-                    not reservation_type.accommodation_type_id
-                    or reservation_type.accommodation_type_id.active
-                )
-            )
-        )
-        values["reservation_types"] = reservation_types
+        values["reservation_types"] = self._effective_reservation_types(pms_property)
         values["is_public_user"] = request.env.user._is_public()
         return values
 
@@ -375,6 +450,7 @@ class PmsWebsiteSale(PmsPropertyWebsite):
         date_start=None,
         date_end=None,
         reservation_type_id=None,
+        accommodation_type_id=None,
         **kwargs,
     ):
         if not date_start or not date_end:
@@ -405,23 +481,21 @@ class PmsWebsiteSale(PmsPropertyWebsite):
                     "available": False,
                     "error": _("Invalid reservation type"),
                 }
-            reservation_type = (
-                request.env["pms.property.reservation"]
-                .sudo()
-                .browse(reservation_type_id)
-                .exists()
+            try:
+                accommodation_type_id = int(accommodation_type_id or 0) or None
+            except (TypeError, ValueError):
+                return {"available": False, "error": _("Invalid accommodation type")}
+            reservation_type, accommodation_type = self._resolve_reservation_offer(
+                property_rec, reservation_type_id, accommodation_type_id
             )
-            if not reservation_type or (
-                reservation_type.property_id
-                and reservation_type.property_id != property_rec
-            ):
+            if not reservation_type:
                 return {
                     "available": False,
                     "error": _("Invalid reservation type"),
                 }
             available = Reservation.is_accommodation_type_available(
                 property_rec.id,
-                reservation_type.accommodation_type_id.id,
+                accommodation_type.id if accommodation_type else False,
                 start,
                 end,
             )
@@ -454,6 +528,7 @@ class PmsWebsiteSale(PmsPropertyWebsite):
         date_start=None,
         date_end=None,
         reservation_type_id=None,
+        accommodation_type_id=None,
         guests=None,
         **kwargs,
     ):
@@ -483,23 +558,15 @@ class PmsWebsiteSale(PmsPropertyWebsite):
             reservation_type_id = int(reservation_type_id or 0)
         except (TypeError, ValueError):
             return {"error": _("Invalid reservation type")}
-        reservation_type = (
-            request.env["pms.property.reservation"]
-            .sudo()
-            .browse(reservation_type_id)
-        )
-        if not reservation_type.exists():
-            return {"error": _("Invalid reservation type")}
-        if reservation_type.property_id and reservation_type.property_id != pms_property:
-            return {"error": _("Invalid reservation type")}
-        accommodation_type = reservation_type.accommodation_type_id
-        if pms_property.property_type == "hotel" and not accommodation_type:
-            return {"error": _("Hotel reservation offers must specify an accommodation type")}
-        if (
-            accommodation_type
-            and accommodation_type.property_id != pms_property
-        ):
+        try:
+            accommodation_type_id = int(accommodation_type_id or 0) or None
+        except (TypeError, ValueError):
             return {"error": _("Invalid accommodation type")}
+        reservation_type, accommodation_type = self._resolve_reservation_offer(
+            pms_property, reservation_type_id, accommodation_type_id
+        )
+        if not reservation_type:
+            return {"error": _("Invalid reservation type")}
 
         guests = [
             guest
@@ -525,7 +592,10 @@ class PmsWebsiteSale(PmsPropertyWebsite):
 
         Reservation = request.env["pms.reservation"].sudo()
         if not Reservation.is_accommodation_type_available(
-            pms_property.id, accommodation_type.id, start, end
+            pms_property.id,
+            accommodation_type.id if accommodation_type else False,
+            start,
+            end,
         ):
             return {
                 "error": _("Accommodation is not available for those dates")
@@ -537,7 +607,9 @@ class PmsWebsiteSale(PmsPropertyWebsite):
                 {
                     "property_id": pms_property.id,
                     "reservation_type_id": reservation_type.id,
-                    "accommodation_type_id": accommodation_type.id,
+                    "accommodation_type_id": accommodation_type.id
+                    if accommodation_type
+                    else False,
                     "start": start,
                     "stop": end,
                     "stage_id": request.env.ref("pms_sale.pms_stage_booked").id,

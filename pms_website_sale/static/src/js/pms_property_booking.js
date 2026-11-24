@@ -21,6 +21,17 @@ import {_t} from "@web/core/l10n/translation";
         var availStatus = document.getElementById("pms_availability_status");
         var addToCartBtn = document.getElementById("pmsAddToCart");
 
+        function selectedAccommodationTypeId() {
+            if (!reservationTypeEl) {
+                return false;
+            }
+            var selectedOption =
+                reservationTypeEl.options[reservationTypeEl.selectedIndex];
+            return selectedOption && selectedOption.dataset.accommodationTypeId
+                ? parseInt(selectedOption.dataset.accommodationTypeId, 10)
+                : false;
+        }
+
         // Set minimum date to today
         var today = new Date().toISOString().split("T")[0];
         if (startInput) {
@@ -66,6 +77,7 @@ import {_t} from "@web/core/l10n/translation";
                     reservationTypeEl && reservationTypeEl.value
                         ? parseInt(reservationTypeEl.value, 10)
                         : false,
+                accommodation_type_id: selectedAccommodationTypeId(),
             })
                 .then(function (result) {
                     if (result && result.available) {
@@ -234,6 +246,7 @@ import {_t} from "@web/core/l10n/translation";
                     date_end: endInput && endInput.value,
                     reservation_type_id:
                         reservationTypeEl && parseInt(reservationTypeEl.value, 10),
+                    accommodation_type_id: selectedAccommodationTypeId(),
                     guests: guests,
                 })
                     .then(function (result) {

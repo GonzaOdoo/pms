@@ -16,6 +16,7 @@
                     <nav class="ts-nav">
                         <a href="/my" t-att-class="'is-active' if ts_active == 'dashboard' else ''">Panel</a>
                         <a href="/my/properties" t-att-class="'is-active' if ts_active == 'properties' else ''">Propiedades</a>
+                        <a href="/my/accommodation-types" t-att-class="'is-active' if ts_active == 'accommodation_types' else ''">Tipos de alojamiento</a>
                         <a href="/my/rooms" t-att-class="'is-active' if ts_active == 'rooms' else ''">Habitaciones</a>
                         <a href="/my/reservations" t-att-class="'is-active' if ts_active == 'reservations' else ''">Administrar reservas</a>
                     </nav>
@@ -25,7 +26,7 @@
                         <a href="/web/session/logout?redirect=/">Salir</a>
                     </div>
                 </aside>
-                <main class="ts-main">
+                <main t-att-class="'ts-main ts-main-wizard' if ts_fullscreen else 'ts-main'">
                     <div class="ts-head">
                         <h1 t-out="ts_title"/>
                         <div class="ts-actions"><t t-out="ts_actions"/></div>

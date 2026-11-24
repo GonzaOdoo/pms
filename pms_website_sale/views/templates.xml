@@ -554,20 +554,24 @@
                                             <option value="">-- Select --</option>
                                             <t t-foreach="reservation_types" t-as="rt">
                                                 <option
-                                                    t-att-value="rt.id"
-                                                    t-att-data-max-guests="rt.accommodation_type_id.capacity or property.no_of_guests or 0"
+                                                    t-att-value="rt['offer'].id"
+                                                    t-att-data-accommodation-type-id="rt['accommodation_type'].id or ''"
+                                                    t-att-data-max-guests="rt['accommodation_type'].capacity or property.no_of_guests or 0"
                                                 >
                                                     <t
-                                                        t-if="rt.accommodation_type_id"
-                                                        t-esc="rt.accommodation_type_id.name + ' - '"
+                                                        t-if="rt['accommodation_type']"
+                                                        t-esc="rt['accommodation_type'].name + ' - '"
                                                     />
-                                                    <t t-esc="rt.name" />
-                                                    <t t-if="rt.price">
+                                                    <t t-esc="rt['offer'].name" />
+                                                    <t t-if="rt['is_fallback']">
+                                                        (tarifa general)
+                                                    </t>
+                                                    <t t-if="rt['offer'].price">
                                                         (<t
-                                                        t-esc="rt.price"
+                                                        t-esc="rt['offer'].price"
                                                         t-options='{"widget": "float", "precision": 2}'
                                                     />&#160;<t
-                                                        t-esc="rt.currency_id.symbol"
+                                                        t-esc="rt['offer'].currency_id.symbol"
                                                     />)
                                                     </t>
                                                 </option>

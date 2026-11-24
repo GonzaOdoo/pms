@@ -1,0 +1,144 @@
+<odoo>
+    <template id="page_accommodation_types" name="Panel: tipos de alojamiento">
+        <t t-call="pms_website_portal.layout">
+            <t t-set="ts_actions">
+                <a
+                    t-if="filter_property"
+                    t-attf-href="/my/accommodation-types/new?property_id=#{filter_property}"
+                    class="ts-btn"
+                >Nuevo tipo de alojamiento</a>
+                <a t-else="" href="/my/accommodation-types/new" class="ts-btn">
+                    Nuevo tipo de alojamiento
+                </a>
+            </t>
+            <form class="ts-search" method="get" action="/my/accommodation-types">
+                <select name="property_id" onchange="this.form.submit()">
+                    <option value="0">Todas las propiedades</option>
+                    <option
+                        t-foreach="properties"
+                        t-as="p"
+                        t-att-value="p.id"
+                        t-att-selected="p.id == filter_property"
+                        t-out="p.name"
+                    />
+                </select>
+            </form>
+            <section class="ts-card">
+                <p t-if="not accommodation_types" class="ts-empty">
+                    Todavía no hay tipos de alojamiento configurados.
+                </p>
+                <div t-else="" class="ts-table-wrap">
+                    <table class="ts-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Propiedad</th>
+                                <th>Capacidad</th>
+                                <th>Dormitorios / Baños</th>
+                                <th>Habitaciones</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="accommodation_types" t-as="item">
+                                <td t-out="item.name"/>
+                                <td t-out="item.property_id.name"/>
+                                <td t-out="item.capacity"/>
+                                <td>
+                                    <span t-out="item.bedroom_count"/> /
+                                    <span t-out="item.bathroom_count"/>
+                                </td>
+                                <td t-out="item.room_count"/>
+                                <td class="ts-right">
+                                    <a
+                                        t-attf-href="/my/rooms/new?property_id=#{item.property_id.id}&amp;accommodation_type_id=#{item.id}"
+                                    >Agregar habitación</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </t>
+    </template>
+
+    <template id="page_accommodation_type_form" name="Panel: nuevo tipo de alojamiento">
+        <t t-call="pms_website_portal.layout">
+            <t t-set="ts_actions">
+                <a href="/my/accommodation-types" class="ts-btn ts-btn-ghost">Volver</a>
+            </t>
+            <form
+                class="ts-card ts-form"
+                method="post"
+                action="/my/accommodation-types/save"
+            >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    t-att-value="request.csrf_token()"
+                />
+                <label class="ts-wide">
+                    Propiedad
+                    <select name="property_id" required="required">
+                        <option
+                            t-foreach="properties"
+                            t-as="p"
+                            t-att-value="p.id"
+                            t-att-selected="property and property == p"
+                            t-out="p.name"
+                        />
+                    </select>
+                </label>
+                <label class="ts-wide">
+                    Nombre del tipo
+                    <input name="name" required="required" maxlength="120"/>
+                </label>
+                <label>
+                    Capacidad máxima
+                    <input type="number" name="capacity" min="1" required="required"/>
+                </label>
+                <label>
+                    Superficie por habitación (m²)
+                    <input type="number" name="area" min="0" step="0.01" value="0"/>
+                </label>
+                <label>
+                    Dormitorios
+                    <input type="number" name="bedroom_count" min="0" value="0"/>
+                </label>
+                <label>
+                    Baños
+                    <input type="number" name="bathroom_count" min="0" value="0"/>
+                </label>
+                <fieldset class="ts-wide ts-amenities">
+                    <legend>Servicios incluidos en este tipo</legend>
+                    <label t-foreach="amenities" t-as="amenity">
+                        <input
+                            type="checkbox"
+                            name="amenity_ids"
+                            t-att-value="amenity.id"
+                        />
+                        <span t-out="amenity.name"/>
+                    </label>
+                    <p t-if="not amenities" class="ts-muted">
+                        No hay servicios configurados para seleccionar.
+                    </p>
+                </fieldset>
+                <h2 class="ts-wide">Tarifa propia (opcional)</h2>
+                <p class="ts-wide ts-muted">
+                    Si dejas el precio vacío, se aplicará una tarifa general disponible.
+                </p>
+                <label>
+                    Nombre de tarifa
+                    <input name="reservation_name" value="Tarifa estándar"/>
+                </label>
+                <label>
+                    Precio por noche
+                    <input type="number" name="price" min="0" step="0.01"/>
+                </label>
+                <div class="ts-wide ts-form-actions">
+                    <button type="submit" class="ts-btn">Crear tipo</button>
+                </div>
+            </form>
+        </t>
+    </template>
+</odoo>
