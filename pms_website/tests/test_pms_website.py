@@ -486,6 +486,9 @@ class TestPmsWebsiteHttp(HttpCase):
         self.assertIn(b'name="search"', response.content)
         self.assertIn(b'name="date_range"', response.content)
         self.assertIn(b'name="guest_select"', response.content)
+        self.assertIn(b"amu-occupancy-popover", response.content)
+        self.assertIn(b'data-occupancy-stepper="adults"', response.content)
+        self.assertIn(b'name="adults"', response.content)
         self.assertIn(b"amu-footer", response.content)
 
     def test_property_page_public(self):

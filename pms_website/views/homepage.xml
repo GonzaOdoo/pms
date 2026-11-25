@@ -55,25 +55,89 @@
                         </div>
                         <div class="amu-search-field amu-search-dates">
                             <label for="amu-search-dates">Fechas</label>
-                            <input
-                                id="amu-search-dates"
-                                class="field_date_range_filtter"
-                                type="text"
-                                name="date_range"
-                                placeholder="Entrada — salida"
-                                autocomplete="off"
-                            />
+                            <div class="amu-date-range">
+                                <input
+                                    id="amu-search-dates"
+                                    type="date"
+                                    name="date_start"
+                                    aria-label="Fecha de entrada"
+                                />
+                                <span class="amu-date-range-separator" aria-hidden="true">—</span>
+                                <input
+                                    type="date"
+                                    name="date_end"
+                                    aria-label="Fecha de salida"
+                                />
+                            </div>
                         </div>
                         <div class="amu-search-field amu-search-guests">
-                            <label for="amu-search-guests">Huéspedes</label>
-                            <input
+                            <label>Huéspedes</label>
+                            <button
                                 id="amu-search-guests"
-                                type="number"
-                                name="guest_select"
-                                min="1"
-                                max="99"
-                                value="2"
-                            />
+                                class="amu-occupancy-trigger"
+                                type="button"
+                                aria-haspopup="dialog"
+                                aria-expanded="false"
+                                aria-controls="amu-home-occupancy"
+                                data-occupancy-trigger=""
+                            >
+                                <span data-occupancy-summary="">2 adultos · 0 niños · 1 habitación</span>
+                                <i class="fa fa-angle-down" aria-hidden="true"/>
+                            </button>
+                            <input type="hidden" name="adults" value="2" data-occupancy-value="adults"/>
+                            <input type="hidden" name="children" value="0" data-occupancy-value="children"/>
+                            <input type="hidden" name="rooms" value="1" data-occupancy-value="rooms"/>
+                            <input type="hidden" name="guest_select" value="2" data-occupancy-total=""/>
+                            <input type="hidden" name="work" value="0" data-occupancy-toggle-value="work"/>
+                            <input type="hidden" name="pets" value="0" data-occupancy-toggle-value="pets"/>
+                            <div
+                                id="amu-home-occupancy"
+                                class="amu-occupancy-popover"
+                                role="dialog"
+                                aria-label="Huéspedes y habitaciones"
+                                hidden="hidden"
+                            >
+                                <div class="amu-occupancy-row">
+                                    <span>Adultos</span>
+                                    <div class="amu-occupancy-stepper">
+                                        <button type="button" data-occupancy-stepper="adults" data-step="-1" aria-label="Quitar un adulto">−</button>
+                                        <span data-occupancy-count="adults">2</span>
+                                        <button type="button" data-occupancy-stepper="adults" data-step="1" aria-label="Agregar un adulto">+</button>
+                                    </div>
+                                </div>
+                                <div class="amu-occupancy-row">
+                                    <span>Niños</span>
+                                    <div class="amu-occupancy-stepper">
+                                        <button type="button" data-occupancy-stepper="children" data-step="-1" aria-label="Quitar un niño">−</button>
+                                        <span data-occupancy-count="children">0</span>
+                                        <button type="button" data-occupancy-stepper="children" data-step="1" aria-label="Agregar un niño">+</button>
+                                    </div>
+                                </div>
+                                <div class="amu-occupancy-row">
+                                    <span>Habitaciones</span>
+                                    <div class="amu-occupancy-stepper">
+                                        <button type="button" data-occupancy-stepper="rooms" data-step="-1" aria-label="Quitar una habitación">−</button>
+                                        <span data-occupancy-count="rooms">1</span>
+                                        <button type="button" data-occupancy-stepper="rooms" data-step="1" aria-label="Agregar una habitación">+</button>
+                                    </div>
+                                </div>
+                                <label class="amu-occupancy-toggle">
+                                    <span>¿Viajás por trabajo?</span>
+                                    <input type="checkbox" data-occupancy-toggle="work"/>
+                                    <span class="amu-switch" aria-hidden="true"/>
+                                </label>
+                                <label class="amu-occupancy-toggle">
+                                    <span>¿Viajás con mascotas?</span>
+                                    <input type="checkbox" data-occupancy-toggle="pets"/>
+                                    <span class="amu-switch" aria-hidden="true"/>
+                                </label>
+                                <p class="amu-occupancy-help">
+                                    Los animales de asistencia no se consideran mascotas.
+                                </p>
+                                <button class="amu-occupancy-done" type="button" data-occupancy-done="">
+                                    Listo
+                                </button>
+                            </div>
                         </div>
                         <button class="amu-search-submit" type="submit">
                             <span>Buscar alojamientos</span>

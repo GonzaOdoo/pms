@@ -147,13 +147,14 @@ class TestWebsiteSaleControllers(HttpCase):
         self.authenticate(None, None)
 
         response = self.url_open(
-            f"/property?search=Boston&date_range=12/10/2026%20-%2012/15/2026"
+            f"/property?search=Boston&date_start=2026-10-12&date_end=2026-12-15"
             f"&guest_select=3&property_type=house&amenity_ids={amenity.id}"
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'name="search"', response.content)
-        self.assertIn(b'name="date_range"', response.content)
+        self.assertIn(b'name="date_start"', response.content)
+        self.assertIn(b'name="date_end"', response.content)
         self.assertIn(b'name="guest_select"', response.content)
         self.assertIn(b'name="amenity_ids"', response.content)
         self.assertIn(b"Private balcony", response.content)
@@ -195,12 +196,76 @@ class TestWebsiteSaleControllers(HttpCase):
         )
         self.authenticate(None, None)
         start = datetime.strptime(self.dates_blocked[0], "%Y-%m-%d").strftime(
-            "%m/%d/%Y"
+            "%d/%m/%Y"
         )
-        end = datetime.strptime(self.dates_blocked[1], "%Y-%m-%d").strftime("%m/%d/%Y")
-        response = self.url_open(f"/property?date_range={start} - {end}")
+        end = datetime.strptime(self.dates_blocked[1], "%Y-%m-%d").strftime("%d/%m/%Y")
+        response = self.url_open(
+            f"/property?date_start={self.dates_blocked[0]}"
+            f"&date_end={self.dates_blocked[1]}"
+        )
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(b"Website Sale Property", response.content)
+
+        legacy_response = self.url_open(f"/property?date_range={start} - {end}")
+        self.assertEqual(legacy_response.status_code, 200)
+        self.assertNotIn(b"Website Sale Property", legacy_response.content)
+
+    def test_search_filters_rooms_guests_pets_and_work(self):
+        hotel = self.env["pms.property"].create(
+            {
+                "name": "Searchable Hotel",
+                "owner_id": self.partner_owner.id,
+                "website_id": self.website.id,
+                "is_published": True,
+                "website_published": True,
+                "city": "Boston",
+                "property_type": "hotel",
+                "no_of_guests": 8,
+            }
+        )
+        accommodation_type = self.env["pms.accommodation.type"].create(
+            {
+                "name": "Double",
+                "property_id": hotel.id,
+                "capacity": 2,
+            }
+        )
+        for room_name in ("Search Room 1", "Search Room 2"):
+            self.env["pms.room"].create(
+                {
+                    "name": room_name,
+                    "property_id": hotel.id,
+                    "type_id": self.env.ref("pms_base.pms_room_type_bed").id,
+                    "accommodation_type_id": accommodation_type.id,
+                }
+            )
+        hotel.amenity_ids = [
+            (
+                6,
+                0,
+                [
+                    self.env.ref("pms_base.pms_amenity_pets_allowed").id,
+                    self.env.ref("pms_base.pms_amenity_dedicated_workspace").id,
+                ],
+            )
+        ]
+        self.authenticate(None, None)
+
+        response = self.url_open(
+            "/property?adults=2&children=2&rooms=2&guest_select=4&work=1&pets=1"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Searchable Hotel", response.content)
+        self.assertIn(b"2 adultos", response.content)
+        self.assertIn(b"2 ni\xc3\xb1os", response.content)
+        self.assertIn(b"2 habitaciones", response.content)
+        self.assertIn(b'name="work" value="1"', response.content)
+        self.assertIn(b'name="pets" value="1"', response.content)
+
+        too_many_rooms = self.url_open(
+            "/property?adults=2&children=2&rooms=3&guest_select=4"
+        )
+        self.assertNotIn(b"Searchable Hotel", too_many_rooms.content)
 
     def test_check_availability_missing_dates(self):
         self.authenticate(None, None)

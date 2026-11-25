@@ -217,27 +217,91 @@
                         </div>
                         <div class="amu-search-field amu-search-dates">
                             <label for="amu-results-dates">Fechas</label>
-                            <input
-                                id="amu-results-dates"
-                                class="field_date_range_filtter"
-                                type="text"
-                                name="date_range"
-                                placeholder="Entrada — salida"
-                                autocomplete="off"
-                                t-att-value="search_raneg"
-                            />
+                            <div class="amu-date-range">
+                                <input
+                                    id="amu-results-dates"
+                                    type="date"
+                                    name="date_start"
+                                    aria-label="Fecha de entrada"
+                                    t-att-value="search_date_start"
+                                />
+                                <span class="amu-date-range-separator" aria-hidden="true">—</span>
+                                <input
+                                    type="date"
+                                    name="date_end"
+                                    aria-label="Fecha de salida"
+                                    t-att-value="search_date_end"
+                                />
+                            </div>
                         </div>
                         <div class="amu-search-field amu-search-guests">
-                            <label for="amu-results-guests">Huéspedes</label>
-                            <input
+                            <label>Huéspedes</label>
+                            <button
                                 id="amu-results-guests"
-                                type="number"
-                                name="guest_select"
-                                min="1"
-                                max="99"
-                                placeholder="2"
-                                t-att-value="search_guest or 2"
-                            />
+                                class="amu-occupancy-trigger"
+                                type="button"
+                                aria-haspopup="dialog"
+                                aria-expanded="false"
+                                aria-controls="amu-results-occupancy"
+                                data-occupancy-trigger=""
+                            >
+                                <span data-occupancy-summary="" t-out="search_occupancy"/>
+                                <i class="fa fa-angle-down" aria-hidden="true"/>
+                            </button>
+                            <input type="hidden" name="adults" t-att-value="search_adults" data-occupancy-value="adults"/>
+                            <input type="hidden" name="children" t-att-value="search_children" data-occupancy-value="children"/>
+                            <input type="hidden" name="rooms" t-att-value="search_rooms" data-occupancy-value="rooms"/>
+                            <input type="hidden" name="guest_select" t-att-value="search_guest or 2" data-occupancy-total=""/>
+                            <input type="hidden" name="work" t-att-value="'1' if search_work else '0'" data-occupancy-toggle-value="work"/>
+                            <input type="hidden" name="pets" t-att-value="'1' if search_pets else '0'" data-occupancy-toggle-value="pets"/>
+                            <div
+                                id="amu-results-occupancy"
+                                class="amu-occupancy-popover"
+                                role="dialog"
+                                aria-label="Huéspedes y habitaciones"
+                                hidden="hidden"
+                            >
+                                <div class="amu-occupancy-row">
+                                    <span>Adultos</span>
+                                    <div class="amu-occupancy-stepper">
+                                        <button type="button" data-occupancy-stepper="adults" data-step="-1" aria-label="Quitar un adulto">−</button>
+                                        <span data-occupancy-count="adults" t-out="search_adults"/>
+                                        <button type="button" data-occupancy-stepper="adults" data-step="1" aria-label="Agregar un adulto">+</button>
+                                    </div>
+                                </div>
+                                <div class="amu-occupancy-row">
+                                    <span>Niños</span>
+                                    <div class="amu-occupancy-stepper">
+                                        <button type="button" data-occupancy-stepper="children" data-step="-1" aria-label="Quitar un niño">−</button>
+                                        <span data-occupancy-count="children" t-out="search_children"/>
+                                        <button type="button" data-occupancy-stepper="children" data-step="1" aria-label="Agregar un niño">+</button>
+                                    </div>
+                                </div>
+                                <div class="amu-occupancy-row">
+                                    <span>Habitaciones</span>
+                                    <div class="amu-occupancy-stepper">
+                                        <button type="button" data-occupancy-stepper="rooms" data-step="-1" aria-label="Quitar una habitación">−</button>
+                                        <span data-occupancy-count="rooms" t-out="search_rooms"/>
+                                        <button type="button" data-occupancy-stepper="rooms" data-step="1" aria-label="Agregar una habitación">+</button>
+                                    </div>
+                                </div>
+                                <label class="amu-occupancy-toggle">
+                                    <span>¿Viajás por trabajo?</span>
+                                    <input type="checkbox" data-occupancy-toggle="work" t-att-checked="search_work"/>
+                                    <span class="amu-switch" aria-hidden="true"/>
+                                </label>
+                                <label class="amu-occupancy-toggle">
+                                    <span>¿Viajás con mascotas?</span>
+                                    <input type="checkbox" data-occupancy-toggle="pets" t-att-checked="search_pets"/>
+                                    <span class="amu-switch" aria-hidden="true"/>
+                                </label>
+                                <p class="amu-occupancy-help">
+                                    Los animales de asistencia no se consideran mascotas.
+                                </p>
+                                <button class="amu-occupancy-done" type="button" data-occupancy-done="">
+                                    Listo
+                                </button>
+                            </div>
                         </div>
                         <input
                             type="hidden"
@@ -287,14 +351,20 @@
                                 />
                                 <input
                                     type="hidden"
-                                    name="date_range"
-                                    t-att-value="search_raneg"
+                                    name="date_start"
+                                    t-att-value="search_date_start"
                                 />
+                                <input type="hidden" name="date_end" t-att-value="search_date_end"/>
                                 <input
                                     type="hidden"
                                     name="guest_select"
-                                    t-att-value="search_guest"
+                                    t-att-value="search_guest or 2"
                                 />
+                                <input type="hidden" name="adults" t-att-value="search_adults"/>
+                                <input type="hidden" name="children" t-att-value="search_children"/>
+                                <input type="hidden" name="rooms" t-att-value="search_rooms"/>
+                                <input t-if="search_work" type="hidden" name="work" value="1"/>
+                                <input t-if="search_pets" type="hidden" name="pets" value="1"/>
                                 <input
                                     t-if="category"
                                     type="hidden"

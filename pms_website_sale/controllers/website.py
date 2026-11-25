@@ -1,5 +1,7 @@
 # Copyright (c) 2021 Gray Matter Logic
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+import math
+import re
 from datetime import datetime
 
 from odoo import _, http
@@ -75,6 +77,15 @@ class PropertyTableCompute:
 
 
 class WebsiteSale(WebsiteSale):
+    @staticmethod
+    def _parse_search_date(value):
+        for date_format in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y"):
+            try:
+                return datetime.strptime(value.strip(), date_format)
+            except ValueError:
+                continue
+        return None
+
     def _get_property_search_domain(self, search, category, guest, args):
         domain = []
         domain += [("is_published", "=", True)]
@@ -107,27 +118,104 @@ class WebsiteSale(WebsiteSale):
         domain += [("property_child_ids", "=", False)]
         domain += [("setup_state", "=", "ready")]
 
-        try:
-            guest_count = int(guest) if guest else 0
-        except (TypeError, ValueError):
-            return domain + [("id", "=", 0)]
+        has_detailed_occupancy = "adults" in args or "children" in args
+        if has_detailed_occupancy:
+            try:
+                adults = int(args.get("adults", 2) or 0)
+                children = int(args.get("children", 0) or 0)
+                requested_rooms = int(args.get("rooms", 1) or 1)
+            except (TypeError, ValueError):
+                return domain + [("id", "=", 0)]
+            if adults < 1 or children < 0 or requested_rooms < 1:
+                return domain + [("id", "=", 0)]
+            guest_count = adults + children
+        else:
+            try:
+                guest_count = int(guest) if guest else 0
+                requested_rooms = int(args.get("rooms", 1) or 1)
+            except (TypeError, ValueError):
+                return domain + [("id", "=", 0)]
+            if guest_count < 0 or requested_rooms < 1:
+                return domain + [("id", "=", 0)]
+
+        pets_required = str(args.get("pets", "")).lower() in (
+            "1",
+            "true",
+            "on",
+        )
+        work_required = str(args.get("work", "")).lower() in (
+            "1",
+            "true",
+            "on",
+        )
+        if pets_required:
+            pets_amenity = request.env.ref(
+                "pms_base.pms_amenity_pets_allowed"
+            )
+            domain.extend(
+                [
+                    "|",
+                    "|",
+                    ("amenity_ids", "in", [pets_amenity.id]),
+                    ("accommodation_type_ids.amenity_ids", "in", [pets_amenity.id]),
+                    ("room_ids.amenity_ids", "in", [pets_amenity.id]),
+                ]
+            )
+        if work_required:
+            workspace_amenity = request.env.ref(
+                "pms_base.pms_amenity_dedicated_workspace"
+            )
+            domain.extend(
+                [
+                    "|",
+                    "|",
+                    ("amenity_ids", "in", [workspace_amenity.id]),
+                    (
+                        "accommodation_type_ids.amenity_ids",
+                        "in",
+                        [workspace_amenity.id],
+                    ),
+                    ("room_ids.amenity_ids", "in", [workspace_amenity.id]),
+                ]
+            )
+
+        if has_detailed_occupancy:
+            adults_for_form = adults
+            children_for_form = children
+        else:
+            adults_for_form = guest_count or 2
+            children_for_form = 0
+        rooms_for_form = requested_rooms
 
         start = stop = False
-        if args.get("date_range"):
+        date_values = []
+        if "date_start" in args or "date_end" in args:
+            raw_start = args.get("date_start", "").strip()
+            raw_stop = args.get("date_end", "").strip()
+            if raw_start or raw_stop:
+                if not raw_start or not raw_stop:
+                    return domain + [("id", "=", 0)]
+                date_values = [raw_start, raw_stop]
+        elif args.get("date_range"):
             date_range = args["date_range"].split(" - ", 1)
             if len(date_range) != 2:
-                date_range = args["date_range"].split("-", 1)
+                date_range = args["date_range"].split(" – ", 1)
+            if len(date_range) != 2:
+                date_match = re.fullmatch(
+                    r"(\d{1,2}/\d{1,2}/\d{4})-(\d{1,2}/\d{1,2}/\d{4})",
+                    args["date_range"],
+                )
+                date_range = list(date_match.groups()) if date_match else []
             if len(date_range) != 2:
                 return domain + [("id", "=", 0)]
-            try:
-                start = datetime.strptime(
-                    date_range[0].strip() + " 00:00:00", "%m/%d/%Y %H:%M:%S"
-                )
-                stop = datetime.strptime(
-                    date_range[1].strip() + " 00:00:00", "%m/%d/%Y %H:%M:%S"
-                )
-            except ValueError:
+            date_values = date_range
+        if date_values:
+            parsed_dates = [
+                self._parse_search_date(value) for value in date_values
+            ]
+            if any(not parsed_date for parsed_date in parsed_dates):
                 return domain + [("id", "=", 0)]
+            start, stop = parsed_dates
             if start >= stop:
                 return domain + [("id", "=", 0)]
 
@@ -135,7 +223,43 @@ class WebsiteSale(WebsiteSale):
         Reservation = request.env["pms.reservation"].sudo()
         available_property_ids = []
         for property_rec in properties:
-            if property_rec.accommodation_type_ids:
+            if property_rec.property_type == "hotel":
+                accommodation_types = property_rec.accommodation_type_ids.filtered(
+                    lambda accommodation_type: accommodation_type.active
+                    and (
+                        not accommodation_type.capacity
+                        or accommodation_type.capacity
+                        >= math.ceil(guest_count / requested_rooms)
+                    )
+                )
+                is_available = False
+                for accommodation_type in accommodation_types:
+                    room_domain = [
+                        ("property_id", "=", property_rec.id),
+                        ("accommodation_type_id", "=", accommodation_type.id),
+                        ("active", "=", True),
+                    ]
+                    physical_room_count = request.env["pms.room"].sudo().search_count(
+                        room_domain
+                    )
+                    available_room_count = physical_room_count
+                    if start:
+                        if not Reservation.is_accommodation_type_available(
+                            property_rec.id,
+                            accommodation_type.id,
+                            start,
+                            stop,
+                        ):
+                            continue
+                        booking_domain = Reservation._get_active_overlap_domain(
+                            property_rec.id, start, stop
+                        ) + [("accommodation_type_id", "=", accommodation_type.id)]
+                        booked_count = Reservation.search_count(booking_domain)
+                        available_room_count -= booked_count
+                    if available_room_count >= requested_rooms:
+                        is_available = True
+                        break
+            elif property_rec.accommodation_type_ids:
                 accommodation_types = property_rec.accommodation_type_ids.filtered(
                     lambda accommodation_type: accommodation_type.active
                     and (
@@ -143,9 +267,9 @@ class WebsiteSale(WebsiteSale):
                         or accommodation_type.capacity >= guest_count
                     )
                 )
-                is_available = bool(accommodation_types) and (
-                    not start
-                    or any(
+                is_available = requested_rooms == 1 and bool(accommodation_types)
+                if is_available and start:
+                    is_available = any(
                         Reservation.is_accommodation_type_available(
                             property_rec.id,
                             accommodation_type.id,
@@ -154,15 +278,18 @@ class WebsiteSale(WebsiteSale):
                         )
                         for accommodation_type in accommodation_types
                     )
-                )
             else:
                 is_available = (
-                    not property_rec.no_of_guests
-                    or property_rec.no_of_guests >= guest_count
-                ) and (
-                    not start
-                    or Reservation.is_accommodation_type_available(
-                        property_rec.id, False, start, stop
+                    requested_rooms == 1
+                    and (
+                        not property_rec.no_of_guests
+                        or property_rec.no_of_guests >= guest_count
+                    )
+                    and (
+                        not start
+                        or Reservation.is_accommodation_type_available(
+                            property_rec.id, False, start, stop
+                        )
                     )
                 )
             if is_available:
@@ -304,13 +431,70 @@ class WebsiteSale(WebsiteSale):
             amenity_filter_groups.append(
                 {"name": "Otros", "amenities": ungrouped_amenities}
             )
+        search_date_start = post.get("date_start", "")
+        search_date_end = post.get("date_end", "")
+        if not search_date_start and not search_date_end and post.get("date_range"):
+            date_range = post["date_range"].split(" - ", 1)
+            if len(date_range) != 2:
+                date_range = post["date_range"].split(" – ", 1)
+            if len(date_range) != 2:
+                date_match = re.fullmatch(
+                    r"(\d{1,2}/\d{1,2}/\d{4})-(\d{1,2}/\d{1,2}/\d{4})",
+                    post["date_range"],
+                )
+                date_range = list(date_match.groups()) if date_match else []
+            if len(date_range) == 2:
+                parsed_dates = [
+                    self._parse_search_date(value) for value in date_range
+                ]
+                if all(parsed_dates):
+                    search_date_start, search_date_end = [
+                        parsed_date.strftime("%Y-%m-%d")
+                        for parsed_date in parsed_dates
+                    ]
+        has_detailed_occupancy = "adults" in post or "children" in post
+        try:
+            if has_detailed_occupancy:
+                adults_for_form = int(post.get("adults", 2) or 0)
+                children_for_form = int(post.get("children", 0) or 0)
+            else:
+                adults_for_form = int(guest_select) if guest_select else 2
+                children_for_form = 0
+            rooms_for_form = int(post.get("rooms", 1) or 1)
+        except (TypeError, ValueError):
+            adults_for_form, children_for_form, rooms_for_form = 2, 0, 1
+        work_required = str(post.get("work", "")).lower() in (
+            "1",
+            "true",
+            "on",
+        )
+        pets_required = str(post.get("pets", "")).lower() in (
+            "1",
+            "true",
+            "on",
+        )
         # properties
         values.update(
             {
                 "category": category,
                 "search_city": search,
-                "search_guest": guest_select,
+                "search_guest": (
+                    adults_for_form + children_for_form
+                    if has_detailed_occupancy
+                    else guest_select
+                ),
                 "search_raneg": post.get("date_range"),
+                "search_date_start": search_date_start,
+                "search_date_end": search_date_end,
+                "search_adults": adults_for_form,
+                "search_children": children_for_form,
+                "search_rooms": rooms_for_form,
+                "search_work": work_required,
+                "search_pets": pets_required,
+                "search_occupancy": (
+                    f"{adults_for_form} adultos · {children_for_form} niños · "
+                    f"{rooms_for_form} habitaciones"
+                ),
                 "selected_property_type": post.get("property_type", ""),
                 "selected_amenity_ids": selected_amenity_ids,
                 "amenity_filter_groups": amenity_filter_groups,
