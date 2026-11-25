@@ -81,6 +81,24 @@
             updateDateLimits();
         });
 
+        const resultsGrid = document.querySelector("[data-results-grid]");
+        if (resultsGrid) {
+            document.querySelectorAll("[data-results-view]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    const isGrid = button.dataset.resultsView === "grid";
+                    resultsGrid.classList.toggle("amu-property-grid--tiles", isGrid);
+                    document
+                        .querySelectorAll("[data-results-view]")
+                        .forEach((viewButton) => {
+                            viewButton.setAttribute(
+                                "aria-pressed",
+                                String(viewButton === button)
+                            );
+                        });
+                });
+            });
+        }
+
         document.querySelectorAll(".amu-search-guests").forEach((occupancy) => {
             const trigger = occupancy.querySelector("[data-occupancy-trigger]");
             const popover = occupancy.querySelector(".amu-occupancy-popover");

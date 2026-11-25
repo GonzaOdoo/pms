@@ -875,24 +875,78 @@
     min-width: 0;
 }
 
+.amu-results-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    color: #62676b;
+    font-size: 14px;
+}
+
+.amu-results-toolbar-label {
+    font-weight: 500;
+}
+
+.amu-view-switch {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--amu-line);
+    background: #fff;
+}
+
+.amu-view-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 6px 12px;
+    border: 0;
+    background: transparent;
+    color: #62676b;
+    cursor: pointer;
+    font: 500 13px/1.2 "AMU Oswald", sans-serif;
+}
+
+.amu-view-button[aria-pressed="true"] {
+    background: var(--amu-nature);
+    color: #fff;
+}
+
+.amu-view-button:focus-visible {
+    outline: 2px solid var(--amu-glacier);
+    outline-offset: 2px;
+}
+
+.amu-property-grid {
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+}
+
 .amu-property-card {
     display: grid;
     grid-template-columns: minmax(220px, 34%) minmax(0, 1fr);
     min-height: 260px;
+    overflow: hidden;
     border: 1px solid var(--amu-line);
+    border-radius: 12px;
     background: #fff;
-    transition: box-shadow 160ms ease, transform 160ms ease;
+    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 .amu-property-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(37, 43, 53, 0.1);
+    border-color: rgba(49, 93, 115, 0.38);
+    box-shadow: 0 14px 34px rgba(37, 43, 53, 0.12);
 }
 
 .amu-property-image {
     position: relative;
     display: block;
-    min-height: 260px;
+    min-height: 240px;
     overflow: hidden;
     background: #e8e4dc;
 }
@@ -915,9 +969,11 @@
     top: 14px;
     left: 14px;
     padding: 6px 10px;
-    background: var(--amu-paper);
+    border-radius: 999px;
+    background: rgba(243, 240, 233, 0.94);
     color: var(--amu-ink);
     font-size: 12px;
+    font-weight: 500;
     letter-spacing: 0.07em;
     text-transform: uppercase;
 }
@@ -925,8 +981,9 @@
 .amu-property-info {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    padding: 24px;
+    align-items: stretch;
+    min-width: 0;
+    padding: 22px 24px;
 }
 
 .amu-property-title-row {
@@ -948,7 +1005,7 @@
 .amu-property-title-row h2 {
     margin: 0;
     font-family: "AMU Gravitas", Georgia, serif;
-    font-size: clamp(20px, 2.4vw, 28px);
+    font-size: clamp(19px, 2vw, 25px);
     font-weight: 400;
     line-height: 1.25;
 }
@@ -963,15 +1020,43 @@
 
 .amu-property-guests {
     flex: 0 0 auto;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: var(--amu-paper);
     color: #62676b;
     font-size: 14px;
 }
 
 .amu-property-description {
-    margin: 14px 0;
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 14px 0 12px;
     color: #62676b;
-    font-size: 16px;
-    line-height: 1.45;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.amu-property-description p {
+    margin: 0;
+}
+
+.amu-property-amenities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 0 0 14px;
+}
+
+.amu-property-amenity {
+    max-width: 100%;
+    padding: 5px 9px;
+    border: 1px solid rgba(37, 43, 53, 0.2);
+    border-radius: 5px;
+    color: #4e5559;
+    font-size: 12px;
+    line-height: 1.25;
 }
 
 .amu-property-meta {
@@ -989,18 +1074,61 @@
 .amu-property-link {
     display: inline-flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
+    align-self: flex-end;
     margin-top: auto;
-    padding-top: 20px;
-    color: var(--amu-clay);
+    padding: 11px 16px;
+    border-radius: 5px;
+    background: var(--amu-nature);
+    color: #fff !important;
     font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-decoration: none !important;
+    transition: background-color 160ms ease;
 }
 
-.amu-property-link:hover {
-    color: var(--amu-ink);
+.amu-property-link:hover,
+.amu-property-link:focus-visible {
+    background: var(--amu-ink);
+}
+
+.amu-property-grid--tiles {
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(#{'min(100%, 290px)'}, 1fr)
+    );
+}
+
+.amu-property-grid--tiles .amu-property-card {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.amu-property-grid--tiles .amu-property-image {
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+}
+
+.amu-property-grid--tiles .amu-property-info {
+    padding: 18px;
+}
+
+.amu-property-grid--tiles .amu-property-title-row {
+    display: block;
+}
+
+.amu-property-grid--tiles .amu-property-guests {
+    display: inline-flex;
+    margin-top: 10px;
+}
+
+.amu-property-grid--tiles .amu-property-link {
+    width: 100%;
+}
+
+.amu-empty-results {
+    grid-column: 1 / -1;
 }
 
 .amu-empty-results {
@@ -1043,4 +1171,59 @@
 
 #products_grid_before .nav-link {
     color: var(--amu-sea);
+}
+
+@media (max-width: 991.98px) {
+    .amu-results-layout {
+        grid-template-columns: 230px minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .amu-property-card {
+        grid-template-columns: minmax(180px, 34%) minmax(0, 1fr);
+    }
+
+    .amu-property-info {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .amu-results-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .amu-filter-sidebar {
+        position: static;
+    }
+
+    .amu-property-card {
+        grid-template-columns: 1fr;
+    }
+
+    .amu-property-image {
+        min-height: 0;
+        aspect-ratio: 16 / 10;
+    }
+
+    .amu-property-info {
+        padding: 18px;
+    }
+
+    .amu-property-title-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .amu-property-guests {
+        align-self: flex-start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .amu-property-card,
+    .amu-property-image img,
+    .amu-property-link {
+        transition: none;
+    }
 }

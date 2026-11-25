@@ -72,6 +72,9 @@ class TestWebsiteSaleControllers(HttpCase):
         response = self.url_open("/property")
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Website Sale Property", response.content)
+        self.assertIn(b'data-results-view="list"', response.content)
+        self.assertIn(b'data-results-view="grid"', response.content)
+        self.assertIn(b"class=\"amu-property-grid\"", response.content)
 
     def test_property_listing_hides_setup_drafts(self):
         self.env["pms.property"].create(
