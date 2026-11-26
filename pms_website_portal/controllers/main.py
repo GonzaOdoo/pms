@@ -1,6 +1,11 @@
+import base64
+import io
 import logging
 import math
+import os
 from datetime import timedelta
+
+from PIL import Image, UnidentifiedImageError
 
 from odoo import fields, http
 from odoo.exceptions import AccessError
@@ -10,7 +15,10 @@ from odoo.addons.portal.controllers.portal import CustomerPortal
 
 _logger = logging.getLogger(__name__)
 GROUP = "pms_website_portal.group_provider"
-WIZARD_STEPS = ("address", "amenities", "inventory", "rate", "review")
+WIZARD_STEPS = ("address", "photos", "amenities", "inventory", "rate", "review")
+MAX_PROPERTY_IMAGES = 20
+MAX_PROPERTY_IMAGE_UPLOADS = 10
+MAX_PROPERTY_IMAGE_SIZE = 10 * 1024 * 1024
 
 # Acciones de reserva que el proveedor puede disparar desde el panel.
 RESERVATION_ACTIONS = {
@@ -26,6 +34,10 @@ FLASH = {
     "completed": "La propiedad quedó configurada y lista para revisión.",
     "error": "Revisá los datos: falta un campo obligatorio o hay un valor inválido",
     "rate_in_use": "No se puede quitar una tarifa que ya está asociada a reservas.",
+    "image_error": (
+        "Cargá hasta 10 imágenes JPG, PNG o WebP por vez, de máximo 10 MB "
+        "cada una. La propiedad admite 20 imágenes."
+    ),
 }
 
 
@@ -139,6 +151,7 @@ class ProviderPanel(http.Controller):
                         WIZARD_STEPS,
                         (
                             "Dirección",
+                            "Fotos",
                             "Servicios",
                             "Habitaciones",
                             "Tarifas",
@@ -150,6 +163,48 @@ class ProviderPanel(http.Controller):
         )
         values.update(extra)
         return values
+
+    def _save_property_images(self, prop, uploads):
+        files = [upload for upload in uploads if upload and upload.filename]
+        if not files:
+            return True
+        existing_count = len(prop.sudo().image_ids)
+        if (
+            len(files) > MAX_PROPERTY_IMAGE_UPLOADS
+            or existing_count + len(files) > MAX_PROPERTY_IMAGES
+        ):
+            return False
+
+        image_values = []
+        for upload in files:
+            content = upload.stream.read(MAX_PROPERTY_IMAGE_SIZE + 1)
+            if not content or len(content) > MAX_PROPERTY_IMAGE_SIZE:
+                return False
+            try:
+                with Image.open(io.BytesIO(content)) as image:
+                    if image.format not in ("JPEG", "PNG", "WEBP"):
+                        return False
+                    image.verify()
+            except (
+                UnidentifiedImageError,
+                OSError,
+                SyntaxError,
+                ValueError,
+                EOFError,
+                Image.DecompressionBombError,
+            ):
+                return False
+            name = os.path.basename(upload.filename.replace("\\", "/")).strip()
+            image_values.append(
+                {
+                    "name": name[:255] or "Imagen",
+                    "image_1920": base64.b64encode(content),
+                    "property_id": prop.id,
+                }
+            )
+
+        request.env["pms.property.image"].sudo().create(image_values)
+        return True
 
     # -------------------------------------------------------------- dashboard
     def _dashboard(self):
@@ -361,6 +416,11 @@ class ProviderPanel(http.Controller):
                     )
                 ],
             }
+        elif step == "photos":
+            if not self._save_property_images(
+                prop, request.httprequest.files.getlist("images")
+            ):
+                return self._redirect(self._wizard_path(prop, step), "image_error")
         elif step == "inventory":
             if prop.property_type in ("house", "camping"):
                 bedroom_count = _to_int(post.get("bedroom_count"))
@@ -532,6 +592,30 @@ class ProviderPanel(http.Controller):
         )
 
     @http.route(
+        "/my/properties/<int:property_id>/images/<int:image_id>/delete",
+        type="http",
+        auth="user",
+        website=True,
+        methods=["POST"],
+    )
+    def property_image_delete(self, property_id, image_id, **post):
+        if not _is_provider():
+            return request.not_found()
+        prop = self._own("pms.property", property_id)
+        if not prop:
+            return request.not_found()
+        image = request.env["pms.property.image"].sudo().search(
+            [("id", "=", image_id), ("property_id", "=", prop.id)],
+            limit=1,
+        )
+        if not image:
+            return request.not_found()
+        image.unlink()
+        if prop.setup_state == "draft":
+            return request.redirect(self._wizard_path(prop, "photos"))
+        return self._redirect(f"/my/properties/{prop.id}", "saved")
+
+    @http.route(
         "/my/properties/save",
         type="http", auth="user", website=True, methods=["POST"],
     )
@@ -560,6 +644,10 @@ class ProviderPanel(http.Controller):
             prop = self._own("pms.property", property_id)
             if not prop:
                 return request.not_found()
+            if not self._save_property_images(
+                prop, request.httprequest.files.getlist("images")
+            ):
+                return self._redirect(f"/my/properties/{prop.id}", "image_error")
             # Validado con el usuario; se escribe con sudo porque la
             # propiedad delega nombre y dirección en res.partner.
             prop.sudo().write(vals)

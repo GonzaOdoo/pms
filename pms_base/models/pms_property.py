@@ -54,6 +54,7 @@ class PmsProperty(models.Model):
     setup_step = fields.Selection(
         [
             ("address", "Address"),
+            ("photos", "Photos"),
             ("amenities", "Amenities"),
             ("inventory", "Rooms"),
             ("rate", "Rates"),
@@ -75,6 +76,11 @@ class PmsProperty(models.Model):
         help="List of rooms in the property.",
         comodel_name="pms.room",
         inverse_name="property_id",
+    )
+    image_ids = fields.One2many(
+        "pms.property.image",
+        "property_id",
+        string="Property Images",
     )
     accommodation_type_ids = fields.One2many(
         "pms.accommodation.type", "property_id", string="Accommodation Types"

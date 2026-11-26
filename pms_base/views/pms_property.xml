@@ -104,6 +104,15 @@
                                 <field name="property_child_ids" invisible="True" />
                             </group>
                         </page>
+                        <page string="Images" name="images">
+                            <field name="image_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="name" />
+                                    <field name="image_1920" widget="image" />
+                                </list>
+                            </field>
+                        </page>
                         <page
                             string="Rooms"
                             name="rooms"

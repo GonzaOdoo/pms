@@ -8,3 +8,4 @@ access_ts_partner_property_provider,Proveedor: ficha de propiedades,res.partner,
 access_ts_stage_provider,Proveedor: etapas,pms.stage,pms_website_portal.group_provider,r,
 access_ts_room_type_provider,Proveedor: tipos de habitacion,pms.room.type,pms_website_portal.group_provider,r,
 access_ts_amenity_provider,Proveedor: amenities,pms.amenity,pms_website_portal.group_provider,r,
+access_ts_property_image_provider,Proveedor: imágenes de sus propiedades,pms.property.image,pms_website_portal.group_provider,r,"[('property_id.owner_id', 'child_of', user.commercial_partner_id.id)]"

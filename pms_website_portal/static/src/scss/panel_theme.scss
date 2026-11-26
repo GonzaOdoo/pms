@@ -267,6 +267,41 @@
         color: var(--amu-ink, #252b35);
     }
 
+    .ts-property-images {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 14px;
+        margin: 20px 0;
+    }
+
+    .ts-property-image {
+        display: grid;
+        align-content: start;
+        gap: 8px;
+        min-width: 0;
+        padding: 10px;
+        border: 1px solid var(--ts-line);
+        background: var(--ts-surface);
+        color: var(--ts-muted);
+        font-size: 13px;
+    }
+
+    .ts-property-image img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+    }
+
+    .ts-property-image span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .ts-property-image .ts-btn {
+        width: 100%;
+    }
+
     .ts-type-card,
     .ts-amenities label {
         border-color: var(--amu-line, rgba(37, 43, 53, 0.16));

@@ -19,4 +19,6 @@ access_pms_team_user,access_pms_team,pms.team,pms_base.group_pms_user,r,
 access_pms_team_manager,access_pms_team,pms.team,pms_base.group_pms_manager,crud,
 access_pms_property_user,access_property_user,pms.property,pms_base.group_pms_user,r,
 access_pms_property_manager,access_property_manager,pms.property,pms_base.group_pms_manager,crud,
+access_pms_property_image_user,access_property_image_user,pms.property.image,pms_base.group_pms_user,r,"['|', ('property_id.company_id', '=', False), ('property_id.company_id', 'in', company_ids)]"
+access_pms_property_image_manager,access_property_image_manager,pms.property.image,pms_base.group_pms_manager,crud,"['|', ('property_id.company_id', '=', False), ('property_id.company_id', 'in', company_ids)]"
 pms_property_rule,Multi-Company Property Rule,pms.property,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"

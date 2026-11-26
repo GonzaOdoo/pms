@@ -14,6 +14,7 @@ from . import (
     pms_amenity,
     pms_service,
     pms_property,
+    pms_property_image,
     res_company,
     res_config_settings,
     res_partner,

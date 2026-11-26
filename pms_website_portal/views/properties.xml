@@ -42,7 +42,7 @@
     <template id="page_property_form" name="Panel: ficha de propiedad">
         <t t-call="pms_website_portal.layout">
             <t t-set="ts_actions"><a href="/my/properties" class="ts-btn ts-btn-ghost">Volver</a></t>
-            <form class="ts-card ts-form" method="post" action="/my/properties/save">
+            <form class="ts-card ts-form" method="post" enctype="multipart/form-data" action="/my/properties/save">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                 <input type="hidden" name="property_id" t-att-value="prop.id if prop else 0"/>
                 <label class="ts-wide">Nombre<input name="name" required="required" t-att-value="prop.name if prop else ''"/></label>
@@ -53,8 +53,48 @@
                 <label>Capacidad (huéspedes)<input name="no_of_guests" type="number" min="0" t-att-value="prop.no_of_guests if prop else ''"/></label>
                 <label>Mínimo de noches<input name="min_nights" type="number" min="0" t-att-value="prop.min_nights if prop else 1"/></label>
                 <label>Máximo de noches<input name="max_nights" type="number" min="1" t-att-value="prop.max_nights if prop else 30"/></label>
-                <div class="ts-wide ts-form-actions"><button type="submit" class="ts-btn">Guardar</button></div>
+                <label class="ts-wide">
+                    Fotos de la propiedad
+                    <span class="ts-muted">
+                        <t t-out="len(prop.image_ids)" /> de 20 fotos cargadas. JPG, PNG o WebP;
+                        hasta 10 fotos por carga.
+                    </span>
+                    <input
+                        type="file"
+                        name="images"
+                        accept="image/jpeg,image/png,image/webp"
+                        multiple="multiple"
+                        t-att-disabled="len(prop.image_ids) >= 20"
+                    />
+                </label>
+                <div class="ts-wide ts-form-actions"><button type="submit" class="ts-btn">Guardar cambios y fotos</button></div>
             </form>
+            <div t-if="prop.image_ids" class="ts-property-images">
+                <article
+                    t-foreach="prop.image_ids"
+                    t-as="property_image"
+                    class="ts-property-image"
+                >
+                    <img
+                        t-att-src="'/web/image/pms.property.image/%s/image_1920' % property_image.id"
+                        t-att-alt="property_image.name"
+                    />
+                    <span t-out="property_image.name" />
+                    <form
+                        method="post"
+                        t-attf-action="/my/properties/#{prop.id}/images/#{property_image.id}/delete"
+                    >
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            t-att-value="request.csrf_token()"
+                        />
+                        <button type="submit" class="ts-btn ts-btn-ghost">
+                            Quitar
+                        </button>
+                    </form>
+                </article>
+            </div>
         </t>
     </template>
 </odoo>

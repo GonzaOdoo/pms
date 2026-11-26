@@ -69,6 +69,22 @@ class TestProviderPortal(HttpCase):
             404,
         )
 
+    def test_wizard_property_photos_step_is_optional(self):
+        prop = self._start_wizard("Propiedad con fotos", "house")
+        self._post(
+            f"/my/properties/{prop.id}/wizard/address/save",
+            {"street": "Calle 1", "city": "Salta"},
+        )
+        response = self._get(f"/my/properties/{prop.id}/wizard/photos")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('name="images"', response.text)
+        self.assertIn('enctype="multipart/form-data"', response.text)
+
+        response = self._post(f"/my/properties/{prop.id}/wizard/photos/save", {})
+        self.assertEqual(response.status_code, 303)
+        prop.invalidate_recordset()
+        self.assertEqual(prop.setup_step, "amenities")
+
     def test_dashboard_replaces_portal_for_provider(self):
         r = self._get("/my")
         self.assertEqual(r.status_code, 200)
@@ -99,6 +115,7 @@ class TestProviderPortal(HttpCase):
             f"/my/properties/{prop.id}/wizard/address/save",
             {"street": "Calle 1", "city": "Salta"},
         )
+        self._post(f"/my/properties/{prop.id}/wizard/photos/save", {})
         self._post(
             f"/my/properties/{prop.id}/wizard/amenities/save",
             {
@@ -132,6 +149,7 @@ class TestProviderPortal(HttpCase):
             f"/my/properties/{prop.id}/wizard/address/save",
             {"street": "Calle 2", "city": "Salta"},
         )
+        self._post(f"/my/properties/{prop.id}/wizard/photos/save", {})
         self._post(
             f"/my/properties/{prop.id}/wizard/amenities/save",
             {

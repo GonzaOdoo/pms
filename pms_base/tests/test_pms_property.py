@@ -66,6 +66,20 @@ class TestPmsProperty(PmsBaseCase):
         self.property.invalidate_recordset()
         self.assertEqual(self.property.room_count, 1)
 
+    def test_property_images_are_linked_to_property(self):
+        image = self.env["pms.property.image"].create(
+            {
+                "name": "Habitación.png",
+                "image_1920": (
+                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwC"
+                    "AAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+                ),
+                "property_id": self.property.id,
+            }
+        )
+        self.assertIn(image, self.property.image_ids)
+        self.assertEqual(image.property_id, self.property)
+
     def test_child_property_count(self):
         """childs_property_count reflects the number of child properties."""
         self.assertEqual(self.property.childs_property_count, 0)

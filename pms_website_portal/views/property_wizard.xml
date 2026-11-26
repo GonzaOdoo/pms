@@ -140,6 +140,68 @@
                     </form>
                 </t>
 
+                <t t-if="wizard_step == 'photos'">
+                    <h2>Fotos de la propiedad</h2>
+                    <p class="ts-muted">
+                        Agrega imágenes JPG, PNG o WebP. Puedes cargar hasta 10 por vez,
+                        con un máximo de 20 fotos por propiedad. Este paso es opcional.
+                    </p>
+                    <p class="ts-muted">
+                        Fotos cargadas: <t t-out="len(prop.image_ids)" /> de 20.
+                    </p>
+                    <form
+                        class="ts-form"
+                        method="post"
+                        enctype="multipart/form-data"
+                        t-attf-action="/my/properties/#{prop.id}/wizard/photos/save"
+                    >
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            t-att-value="request.csrf_token()"
+                        />
+                        <label class="ts-wide">
+                            Seleccionar fotos
+                            <input
+                                type="file"
+                                name="images"
+                                accept="image/jpeg,image/png,image/webp"
+                                multiple="multiple"
+                                t-att-disabled="len(prop.image_ids) >= 20"
+                            />
+                        </label>
+                        <div class="ts-wide ts-form-actions">
+                            <button type="submit" class="ts-btn">Guardar y continuar</button>
+                        </div>
+                    </form>
+                    <div t-if="prop.image_ids" class="ts-property-images">
+                        <article
+                            t-foreach="prop.image_ids"
+                            t-as="property_image"
+                            class="ts-property-image"
+                        >
+                            <img
+                                t-att-src="'/web/image/pms.property.image/%s/image_1920' % property_image.id"
+                                t-att-alt="property_image.name"
+                            />
+                            <span t-out="property_image.name" />
+                            <form
+                                method="post"
+                                t-attf-action="/my/properties/#{prop.id}/images/#{property_image.id}/delete"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    t-att-value="request.csrf_token()"
+                                />
+                                <button type="submit" class="ts-btn ts-btn-ghost">
+                                    Quitar
+                                </button>
+                            </form>
+                        </article>
+                    </div>
+                </t>
+
                 <t t-if="wizard_step == 'amenities'">
                     <h2>Características y servicios</h2>
                     <p class="ts-muted">
@@ -417,6 +479,7 @@
                     <dl class="ts-dl">
                         <div><dt>Tipo</dt><dd t-out="'Hotel' if prop.property_type == 'hotel' else ('Camping' if prop.property_type == 'camping' else 'Casa o apartamento')"/></div>
                         <div><dt>Dirección</dt><dd><span t-out="prop.street"/>, <span t-out="prop.city"/></dd></div>
+                        <div><dt>Fotos</dt><dd t-out="len(prop.image_ids)"/></div>
                         <div><dt>Capacidad</dt><dd><span t-out="prop.no_of_guests"/> huéspedes</dd></div>
                         <div t-if="prop.property_type in ('house', 'camping')"><dt>Dormitorios</dt><dd t-out="prop.bedroom_count"/></div>
                         <div t-if="prop.property_type in ('house', 'camping')"><dt>Baños</dt><dd t-out="prop.bathroom_count"/></div>
