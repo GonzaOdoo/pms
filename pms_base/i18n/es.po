@@ -2712,6 +2712,26 @@ msgstr "Lavavajillas"
 msgid "Dedicated workspace"
 msgstr "Espacio de trabajo dedicado"
 
+#. module: pms_base
+#: model:product.template,name:pms_base.demo_product_internet
+msgid "Internet"
+msgstr "Internet"
+
+#. module: pms_base
+#: model:product.template,name:pms_base.demo_product_cleaning
+msgid "Cleaning"
+msgstr "Limpieza"
+
+#. module: pms_base
+#: model:product.template,name:pms_base.demo_product_laundry
+msgid "Laundry"
+msgstr "Lavandería"
+
+#. module: pms_base
+#: model:product.template,name:pms_base.demo_product_parking
+msgid "Parking"
+msgstr "Estacionamiento"
+
 #~ msgid ""
 #~ "<br/>\n"
 #~ "                                                Properties"
