@@ -564,7 +564,7 @@
 
     <template
         id="property_booking_form"
-        inherit_id="pms_website.property"
+        inherit_id="pms_website.property_detail"
         name="Property Booking Form"
     >
         <!-- Book Now button in property details -->

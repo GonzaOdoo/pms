@@ -279,12 +279,11 @@ class TestPmsWebsiteController(PmsBaseCase):
         self.assertEqual(options["bedrooms"], [])
 
     def test_product_page_not_found(self):
+        from ..controllers import website as website_module
+
         controller = Website()
-        with patch.object(
-            type(self.property),
-            "can_access_from_current_website",
-            return_value=False,
-        ):
+        self.property.is_published = False
+        with self._mock_request(website_module):
             with self.assertRaises(NotFound):
                 controller.product(self.property)
 
@@ -294,17 +293,12 @@ class TestPmsWebsiteController(PmsBaseCase):
         controller = Website()
         with patch("odoo.http.Response.load", lambda result: result):
             with self._mock_request(website_module, render=True) as mock_request:
-                with patch.object(
-                    type(self.property),
-                    "can_access_from_current_website",
-                    return_value=True,
-                ):
-                    result = controller.product(
-                        self.property, category="category", search="search"
-                    )
+                result = controller.product(
+                    self.property, category="category", search="search"
+                )
                 mock_request.render.assert_called_once()
                 args, _kwargs = mock_request.render.call_args
-                self.assertEqual(args[0], "pms_website.property")
+                self.assertEqual(args[0], "pms_website.property_detail")
                 self.assertEqual(args[1]["property"], self.property)
                 self.assertEqual(result.status_code, 200)
                 self.assertEqual(result.get_data(), b"page")

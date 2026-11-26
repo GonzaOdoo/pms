@@ -198,7 +198,7 @@ class ProviderPanel(http.Controller):
             image_values.append(
                 {
                     "name": name[:255] or "Imagen",
-                    "image_1920": base64.b64encode(content),
+                    "image_1920": base64.b64encode(content).decode("ascii"),
                     "property_id": prop.id,
                 }
             )

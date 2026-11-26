@@ -1,5 +1,6 @@
 id,name,model_id,group_id/id,operation,domain
 access_pms_property_public,access_property_public,pms.property,base.group_public,crud,
+access_pms_property_image_public,access_property_image_public,pms.property.image,base.group_public,r,"[('property_id.is_published', '=', True), ('property_id.setup_state', '=', 'ready')]"
 access_pms_room_public,access_pms_room,pms.room,base.group_public,r,
 access_pms_amenity_public,access_pms_amenity,pms.amenity,base.group_public,r,
 access_pms_service,access_pms_service,pms.service,base.group_public,r,

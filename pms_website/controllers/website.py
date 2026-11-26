@@ -151,18 +151,26 @@ class Website(Website):
         sitemap=True,
     )
     def product(self, pms_property, category="", search="", **kwargs):
-        if (
-            pms_property.setup_state != "ready"
-            or not pms_property.can_access_from_current_website()
-        ):
+        published_property = request.env["pms.property"].sudo().search(
+            Domain.AND(
+                [
+                    [("id", "=", pms_property.id)],
+                    self._get_published_properties_domain(),
+                ]
+            ),
+            limit=1,
+        )
+        if not published_property:
             raise NotFound()
+        pms_property = published_property
         return request.render(
-            "pms_website.property",
+            "pms_website.property_detail",
             self._prepare_property_values(pms_property, category, search, **kwargs),
         )
 
     def _prepare_property_values(self, pms_property, category, search, **kwargs):
         keep = QueryURL("/properties")
+        pms_property = pms_property.sudo()
         return {
             "property": pms_property,
             "main_object": pms_property,

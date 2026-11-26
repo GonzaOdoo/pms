@@ -1227,3 +1227,492 @@
         transition: none;
     }
 }
+
+.amu-property-detail {
+    min-height: 70vh;
+    background: var(--amu-paper);
+    color: var(--amu-ink);
+    font-family: "AMU Oswald", sans-serif;
+}
+
+.amu-property-detail-container {
+    width: #{'min(1200px, calc(100% - 48px))'};
+    margin-inline: auto;
+    padding: 26px 0 76px;
+}
+
+.amu-property-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+    color: #62676b;
+    font-size: 13px;
+}
+
+.amu-property-breadcrumb a {
+    color: var(--amu-sea);
+}
+
+.amu-property-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.amu-property-heading .amu-eyebrow,
+.amu-detail-section-heading .amu-eyebrow,
+.amu-property-booking-card .amu-eyebrow {
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.amu-property-heading h1 {
+    margin: 0;
+    font-family: "AMU Gravitas", Georgia, serif;
+    font-size: clamp(30px, 4vw, 48px);
+    font-weight: 400;
+    line-height: 1.15;
+}
+
+.amu-property-heading-location {
+    margin: 10px 0 0;
+    color: #62676b;
+    font-size: 16px;
+}
+
+.amu-property-heading-location i {
+    margin-right: 5px;
+    color: var(--amu-clay);
+}
+
+.amu-map-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--amu-sea);
+    color: var(--amu-sea);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.amu-map-link:hover,
+.amu-map-link:focus-visible {
+    background: var(--amu-sea);
+    color: #fff;
+    text-decoration: none;
+}
+
+.amu-detail-gallery {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-rows: repeat(2, minmax(150px, 1fr));
+    gap: 10px;
+    height: clamp(330px, 43vw, 540px);
+    margin-bottom: clamp(34px, 5vw, 58px);
+    overflow: hidden;
+}
+
+.amu-detail-gallery-main,
+.amu-detail-gallery-side a,
+.amu-detail-gallery-fallback {
+    position: relative;
+    display: block;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: #e2ded5;
+}
+
+.amu-detail-gallery-main {
+    grid-row: 1 / -1;
+}
+
+.amu-detail-gallery-main:only-child,
+.amu-detail-gallery-fallback,
+.amu-detail-gallery-empty {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+}
+
+.amu-detail-gallery img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 220ms ease;
+}
+
+.amu-detail-gallery a:hover img {
+    transform: scale(1.025);
+}
+
+.amu-detail-gallery-side {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    min-width: 0;
+    min-height: 0;
+}
+
+.amu-detail-gallery-side-vertical {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.amu-detail-gallery-side a:first-child:nth-last-child(1) {
+    grid-row: 1 / -1;
+}
+
+.amu-detail-gallery-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    background: #e2ded5;
+    color: #62676b;
+    font-size: 15px;
+}
+
+.amu-detail-gallery-empty i {
+    color: var(--amu-mountain);
+    font-size: 34px;
+}
+
+.amu-property-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(270px, 340px);
+    align-items: start;
+    gap: clamp(30px, 5vw, 64px);
+}
+
+.amu-property-detail-main {
+    min-width: 0;
+}
+
+.amu-detail-overview {
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--amu-line);
+}
+
+.amu-detail-section-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.amu-detail-section-heading h2 {
+    margin: 0;
+    font-family: "AMU Gravitas", Georgia, serif;
+    font-size: clamp(22px, 2.5vw, 29px);
+    font-weight: 400;
+}
+
+.amu-capacity-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fff;
+    color: var(--amu-sea);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.amu-property-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin: 24px 0;
+}
+
+.amu-property-facts > div {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    align-items: center;
+    gap: 3px 8px;
+    min-height: 60px;
+    padding: 10px 12px;
+    border: 1px solid var(--amu-line);
+    background: #fff;
+}
+
+.amu-property-facts i {
+    grid-row: span 2;
+    color: var(--amu-sea);
+    font-size: 18px;
+}
+
+.amu-property-facts strong {
+    color: var(--amu-ink);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.amu-property-facts span {
+    color: #62676b;
+    font-size: 12px;
+}
+
+.amu-detail-description,
+.amu-detail-description-secondary {
+    color: #555b61;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.amu-detail-description p:last-child,
+.amu-detail-description-secondary p:last-child {
+    margin-bottom: 0;
+}
+
+.amu-detail-description-secondary {
+    margin-top: 16px;
+}
+
+.amu-detail-section {
+    padding: 30px 0;
+    border-bottom: 1px solid var(--amu-line);
+}
+
+.amu-accommodation-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.amu-accommodation-card {
+    padding: 20px;
+    border: 1px solid var(--amu-line);
+    background: #fff;
+}
+
+.amu-accommodation-card h3 {
+    margin: 0;
+    color: var(--amu-ink);
+    font-family: "AMU Gravitas", Georgia, serif;
+    font-size: 19px;
+    font-weight: 400;
+}
+
+.amu-accommodation-card p {
+    margin: 8px 0 0;
+    color: #62676b;
+}
+
+.amu-accommodation-card ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin: 14px 0 0;
+    padding: 0;
+    color: #555b61;
+    font-size: 14px;
+    list-style: none;
+}
+
+.amu-accommodation-card li i {
+    margin-right: 5px;
+    color: var(--amu-sea);
+}
+
+.amu-detail-amenities {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+    margin-top: 20px;
+}
+
+.amu-detail-amenity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    color: #4e5559;
+    font-size: 15px;
+}
+
+.amu-detail-amenity i {
+    flex: 0 0 18px;
+    color: var(--amu-nature);
+}
+
+.amu-detail-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 14px;
+}
+
+.amu-detail-tags span {
+    padding: 5px 9px;
+    border: 1px solid var(--amu-line);
+    color: #555b61;
+    font-size: 12px;
+}
+
+.amu-property-booking-column {
+    position: sticky;
+    top: 24px;
+}
+
+.amu-property-booking-card {
+    padding: 24px;
+    border: 1px solid var(--amu-line);
+    background: #fff;
+    box-shadow: 0 14px 36px rgba(37, 43, 53, 0.08);
+}
+
+.amu-property-booking-card h2 {
+    margin: 0;
+    font-family: "AMU Gravitas", Georgia, serif;
+    font-size: 23px;
+    font-weight: 400;
+}
+
+.amu-property-booking-card > p:not(.amu-eyebrow) {
+    margin: 10px 0 18px;
+    color: #62676b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.amu-property-booking-card #product_details {
+    display: grid;
+    gap: 10px;
+}
+
+.amu-property-booking-card #product_details .mt-3 {
+    margin-top: 0 !important;
+}
+
+.amu-property-booking-card #product_details .btn {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--amu-nature);
+    border-radius: 0;
+    background: var(--amu-nature);
+    color: #fff;
+    font-family: "AMU Oswald", sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+}
+
+.amu-property-booking-card #product_details .btn:hover,
+.amu-property-booking-card #product_details .btn:focus-visible {
+    border-color: var(--amu-ink);
+    background: var(--amu-ink);
+}
+
+.amu-property-booking-card #product_details .amu-detail-contact {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 11px 14px;
+    border: 1px solid var(--amu-sea);
+    color: var(--amu-sea);
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.amu-property-booking-card #product_details .amu-detail-contact:hover {
+    background: var(--amu-sea);
+    color: #fff;
+}
+
+.amu-booking-note {
+    display: flex;
+    gap: 8px;
+    margin: 18px 0 0 !important;
+    padding-top: 14px;
+    border-top: 1px solid var(--amu-line);
+    color: #62676b;
+    font-size: 12px !important;
+}
+
+.amu-booking-note i {
+    color: var(--amu-sea);
+}
+
+@media (max-width: 900px) {
+    .amu-property-detail-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .amu-property-booking-column {
+        position: static;
+    }
+}
+
+@media (max-width: 640px) {
+    .amu-property-detail-container {
+        width: #{'min(calc(100% - 32px), 560px)'};
+        padding-top: 18px;
+    }
+
+    .amu-property-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .amu-detail-gallery {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        height: auto;
+        gap: 8px;
+        margin-bottom: 32px;
+    }
+
+    .amu-detail-gallery-main,
+    .amu-detail-gallery-fallback,
+    .amu-detail-gallery-empty {
+        grid-row: auto;
+        min-height: 0;
+        aspect-ratio: 4 / 3;
+    }
+
+    .amu-detail-gallery-main:only-child {
+        grid-column: 1;
+    }
+
+    .amu-detail-gallery-side {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(2, minmax(105px, 1fr));
+        gap: 8px;
+    }
+
+    .amu-detail-gallery-side-vertical {
+        grid-template-rows: minmax(105px, 1fr);
+    }
+
+    .amu-detail-gallery-side a:first-child:nth-last-child(1) {
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
+
+    .amu-detail-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .amu-property-facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .amu-detail-amenities {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 6px;
+    }
+
+    .amu-property-booking-card {
+        padding: 20px;
+    }
+}

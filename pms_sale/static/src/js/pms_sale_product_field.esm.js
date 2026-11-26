@@ -1,7 +1,7 @@
 /** @odoo-module **/
 // Copyright (c) 2021 Gray Matter Logic
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-import {SaleOrderLineProductField} from "@sale/js/sale_product_field";
+import {SaleOrderLineProductField} from "@sale/js/sale_product_field/sale_product_field";
 import {patch} from "@web/core/utils/patch";
 import {useService} from "@web/core/utils/hooks";
 

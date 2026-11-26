@@ -454,6 +454,281 @@
         </t>
     </template>
 
+    <template id="property_detail" name="Property Detail">
+        <t t-call="website.layout">
+            <t t-set="additional_title" t-value="property.name" />
+            <t t-set="property_images" t-value="property.image_ids" />
+            <main id="wrap" class="amu-property-detail">
+                <div class="amu-property-detail-container">
+                    <nav class="amu-property-breadcrumb" aria-label="Migas de pan">
+                        <a href="/properties">Alojamientos</a>
+                        <i class="fa fa-angle-right" aria-hidden="true" />
+                        <span t-out="property.city or property.name" />
+                    </nav>
+
+                    <header class="amu-property-heading">
+                        <div>
+                            <p class="amu-eyebrow">
+                                <t t-out="'Hotel' if property.property_type == 'hotel' else ('Camping' if property.property_type == 'camping' else 'Casa o apartamento')" />
+                            </p>
+                            <h1 itemprop="name" t-field="property.name" />
+                            <p class="amu-property-heading-location" t-if="property.city">
+                                <i class="fa fa-map-marker" aria-hidden="true" />
+                                <span t-out="property.city" />
+                            </p>
+                        </div>
+                        <a
+                            t-if="property.partner_id"
+                            t-att-href="property.google_map_link()"
+                            target="_blank"
+                            rel="noopener"
+                            class="amu-map-link"
+                        >
+                            <i class="fa fa-map-o" aria-hidden="true" />
+                            Ver ubicación
+                        </a>
+                    </header>
+
+                    <section class="amu-detail-gallery" aria-label="Fotos de la propiedad">
+                        <t t-if="property_images">
+                            <a
+                                class="amu-detail-gallery-main"
+                                t-attf-href="/web/image/pms.property.image/#{property_images[0].id}/image_1920"
+                                target="_blank"
+                                rel="noopener"
+                            >
+                                <img
+                                    t-att-src="'/web/image/pms.property.image/%s/image_1920' % property_images[0].id"
+                                    t-att-alt="property_images[0].name or property.name"
+                                    fetchpriority="high"
+                                />
+                            </a>
+                            <div
+                                t-if="len(property_images) > 1"
+                                t-attf-class="amu-detail-gallery-side #{'amu-detail-gallery-side-vertical' if len(property_images) &lt;= 3 else ''}"
+                            >
+                                <a
+                                    t-foreach="property_images[1:5]"
+                                    t-as="property_image"
+                                    t-attf-href="/web/image/pms.property.image/#{property_image.id}/image_1920"
+                                    target="_blank"
+                                    rel="noopener"
+                                >
+                                    <img
+                                        t-att-src="'/web/image/pms.property.image/%s/image_1920' % property_image.id"
+                                        t-att-alt="property_image.name or property.name"
+                                        loading="lazy"
+                                    />
+                                </a>
+                            </div>
+                        </t>
+                        <t t-elif="property.image_1920">
+                            <div class="amu-detail-gallery-fallback">
+                                <img
+                                    t-att-src="website.image_url(property, 'image_1024')"
+                                    t-att-alt="property.name"
+                                    fetchpriority="high"
+                                />
+                            </div>
+                        </t>
+                        <div t-else="" class="amu-detail-gallery-empty">
+                            <i class="fa fa-picture-o" aria-hidden="true" />
+                            <span>Pronto habrá fotos de este alojamiento</span>
+                        </div>
+                    </section>
+
+                    <div class="amu-property-detail-layout">
+                        <div class="amu-property-detail-main">
+                            <section class="amu-detail-overview">
+                                <div class="amu-detail-section-heading">
+                                    <div>
+                                        <p class="amu-eyebrow">TU PRÓXIMA ESTADÍA</p>
+                                        <h2>Un lugar para disfrutar</h2>
+                                    </div>
+                                    <span class="amu-capacity-badge" t-if="property.no_of_guests">
+                                        <i class="fa fa-users" aria-hidden="true" />
+                                        Hasta <t t-out="property.no_of_guests" /> huéspedes
+                                    </span>
+                                </div>
+                                <div class="amu-property-facts">
+                                    <div t-if="show_rooms and property.qty_bedroom">
+                                        <i class="fa fa-bed" aria-hidden="true" />
+                                        <strong t-out="property.qty_bedroom" />
+                                        <span>Dormitorios</span>
+                                    </div>
+                                    <div
+                                        t-if="show_rooms and (property.bathroom_count or property.qty_half_bathroom)"
+                                    >
+                                        <i class="fa fa-bath" aria-hidden="true" />
+                                        <strong t-out="property.bathroom_count or property.qty_half_bathroom" />
+                                        <span>Baños</span>
+                                    </div>
+                                    <div t-if="property.area">
+                                        <i class="fa fa-arrows-alt" aria-hidden="true" />
+                                        <strong><t t-out="property.area" /> m²</strong>
+                                        <span>Superficie</span>
+                                    </div>
+                                    <div t-if="property.min_nights">
+                                        <i class="fa fa-moon-o" aria-hidden="true" />
+                                        <strong t-out="property.min_nights" />
+                                        <span>Noches mínimas</span>
+                                    </div>
+                                </div>
+                                <div
+                                    t-if="property.website_description1"
+                                    class="amu-detail-description"
+                                    itemprop="description"
+                                    t-field="property.website_description1"
+                                />
+                                <p t-else="" class="amu-detail-description">
+                                    Descubre todo lo que este alojamiento tiene para ofrecerte.
+                                </p>
+                                <div
+                                    t-if="property.website_description2"
+                                    class="amu-detail-description-secondary"
+                                    t-field="property.website_description2"
+                                />
+                            </section>
+
+                            <section
+                                t-if="show_rooms and property.accommodation_type_ids.filtered('active')"
+                                class="amu-detail-section"
+                            >
+                                <div class="amu-detail-section-heading">
+                                    <div>
+                                        <p class="amu-eyebrow">OPCIONES PARA TU ESTADÍA</p>
+                                        <h2>Tipos de habitación</h2>
+                                    </div>
+                                </div>
+                                <div class="amu-accommodation-list">
+                                    <article
+                                        t-foreach="property.accommodation_type_ids.filtered('active')"
+                                        t-as="accommodation_type"
+                                        class="amu-accommodation-card"
+                                    >
+                                        <div>
+                                            <h3 t-out="accommodation_type.name" />
+                                            <p t-if="accommodation_type.description" t-out="accommodation_type.description" />
+                                        </div>
+                                        <ul>
+                                            <li t-if="accommodation_type.capacity">
+                                                <i class="fa fa-users" aria-hidden="true" />
+                                                <t t-out="accommodation_type.capacity" /> huéspedes
+                                            </li>
+                                            <li t-if="accommodation_type.bedroom_count">
+                                                <i class="fa fa-bed" aria-hidden="true" />
+                                                <t t-out="accommodation_type.bedroom_count" /> dormitorios
+                                            </li>
+                                            <li t-if="accommodation_type.bathroom_count">
+                                                <i class="fa fa-bath" aria-hidden="true" />
+                                                <t t-out="accommodation_type.bathroom_count" /> baños
+                                            </li>
+                                        </ul>
+                                        <div
+                                            t-if="show_amenities and accommodation_type.amenity_ids"
+                                            class="amu-detail-tags"
+                                        >
+                                            <span
+                                                t-foreach="accommodation_type.amenity_ids"
+                                                t-as="amenity"
+                                                t-out="amenity.name"
+                                            />
+                                        </div>
+                                    </article>
+                                </div>
+                            </section>
+
+                            <section
+                                t-if="show_amenities and property.amenity_ids"
+                                class="amu-detail-section"
+                            >
+                                <div class="amu-detail-section-heading">
+                                    <div>
+                                        <p class="amu-eyebrow">COMODIDAD EN CADA DETALLE</p>
+                                        <h2>Servicios y comodidades</h2>
+                                    </div>
+                                </div>
+                                <t
+                                    t-set="main_amenities"
+                                    t-value="property.amenity_ids.filtered(lambda amenity: amenity.is_main_amenity) or property.amenity_ids"
+                                />
+                                <div class="amu-detail-amenities">
+                                    <div
+                                        t-foreach="main_amenities"
+                                        t-as="amenity"
+                                        class="amu-detail-amenity"
+                                    >
+                                        <i class="fa fa-check" aria-hidden="true" />
+                                        <span t-out="amenity.name" />
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section
+                                t-if="show_services and property.service_ids"
+                                class="amu-detail-section"
+                            >
+                                <div class="amu-detail-section-heading">
+                                    <div>
+                                        <p class="amu-eyebrow">SERVICIOS ADICIONALES</p>
+                                        <h2>También disponible</h2>
+                                    </div>
+                                </div>
+                                <div class="amu-detail-amenities">
+                                    <div
+                                        t-foreach="property.sudo().service_ids.filtered('active')"
+                                        t-as="service"
+                                        class="amu-detail-amenity"
+                                    >
+                                        <i class="fa fa-plus" aria-hidden="true" />
+                                        <span t-out="service.name.name" />
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
+                        <aside class="amu-property-booking-column">
+                            <div class="amu-property-booking-card">
+                                <p class="amu-eyebrow">¿TE GUSTARÍA ALOJARTE AQUÍ?</p>
+                                <h2>Consulta disponibilidad</h2>
+                                <p>Revisa las opciones de reserva para este alojamiento.</p>
+                                <div id="product_details">
+                                    <span
+                                        itemprop="url"
+                                        class="visually-hidden"
+                                        t-out="property.website_url"
+                                    />
+                                    <a
+                                        href="/contactus"
+                                        class="amu-detail-contact"
+                                    >
+                                        Contactar al alojamiento
+                                        <i class="fa fa-arrow-right" aria-hidden="true" />
+                                    </a>
+                                </div>
+                                <p class="amu-booking-note">
+                                    <i class="fa fa-info-circle" aria-hidden="true" />
+                                    La disponibilidad y las tarifas se confirman al reservar.
+                                </p>
+                            </div>
+                        </aside>
+                    </div>
+
+                    <div
+                        class="modal fade right d-none"
+                        id="exampleModalPreview"
+                        aria-hidden="true"
+                        tabindex="-1"
+                    />
+                    <div
+                        class="oe_structure oe_empty"
+                        id="oe_structure_website_sale_property_detail"
+                    />
+                </div>
+            </main>
+        </t>
+    </template>
+
     <template id="properties" name="Properties">
         <t t-call="website.layout">
             <t t-set="additional_title">Properties</t>
