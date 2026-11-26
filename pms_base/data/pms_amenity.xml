@@ -1,162 +1,162 @@
-<odoo noupdate="1">
+<odoo>
     <record id="demo_amenity_wifi" model="pms.amenity">
         <field name="name">Wi-Fi</field>
         <field name="type_id" ref="pms_amenity_type_1" />
         <field name="default_code">WIFI</field>
     </record>
     <record id="demo_amenity_tv" model="pms.amenity">
-        <field name="name">Smart TV</field>
+        <field name="name">Televisor inteligente</field>
         <field name="type_id" ref="pms_amenity_type_1" />
         <field name="default_code">TV</field>
     </record>
     <record id="demo_amenity_shampoo" model="pms.amenity">
-        <field name="name">Shampoo</field>
+        <field name="name">Champú</field>
         <field name="type_id" ref="pms_amenity_type_0" />
         <field name="default_code">SHAMP</field>
     </record>
     <record id="demo_amenity_towels" model="pms.amenity">
-        <field name="name">Towels</field>
+        <field name="name">Toallas</field>
         <field name="type_id" ref="pms_amenity_type_0" />
         <field name="default_code">TOWEL</field>
     </record>
     <record id="demo_amenity_microwave" model="pms.amenity">
-        <field name="name">Microwave</field>
+        <field name="name">Microondas</field>
         <field name="type_id" ref="pms_amenity_type_2" />
         <field name="default_code">MWV</field>
     </record>
     <record id="demo_amenity_coffee" model="pms.amenity">
-        <field name="name">Coffee Maker</field>
+        <field name="name">Cafetera</field>
         <field name="type_id" ref="pms_amenity_type_2" />
         <field name="default_code">COFFEE</field>
     </record>
 
     <record id="pms_amenity_bed_linens" model="pms.amenity">
-        <field name="name">Bed linens</field>
+        <field name="name">Ropa de cama</field>
         <field name="type_id" ref="pms_amenity_type_0" />
         <field name="default_code">BEDLINEN</field>
     </record>
     <record id="pms_amenity_body_soap" model="pms.amenity">
-        <field name="name">Body soap</field>
+        <field name="name">Jabón corporal</field>
         <field name="type_id" ref="pms_amenity_type_0" />
         <field name="default_code">SOAP</field>
     </record>
     <record id="pms_amenity_hot_water" model="pms.amenity">
-        <field name="name">Hot water</field>
+        <field name="name">Agua caliente</field>
         <field name="type_id" ref="pms_amenity_type_12" />
         <field name="default_code">HOTWATER</field>
     </record>
     <record id="pms_amenity_hair_dryer" model="pms.amenity">
-        <field name="name">Hair dryer</field>
+        <field name="name">Secador de pelo</field>
         <field name="type_id" ref="pms_amenity_type_12" />
         <field name="default_code">HAIRDRYER</field>
     </record>
     <record id="pms_amenity_toilet_paper" model="pms.amenity">
-        <field name="name">Toilet paper</field>
+        <field name="name">Papel higiénico</field>
         <field name="type_id" ref="pms_amenity_type_0" />
         <field name="default_code">TOILETPAPER</field>
     </record>
     <record id="pms_amenity_private_bathroom" model="pms.amenity">
-        <field name="name">Private bathroom</field>
+        <field name="name">Baño privado</field>
         <field name="type_id" ref="pms_amenity_type_12" />
         <field name="default_code">PRIVATEBATH</field>
     </record>
     <record id="pms_amenity_kitchen" model="pms.amenity">
-        <field name="name">Kitchen</field>
+        <field name="name">Cocina</field>
         <field name="type_id" ref="pms_amenity_type_2" />
         <field name="default_code">KITCHEN</field>
     </record>
     <record id="pms_amenity_refrigerator" model="pms.amenity">
-        <field name="name">Refrigerator</field>
+        <field name="name">Refrigerador</field>
         <field name="type_id" ref="pms_amenity_type_2" />
         <field name="default_code">FRIDGE</field>
     </record>
     <record id="pms_amenity_dishes_silverware" model="pms.amenity">
-        <field name="name">Dishes and silverware</field>
+        <field name="name">Vajilla y cubiertos</field>
         <field name="type_id" ref="pms_amenity_type_2" />
         <field name="default_code">DISHES</field>
     </record>
     <record id="pms_amenity_cooking_basics" model="pms.amenity">
-        <field name="name">Cooking basics</field>
+        <field name="name">Elementos básicos para cocinar</field>
         <field name="type_id" ref="pms_amenity_type_2" />
         <field name="default_code">COOKBASIC</field>
     </record>
     <record id="pms_amenity_oven" model="pms.amenity">
-        <field name="name">Oven</field>
+        <field name="name">Horno</field>
         <field name="type_id" ref="pms_amenity_type_2" />
         <field name="default_code">OVEN</field>
     </record>
     <record id="pms_amenity_stove" model="pms.amenity">
-        <field name="name">Stove</field>
+        <field name="name">Cocina con horno</field>
         <field name="type_id" ref="pms_amenity_type_2" />
         <field name="default_code">STOVE</field>
     </record>
     <record id="pms_amenity_kettle" model="pms.amenity">
-        <field name="name">Electric kettle</field>
+        <field name="name">Pava eléctrica</field>
         <field name="type_id" ref="pms_amenity_type_2" />
         <field name="default_code">KETTLE</field>
     </record>
     <record id="pms_amenity_dishwasher" model="pms.amenity">
-        <field name="name">Dishwasher</field>
+        <field name="name">Lavavajillas</field>
         <field name="type_id" ref="pms_amenity_type_2" />
         <field name="default_code">DISHWASHER</field>
     </record>
     <record id="pms_amenity_washer" model="pms.amenity">
-        <field name="name">Washer</field>
+        <field name="name">Lavarropas</field>
         <field name="type_id" ref="pms_amenity_type_3" />
         <field name="default_code">WASHER</field>
     </record>
     <record id="pms_amenity_dryer" model="pms.amenity">
-        <field name="name">Dryer</field>
+        <field name="name">Secadora</field>
         <field name="type_id" ref="pms_amenity_type_3" />
         <field name="default_code">DRYER</field>
     </record>
     <record id="pms_amenity_iron" model="pms.amenity">
-        <field name="name">Iron</field>
+        <field name="name">Plancha</field>
         <field name="type_id" ref="pms_amenity_type_3" />
         <field name="default_code">IRON</field>
     </record>
     <record id="pms_amenity_free_parking" model="pms.amenity">
-        <field name="name">Free parking on premises</field>
+        <field name="name">Estacionamiento gratuito en el alojamiento</field>
         <field name="type_id" ref="pms_amenity_type_4" />
         <field name="default_code">PARKFREE</field>
     </record>
     <record id="pms_amenity_pets_allowed" model="pms.amenity">
-        <field name="name">Pets allowed</field>
+        <field name="name">Se permiten mascotas</field>
         <field name="type_id" ref="pms_amenity_type_5" />
         <field name="default_code">PETS</field>
     </record>
     <record id="pms_amenity_air_conditioning" model="pms.amenity">
-        <field name="name">Air conditioning</field>
+        <field name="name">Aire acondicionado</field>
         <field name="type_id" ref="pms_amenity_type_6" />
         <field name="default_code">AC</field>
     </record>
     <record id="pms_amenity_heating" model="pms.amenity">
-        <field name="name">Heating</field>
+        <field name="name">Calefacción</field>
         <field name="type_id" ref="pms_amenity_type_6" />
         <field name="default_code">HEATING</field>
     </record>
     <record id="pms_amenity_fan" model="pms.amenity">
-        <field name="name">Ceiling fan</field>
+        <field name="name">Ventilador de techo</field>
         <field name="type_id" ref="pms_amenity_type_6" />
         <field name="default_code">FAN</field>
     </record>
     <record id="pms_amenity_pool" model="pms.amenity">
-        <field name="name">Swimming pool</field>
+        <field name="name">Piscina</field>
         <field name="type_id" ref="pms_amenity_type_7" />
         <field name="default_code">POOL</field>
     </record>
     <record id="pms_amenity_hot_tub" model="pms.amenity">
-        <field name="name">Hot tub</field>
+        <field name="name">Jacuzzi</field>
         <field name="type_id" ref="pms_amenity_type_7" />
         <field name="default_code">HOTTUB</field>
     </record>
     <record id="pms_amenity_gym" model="pms.amenity">
-        <field name="name">Gym</field>
+        <field name="name">Gimnasio</field>
         <field name="type_id" ref="pms_amenity_type_7" />
         <field name="default_code">GYM</field>
     </record>
     <record id="pms_amenity_balcony" model="pms.amenity">
-        <field name="name">Balcony</field>
+        <field name="name">Balcón</field>
         <field name="type_id" ref="pms_amenity_type_8" />
         <field name="default_code">BALCONY</field>
     </record>
@@ -166,57 +166,57 @@
         <field name="default_code">PATIO</field>
     </record>
     <record id="pms_amenity_garden" model="pms.amenity">
-        <field name="name">Garden</field>
+        <field name="name">Jardín</field>
         <field name="type_id" ref="pms_amenity_type_8" />
         <field name="default_code">GARDEN</field>
     </record>
     <record id="pms_amenity_bbq_grill" model="pms.amenity">
-        <field name="name">BBQ grill</field>
+        <field name="name">Parrilla</field>
         <field name="type_id" ref="pms_amenity_type_8" />
         <field name="default_code">BBQ</field>
     </record>
     <record id="pms_amenity_crib" model="pms.amenity">
-        <field name="name">Crib</field>
+        <field name="name">Cuna</field>
         <field name="type_id" ref="pms_amenity_type_9" />
         <field name="default_code">CRIB</field>
     </record>
     <record id="pms_amenity_high_chair" model="pms.amenity">
-        <field name="name">High chair</field>
+        <field name="name">Silla alta para bebés</field>
         <field name="type_id" ref="pms_amenity_type_9" />
         <field name="default_code">HIGHCHAIR</field>
     </record>
     <record id="pms_amenity_smoke_alarm" model="pms.amenity">
-        <field name="name">Smoke alarm</field>
+        <field name="name">Detector de humo</field>
         <field name="type_id" ref="pms_amenity_type_10" />
         <field name="default_code">SMOKEALARM</field>
     </record>
     <record id="pms_amenity_co_alarm" model="pms.amenity">
-        <field name="name">Carbon monoxide alarm</field>
+        <field name="name">Detector de monóxido de carbono</field>
         <field name="type_id" ref="pms_amenity_type_10" />
         <field name="default_code">COALARM</field>
     </record>
     <record id="pms_amenity_fire_extinguisher" model="pms.amenity">
-        <field name="name">Fire extinguisher</field>
+        <field name="name">Extintor de incendios</field>
         <field name="type_id" ref="pms_amenity_type_10" />
         <field name="default_code">FIREEXT</field>
     </record>
     <record id="pms_amenity_first_aid_kit" model="pms.amenity">
-        <field name="name">First aid kit</field>
+        <field name="name">Botiquín de primeros auxilios</field>
         <field name="type_id" ref="pms_amenity_type_10" />
         <field name="default_code">FIRSTAID</field>
     </record>
     <record id="pms_amenity_elevator" model="pms.amenity">
-        <field name="name">Elevator</field>
+        <field name="name">Ascensor</field>
         <field name="type_id" ref="pms_amenity_type_11" />
         <field name="default_code">ELEVATOR</field>
     </record>
     <record id="pms_amenity_step_free_access" model="pms.amenity">
-        <field name="name">Step-free access</field>
+        <field name="name">Acceso sin escalones</field>
         <field name="type_id" ref="pms_amenity_type_11" />
         <field name="default_code">STEPFREE</field>
     </record>
     <record id="pms_amenity_dedicated_workspace" model="pms.amenity">
-        <field name="name">Dedicated workspace</field>
+        <field name="name">Espacio de trabajo dedicado</field>
         <field name="type_id" ref="pms_amenity_type_1" />
         <field name="default_code">WORKSPACE</field>
     </record>
