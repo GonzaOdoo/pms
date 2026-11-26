@@ -68,10 +68,24 @@ class TestWebsiteSaleControllers(HttpCase):
         )
 
     def test_property_listing_page(self):
+        image = self.env["pms.property.image"].create(
+            {
+                "name": "Listing image",
+                "image_1920": (
+                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwC"
+                    "AAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+                ),
+                "property_id": self.property.id,
+            }
+        )
         self.authenticate(None, None)
         response = self.url_open("/property")
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Website Sale Property", response.content)
+        self.assertIn(
+            f"/web/image/pms.property.image/{image.id}/image_1024".encode(),
+            response.content,
+        )
         self.assertIn(b'data-results-view="list"', response.content)
         self.assertIn(b'data-results-view="grid"', response.content)
         self.assertIn(b"class=\"amu-property-grid\"", response.content)

@@ -464,15 +464,27 @@
                                     t-as="property"
                                     class="amu-property-card"
                                 >
-                                    <a
+                                   <a
                                         class="amu-property-image"
                                         t-att-href="property.website_url"
                                         t-att-aria-label="property.name"
                                     >
-                                        <span
-                                            t-field="property.image_1920"
-                                            t-options="{'widget': 'image', 'preview_image': 'image_1024', 'class': 'w-100 h-100', 'alt-field': 'name'}"
+                                        <img
+                                            t-if="property.image_ids"
+                                            t-att-src="'/web/image/pms.property.image/%s/image_1920' % property.image_ids[0].id"
+                                            t-att-alt="property.image_ids[0].name or property.name"
+                                            class="w-100 h-100"
+                                            style="object-fit: cover;"
+                                            loading="lazy"
                                         />
+                                        <img
+                                            t-else=""
+                                            src="/web/static/img/placeholder.png"
+                                            alt="Sin imagen disponible"
+                                            class="w-100 h-100"
+                                            style="object-fit: cover;"
+                                        />
+                                    
                                         <span
                                             class="amu-property-type"
                                             t-out="'Hotel' if property.property_type == 'hotel' else 'Casa o apartamento'"
