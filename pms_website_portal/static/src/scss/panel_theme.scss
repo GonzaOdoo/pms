@@ -1,5 +1,5 @@
 .ts-app {
-    --ts-bg: var(--amu-paper, #f3f0e9);
+    --ts-bg: #fff;
     --ts-surface: #fff;
     --ts-fg: var(--amu-ink, #252b35);
     --ts-muted: #62676b;
@@ -8,7 +8,7 @@
     --ts-accent-soft: #e5edf0;
     --ts-danger: var(--amu-clay, #b75f50);
     --ts-radius: 0;
-    background: var(--amu-paper, #f3f0e9);
+    background: #fff;
     color: var(--amu-ink, #252b35);
     font-family: "AMU Oswald", "Arial Narrow", sans-serif;
 
@@ -82,12 +82,12 @@
     }
 
     .ts-main {
-        background: var(--amu-paper, #f3f0e9);
+        background: #fff;
     }
 
     .ts-head h1 {
         color: var(--amu-ink, #252b35);
-        font-family: "AMU Gravitas", Georgia, serif;
+        font-family: inherit;
         font-size: clamp(26px, 3vw, 38px);
         font-weight: 400;
         letter-spacing: 0;
@@ -108,7 +108,7 @@
 
     .ts-card h2 {
         color: var(--amu-ink, #252b35);
-        font-family: "AMU Gravitas", Georgia, serif;
+        font-family: inherit;
         font-size: 22px;
         font-weight: 400;
     }
@@ -279,9 +279,9 @@
         align-content: start;
         gap: 8px;
         min-width: 0;
-        padding: 10px;
-        border: 1px solid var(--ts-line);
-        background: var(--ts-surface);
+        padding: 0;
+        border: 0;
+        background: #fff;
         color: var(--ts-muted);
         font-size: 13px;
     }
@@ -304,20 +304,21 @@
 
     .ts-type-card,
     .ts-amenities label {
-        border-color: var(--amu-line, rgba(37, 43, 53, 0.16));
+        border: 0;
         border-radius: 0;
         background: #fff;
+        box-shadow: none;
     }
 
     .ts-type-card:focus-within,
     .ts-amenities label:focus-within {
-        border-color: var(--amu-sea, #315d73);
-        box-shadow: 0 0 0 2px rgba(167, 195, 211, 0.45);
+        outline: 2px solid var(--amu-glacier, #a7c3d3);
+        outline-offset: 3px;
     }
 
     .ts-type-card:hover,
     .ts-amenities label:hover {
-        border-color: var(--amu-glacier, #a7c3d3);
+        background: #fff;
     }
 
     .ts-type-card input,
@@ -329,17 +330,18 @@
 .ts-main-wizard {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
+    align-items:center;
     width: 100%;
     max-width: none;
-    min-height: calc(100vh - 64px);
-    padding: clamp(20px, 4vw, 48px) 0;
-
+    min-height: 100vh;
+    padding: clamp(24px, 4vw, 56px) clamp(20px, 5vw, 72px);
+    background: #fff;
     .ts-head,
     .ts-flash,
     .ts-wizard {
-        width: #{'min(1240px, calc(100% - 48px))'};
-        margin-inline: auto;
+        width: 100%;
+        margin-inline: 0;
     }
 
     .ts-head {
@@ -347,16 +349,19 @@
     }
 
     .ts-wizard {
-        max-width: 1240px;
-        min-height: calc(100vh - 184px);
-        padding: clamp(24px, 4vw, 56px);
-        border-radius: 18px;
-        box-shadow: 0 18px 48px rgba(37, 43, 53, 0.09);
+        max-width: 1200px;
+        min-height: calc(100vh - 180px);
+        padding: 0;
+        border: 0;
+        background: #fff;
+        box-shadow: none;
 
         h2 {
             margin-bottom: 8px;
             font-size: clamp(22px, 2.4vw, 30px);
             letter-spacing: -0.02em;
+            font-family: inherit;
+            font-weight: 500;
         }
 
         .ts-muted {
@@ -393,13 +398,29 @@
             padding: 11px 20px;
         }
     }
+
+    .ts-type-card {
+        flex: 0 1 auto;
+        padding: 0;
+    }
+
+    .ts-amenities label {
+        padding: 0;
+    }
+
+    .ts-wizard-note {
+        padding: 12px 0;
+        border: 0;
+        background: #fff;
+        color: var(--amu-ink, #252b35);
+    }
 }
 
 @media (max-width: 860px) {
     .ts-app {
         .ts-topbar {
             border-color: var(--amu-line, rgba(37, 43, 53, 0.16));
-            background: var(--amu-paper, #f3f0e9);
+            background: #fff;
         }
 
         .ts-topbar .ts-brand {
@@ -412,18 +433,18 @@
     }
 
     .ts-main-wizard {
-        min-height: calc(100vh - 52px);
-        padding: 20px 0;
+        min-height: 100vh;
+        padding: 24px 16px;
 
         .ts-head,
         .ts-flash,
         .ts-wizard {
-            width: calc(100% - 32px);
+            width: 100%;
         }
 
         .ts-wizard {
             min-height: 0;
-            padding: 24px 18px;
+            padding: 0;
         }
 
         .ts-wizard-steps {
