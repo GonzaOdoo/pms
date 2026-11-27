@@ -27,6 +27,10 @@
     --amu-line: rgba(37, 43, 53, 0.16);
 }
 
+body{
+    background: var(--amu-paper);
+}
+
 #wrapwrap > header,
 #top,
 #top .navbar {

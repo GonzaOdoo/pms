@@ -5,6 +5,8 @@
         name="AMU website footer"
     >
         <xpath expr="//footer[@id='bottom']" position="replace">
+            <span></span>
+            <!--
             <footer
                 id="bottom"
                 t-attf-class="amu-footer #{'d-none o_snippet_invisible' if main_object and 'footer_visible' in main_object and not main_object.sudo().footer_visible else ''}"
@@ -30,6 +32,7 @@
                     <span>Viajar también es encontrarse.</span>
                 </div>
             </footer>
+            -->
         </xpath>
     </template>
 </odoo>
