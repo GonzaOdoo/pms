@@ -19,10 +19,12 @@
                     -->
                 </header>
                 <aside class="ts-side">
+                    <!--
                     <div class="ts-brand">
                         <span class="ts-brand-mark" aria-hidden="true">✳</span>
                         Turismo Social
                     </div>
+                    -->
                     <nav class="ts-nav">
                         <a href="/my" t-att-class="'is-active' if ts_active == 'dashboard' else ''">Panel</a>
                         <a href="/my/properties" t-att-class="'is-active' if ts_active == 'properties' else ''">Propiedades</a>
