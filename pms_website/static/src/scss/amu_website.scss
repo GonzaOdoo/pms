@@ -26,6 +26,9 @@
     --amu-clay: #b75f50;
     --amu-line: rgba(37, 43, 53, 0.16);
 }
+img{
+    border-radius:20px;
+}
 
 body{
     background: var(--amu-paper);
@@ -952,7 +955,7 @@ body{
     display: block;
     min-height: 240px;
     overflow: hidden;
-    background: #e8e4dc;
+    //background: #e8e4dc;
 }
 
 .amu-property-image img {
