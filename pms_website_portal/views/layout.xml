@@ -11,10 +11,12 @@
                     <label for="ts-nav-toggle" class="ts-burger" aria-label="Menú">
                         <span aria-hidden="true">☰</span>
                     </label>
+                    <!--
                     <span class="ts-brand">
                         <span class="ts-brand-mark" aria-hidden="true">✳</span>
                         Turismo Social
                     </span>
+                    -->
                 </header>
                 <aside class="ts-side">
                     <div class="ts-brand">
