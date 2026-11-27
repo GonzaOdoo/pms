@@ -36,6 +36,7 @@
                                 <th>Capacidad</th>
                                 <th>Dormitorios / Baños</th>
                                 <th>Habitaciones</th>
+                                <th>Tarifa por noche</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -49,6 +50,14 @@
                                     <span t-out="item.bathroom_count"/>
                                 </td>
                                 <td t-out="item.room_count"/>
+                                <td>
+                                    <span
+                                        t-if="item.has_custom_price"
+                                        t-field="item.price"
+                                        t-options='{"widget": "monetary", "display_currency": item.currency_id}'
+                                    />
+                                    <span t-else="">Tarifa general</span>
+                                </td>
                                 <td class="ts-right">
                                     <a
                                         t-attf-href="/my/rooms/new?property_id=#{item.property_id.id}&amp;accommodation_type_id=#{item.id}"

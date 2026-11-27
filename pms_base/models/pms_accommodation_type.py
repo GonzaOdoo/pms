@@ -27,6 +27,22 @@ class PmsAccommodationType(models.Model):
     bedroom_count = fields.Integer(string="Bedrooms")
     bathroom_count = fields.Integer(string="Bathrooms")
     area = fields.Float()
+    price = fields.Monetary(
+        string="Price per Night",
+        currency_field="currency_id",
+        default=0.0,
+    )
+    has_custom_price = fields.Boolean(
+        string="Has Custom Price",
+        default=False,
+        help="When disabled, the general property rate is used.",
+    )
+    currency_id = fields.Many2one(
+        "res.currency",
+        string="Currency",
+        required=True,
+        default=lambda self: self.env.company.currency_id,
+    )
     amenity_ids = fields.Many2many(
         "pms.amenity",
         string="Amenities",
@@ -48,6 +64,14 @@ class PmsAccommodationType(models.Model):
     def _compute_room_count(self):
         for accommodation_type in self:
             accommodation_type.room_count = len(accommodation_type.room_ids)
+
+    @api.constrains("price")
+    def _check_price(self):
+        for accommodation_type in self:
+            if accommodation_type.price < 0:
+                raise ValidationError(
+                    self.env._("The accommodation price cannot be negative.")
+                )
 
     @api.constrains("property_id")
     def _check_rooms_property(self):

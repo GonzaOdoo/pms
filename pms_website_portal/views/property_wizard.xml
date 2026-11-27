@@ -332,12 +332,13 @@
                                     <th>Dormitorios / Baños</th>
                                     <th>Superficie</th>
                                     <th>Habitaciones creadas</th>
+                                    <th>Tarifa por noche</th>
                                     <th>Servicios</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr t-if="not accommodation_types">
-                                    <td colspan="6" class="ts-empty">
+                                    <td colspan="7" class="ts-empty">
                                         Todavía no agregaste tipos de habitación.
                                     </td>
                                 </tr>
@@ -359,6 +360,14 @@
                                             t-attf-href="/my/rooms?property_id=#{prop.id}"
                                             class="ms-2"
                                         >Ver habitaciones</a>
+                                    </td>
+                                    <td>
+                                        <span
+                                            t-if="item.has_custom_price"
+                                            t-field="item.price"
+                                            t-options='{"widget": "monetary", "display_currency": item.currency_id}'
+                                        />
+                                        <span t-else="">Tarifa general</span>
                                     </td>
                                     <td>
                                         <t
@@ -406,8 +415,10 @@
                 <t t-if="wizard_step == 'rate'">
                     <h2>Tarifa de reserva</h2>
                     <p t-if="prop.property_type == 'hotel'" class="ts-muted">
-                        La tarifa propia de este tipo de habitación es opcional. Si
-                        queda vacía, se utilizará una tarifa general disponible.
+                        Esta tarifa se aplicará a
+                        <strong t-out="accommodation_type.name if accommodation_type else 'el tipo de habitación seleccionado'" />.
+                        Puedes definir tarifas propias para otros tipos al crearlos;
+                        si quedan vacías, se utilizará una tarifa general disponible.
                     </p>
                     <p t-else="" class="ts-muted">
                         Define el precio por noche de la propiedad.
@@ -471,10 +482,14 @@
                                 habitaciones ·
                                 <span t-out="item.capacity"/> personas ·
                                 <span t-out="item.bedroom_count"/> dormitorios ·
-                                <span t-out="item.bathroom_count"/> baños
+                                <span t-out="item.bathroom_count"/> baños ·
+                                <t t-if="item.has_custom_price">
+                                    <span t-field="item.price" t-options='{"widget": "monetary", "display_currency": item.currency_id}'/>
+                                </t>
+                                <t t-else="">tarifa general</t>
                             </dd>
                         </div>
-                        <div t-if="reservation_offer"><dt>Tarifa por noche</dt><dd><span t-out="reservation_offer.price"/> <span t-out="reservation_offer.currency_id.symbol"/></dd></div>
+                        <div t-if="reservation_offer and prop.property_type != 'hotel'"><dt>Tarifa por noche</dt><dd><span t-out="reservation_offer.price"/> <span t-out="reservation_offer.currency_id.symbol"/></dd></div>
                     </dl>
                     <div class="ts-wizard-note">
                         Al terminar, la propiedad quedará lista para que la administración

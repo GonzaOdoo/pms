@@ -474,6 +474,8 @@ class ProviderPanel(http.Controller):
                     "accommodation_type_id": accommodation_type.id or False,
                     "price": price,
                 }
+                if accommodation_type:
+                    offer_vals["currency_id"] = accommodation_type.currency_id.id
                 if offer:
                     offer.write(offer_vals)
                 else:
@@ -495,6 +497,13 @@ class ProviderPanel(http.Controller):
                             self._wizard_path(prop, step), "rate_in_use"
                         )
                     offer.unlink()
+            if prop.property_type == "hotel" and accommodation_type:
+                accommodation_type.sudo().write(
+                    {
+                        "price": price or 0.0,
+                        "has_custom_price": price is not None,
+                    }
+                )
         if vals:
             prop.sudo().write(vals)
         next_index = max(current_index, step_index + 1)
@@ -743,6 +752,8 @@ class ProviderPanel(http.Controller):
                 "bedroom_count": bedroom_count,
                 "bathroom_count": bathroom_count,
                 "area": area,
+                "price": price or 0.0,
+                "has_custom_price": price is not None,
                 "amenity_ids": [(6, 0, amenities.ids)],
             }
         )
@@ -780,6 +791,7 @@ class ProviderPanel(http.Controller):
                     "product_id": product.id,
                     "property_id": prop.id,
                     "accommodation_type_id": accommodation_type.id,
+                    "currency_id": accommodation_type.currency_id.id,
                     "price": price,
                 }
             )

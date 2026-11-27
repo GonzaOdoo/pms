@@ -9,6 +9,23 @@ from .common import PmsBaseCase
 
 
 class TestPmsAccommodationType(PmsBaseCase):
+    def test_custom_price_is_stored_on_accommodation_type(self):
+        accommodation_type = self.env["pms.accommodation.type"].create(
+            {
+                "name": "Priced Double",
+                "property_id": self.property.id,
+                "price": 125.5,
+                "has_custom_price": True,
+            }
+        )
+
+        self.assertEqual(accommodation_type.price, 125.5)
+        self.assertTrue(accommodation_type.has_custom_price)
+        self.assertEqual(
+            accommodation_type.currency_id,
+            self.env.company.currency_id,
+        )
+
     def test_create_accommodation_type_and_assign_rooms(self):
         accommodation_type = self.env["pms.accommodation.type"].create(
             {

@@ -259,12 +259,18 @@ class TestProviderPortal(HttpCase):
         self.assertEqual(len(accommodation_type.room_ids.filtered("active")), 2)
         self.assertEqual(accommodation_type.room_ids.mapped("capacity"), [2, 2])
         self.assertEqual(accommodation_type.room_ids.mapped("area"), [25, 25])
+        self.assertEqual(accommodation_type.price, 150)
+        self.assertTrue(accommodation_type.has_custom_price)
         self.assertEqual(
             prop.reservation_ids.filtered(
                 lambda offer: offer.accommodation_type_id == accommodation_type
             ).price,
             150,
         )
+        type_listing = self._get(
+            f"/my/accommodation-types?property_id={prop.id}"
+        )
+        self.assertIn("150", type_listing.text)
 
     def test_accommodation_type_creation_has_optional_rate_and_inherits_to_rooms(self):
         prop = self._start_wizard("Hotel Tipo", "hotel")
@@ -286,6 +292,7 @@ class TestProviderPortal(HttpCase):
         accommodation_type = self.env["pms.accommodation.type"].search(
             [("property_id", "=", prop.id)]
         )
+        self.assertFalse(accommodation_type.has_custom_price)
         self.assertFalse(
             prop.reservation_ids.filtered(
                 lambda offer: offer.accommodation_type_id == accommodation_type
@@ -296,6 +303,29 @@ class TestProviderPortal(HttpCase):
         self.assertEqual(room.capacity, 3)
         self.assertEqual(room.area, 40)
         self.assertIn(amenity, room.amenity_ids)
+
+    def test_accommodation_type_custom_price_is_saved_and_listed(self):
+        prop = self._start_wizard("Hotel con tarifa", "hotel")
+        self._post(
+            "/my/accommodation-types/save",
+            {
+                "property_id": prop.id,
+                "name": "Suite con tarifa",
+                "capacity": "2",
+                "bedroom_count": "1",
+                "bathroom_count": "1",
+                "area": "30",
+                "quantity": "1",
+                "price": "85",
+            },
+        )
+        accommodation_type = self.env["pms.accommodation.type"].search(
+            [("property_id", "=", prop.id)]
+        )
+        self.assertEqual(accommodation_type.price, 85)
+        self.assertTrue(accommodation_type.has_custom_price)
+        listing = self._get(f"/my/accommodation-types?property_id={prop.id}")
+        self.assertIn("85", listing.text)
 
     def test_cannot_edit_or_room_into_foreign_property(self):
         b = self.mutual["b"]

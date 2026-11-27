@@ -18,6 +18,9 @@
                             <field name="bedroom_count" />
                             <field name="bathroom_count" />
                             <field name="area" />
+                            <field name="price" />
+                            <field name="has_custom_price" />
+                            <field name="currency_id" />
                         </group>
                         <group>
                             <field name="active" />
@@ -58,6 +61,8 @@
                 <field name="name" />
                 <field name="property_id" />
                 <field name="capacity" />
+                <field name="price" />
+                <field name="currency_id" column_invisible="1" />
                 <field name="room_count" />
             </list>
         </field>
