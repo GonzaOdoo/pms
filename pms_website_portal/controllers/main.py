@@ -110,7 +110,8 @@ class ProviderPanel(http.Controller):
         return record
 
     def _redirect(self, path, msg):
-        return request.redirect(f"{path}?msg={msg}")
+        separator = "&" if "?" in path else "?"
+        return request.redirect(f"{path}{separator}msg={msg}")
 
     def _wizard_path(self, prop, step=None):
         return f"/my/properties/{prop.id}/wizard/{step or prop.setup_step}"
@@ -313,7 +314,7 @@ class ProviderPanel(http.Controller):
             prop,
             step,
             accommodation_type=accommodation_type,
-            accommodation_types=prop.sudo().accommodation_type_ids
+            accommodation_types=prop.sudo().accommodation_type_ids.filtered("active")
             if prop.property_type == "hotel"
             else request.env["pms.accommodation.type"],
             reservation_offer=prop.reservation_ids.filtered(
@@ -329,11 +330,6 @@ class ProviderPanel(http.Controller):
             values["amenities"] = request.env["pms.amenity"].search(
                 [("active", "=", True)], order="name"
             )
-        elif step == "inventory" and prop.property_type == "hotel":
-            values["room_amenities"] = request.env["pms.amenity"].search(
-                [("active", "=", True)], order="name"
-            )
-            values["accommodation_types"] = prop.sudo().accommodation_type_ids
         return request.render(
             "pms_website_portal.page_property_wizard_step",
             values,
@@ -437,55 +433,10 @@ class ProviderPanel(http.Controller):
                     "bathroom_count": bathroom_count,
                 }
             else:
-                name = (post.get("accommodation_name") or "").strip()
-                capacity = _to_int(post.get("capacity"))
-                bedroom_count = _to_int(post.get("bedroom_count"))
-                bathroom_count = _to_int(post.get("bathroom_count"))
-                area = _to_float(post.get("area"))
-                if (
-                    not name
-                    or capacity is None
-                    or bedroom_count is None
-                    or bathroom_count is None
-                    or area is None
-                    or capacity <= 0
-                    or bedroom_count < 0
-                    or bathroom_count < 0
-                    or area < 0
-                ):
+                if post.get("inventory_action") != "continue":
                     return self._redirect(self._wizard_path(prop, step), "error")
-                amenities = request.env["pms.amenity"].sudo().search(
-                    [
-                        ("active", "=", True),
-                        (
-                            "id",
-                            "in",
-                            [
-                                _to_int(value)
-                                for value in request.httprequest.form.getlist(
-                                    "room_amenity_ids"
-                                )
-                            ],
-                        ),
-                    ]
-                )
-                accommodation_type = prop.sudo().accommodation_type_ids[:1]
-                accommodation_vals = {
-                    "name": name,
-                    "capacity": capacity,
-                    "bedroom_count": bedroom_count,
-                    "bathroom_count": bathroom_count,
-                    "area": area,
-                    "amenity_ids": [(6, 0, amenities.ids)],
-                }
-                if accommodation_type:
-                    accommodation_type.write(accommodation_vals)
-                else:
-                    accommodation_type = request.env[
-                        "pms.accommodation.type"
-                    ].sudo().create(
-                        dict(accommodation_vals, property_id=prop.id)
-                    )
+                if not prop.sudo().accommodation_type_ids.filtered("active"):
+                    return self._redirect(self._wizard_path(prop, step), "error")
         elif step == "rate":
             name = (post.get("reservation_name") or "").strip()
             price_value = post.get("price")
@@ -702,6 +653,7 @@ class ProviderPanel(http.Controller):
                 amenities=request.env["pms.amenity"].search(
                     [("active", "=", True)], order="name"
                 ),
+                return_wizard=kw.get("return_wizard") == "1",
             ),
         )
 
@@ -726,6 +678,13 @@ class ProviderPanel(http.Controller):
         area = _to_float(post.get("area"))
         price_raw = post.get("price")
         price = _to_float(price_raw) if price_raw not in (None, "") else None
+        quantity = _to_int(post.get("quantity"))
+        return_wizard = post.get("return_wizard") == "1"
+        error_path = "/my/accommodation-types"
+        if prop:
+            error_path = f"/my/accommodation-types/new?property_id={prop.id}"
+            if return_wizard:
+                error_path += "&return_wizard=1"
         if (
             not prop
             or not name
@@ -738,21 +697,30 @@ class ProviderPanel(http.Controller):
             or area is None
             or area < 0
             or (price_raw not in (None, "") and (price is None or price < 0))
+            or (
+                prop.property_type == "hotel"
+                and (quantity is None or quantity < 1)
+            )
+            or (
+                return_wizard
+                and (
+                    prop.property_type != "hotel"
+                    or prop.setup_state != "draft"
+                )
+            )
         ):
-            return self._redirect("/my/accommodation-types", "error")
+            return self._redirect(error_path, "error")
         if request.env["pms.accommodation.type"].sudo().search_count(
             [("property_id", "=", prop.id), ("name", "=", name)]
         ):
-            return self._redirect(
-                f"/my/accommodation-types?property_id={prop.id}", "error"
-            )
+            return self._redirect(error_path, "error")
         product = False
         if price is not None:
             product = request.env.ref(
                 "pms_sale.product_product_reservation", raise_if_not_found=False
             )
             if not product:
-                return self._redirect("/my/accommodation-types", "error")
+                return self._redirect(error_path, "error")
         amenity_ids = [
             _to_int(value)
             for value in request.httprequest.form.getlist("amenity_ids")
@@ -760,6 +728,13 @@ class ProviderPanel(http.Controller):
         amenities = request.env["pms.amenity"].sudo().search(
             [("active", "=", True), ("id", "in", amenity_ids)]
         )
+        room_type = False
+        if prop.property_type == "hotel":
+            room_type = request.env.ref(
+                "pms_base.pms_room_type_bed", raise_if_not_found=False
+            )
+            if not room_type:
+                return self._redirect(error_path, "error")
         accommodation_type = request.env["pms.accommodation.type"].sudo().create(
             {
                 "name": name,
@@ -771,6 +746,32 @@ class ProviderPanel(http.Controller):
                 "amenity_ids": [(6, 0, amenities.ids)],
             }
         )
+        if room_type:
+            rooms = request.env["pms.room"].sudo()
+            existing_names = set(
+                rooms.with_context(active_test=False)
+                .search([("property_id", "=", prop.id)])
+                .mapped("name")
+            )
+            room_values = []
+            room_number = 1
+            while len(room_values) < quantity:
+                room_name = f"{name} {room_number}"
+                if room_name not in existing_names:
+                    existing_names.add(room_name)
+                    room_values.append(
+                        {
+                            "name": room_name,
+                            "property_id": prop.id,
+                            "type_id": room_type.id,
+                            "accommodation_type_id": accommodation_type.id,
+                            "capacity": capacity,
+                            "area": area,
+                            "amenity_ids": [(6, 0, amenities.ids)],
+                        }
+                    )
+                room_number += 1
+            rooms.create(room_values)
         if price is not None:
             request.env["pms.property.reservation"].sudo().create(
                 {
@@ -782,6 +783,14 @@ class ProviderPanel(http.Controller):
                     "price": price,
                 }
             )
+        if return_wizard:
+            inventory_index = WIZARD_STEPS.index("inventory")
+            current_index = WIZARD_STEPS.index(
+                prop.setup_step or WIZARD_STEPS[0]
+            )
+            if current_index < inventory_index:
+                prop.sudo().write({"setup_step": "inventory"})
+            return request.redirect(self._wizard_path(prop, "inventory"))
         return self._redirect(
             f"/my/accommodation-types?property_id={prop.id}", "created"
         )

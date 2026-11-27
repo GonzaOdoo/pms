@@ -135,7 +135,7 @@
                             <input name="zip" t-att-value="prop.zip" />
                         </label>
                         <div class="ts-wide ts-form-actions">
-                            <button type="submit" class="ts-btn">Continuar</button>
+                            <button type="submit" class="ts-btn">Guardar y continuar</button>
                         </div>
                     </form>
                 </t>
@@ -318,102 +318,89 @@
                 </t>
 
                 <t t-if="wizard_step == 'inventory' and prop.property_type == 'hotel'">
-                    <h2>Tipo de habitación</h2>
+                    <h2>Habitaciones del hotel</h2>
                     <p class="ts-muted">
-                        Define las características de esta categoría. Después podrás
-                        agregar las habitaciones físicas que pertenecen a ella.
+                        Crea los tipos de habitación y la cantidad de unidades de cada
+                        tipo. Luego podrás editar sus nombres y números desde Habitaciones.
                     </p>
+                    <div class="ts-table-wrap">
+                        <table class="ts-table">
+                            <thead>
+                                <tr>
+                                    <th>Tipo de habitación</th>
+                                    <th>Capacidad</th>
+                                    <th>Dormitorios / Baños</th>
+                                    <th>Superficie</th>
+                                    <th>Habitaciones creadas</th>
+                                    <th>Servicios</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-if="not accommodation_types">
+                                    <td colspan="6" class="ts-empty">
+                                        Todavía no agregaste tipos de habitación.
+                                    </td>
+                                </tr>
+                                <tr t-foreach="accommodation_types" t-as="item">
+                                    <td t-out="item.name" />
+                                    <td>
+                                        <span t-out="item.capacity" /> huéspedes
+                                    </td>
+                                    <td>
+                                        <span t-out="item.bedroom_count" /> /
+                                        <span t-out="item.bathroom_count" />
+                                    </td>
+                                    <td>
+                                        <span t-out="item.area" /> m²
+                                    </td>
+                                    <td>
+                                        <span t-out="item.room_count" />
+                                        <a
+                                            t-attf-href="/my/rooms?property_id=#{prop.id}"
+                                            class="ms-2"
+                                        >Ver habitaciones</a>
+                                    </td>
+                                    <td>
+                                        <t
+                                            t-foreach="item.amenity_ids"
+                                            t-as="amenity"
+                                        >
+                                            <span t-out="amenity.name" />
+                                            <t t-if="not amenity_last">, </t>
+                                        </t>
+                                        <span t-if="not item.amenity_ids">—</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="ts-action-row my-4">
+                        <a
+                            t-attf-href="/my/accommodation-types/new?property_id=#{prop.id}&amp;return_wizard=1"
+                            class="ts-btn ts-btn-ghost"
+                        >Agregar tipo de habitación</a>
+                    </div>
                     <form
-                        class="ts-form"
                         method="post"
                         t-attf-action="/my/properties/#{prop.id}/wizard/inventory/save"
+                        class="ts-form-actions"
                     >
                         <input
                             type="hidden"
                             name="csrf_token"
                             t-att-value="request.csrf_token()"
                         />
-                        <label class="ts-wide">
-                            Nombre del tipo
-                            <input
-                                name="accommodation_name"
-                                required="required"
-                                t-att-value="accommodation_type.name if accommodation_type else 'Habitación estándar'"
-                            />
-                        </label>
-                        <label>
-                            Capacidad por habitación
-                            <input
-                                type="number"
-                                name="capacity"
-                                min="1"
-                                required="required"
-                                t-att-value="accommodation_type.capacity if accommodation_type else 2"
-                            />
-                        </label>
-                        <label>
-                            Dormitorios por habitación
-                            <input
-                                type="number"
-                                name="bedroom_count"
-                                min="0"
-                                t-att-value="accommodation_type.bedroom_count if accommodation_type else 1"
-                            />
-                        </label>
-                        <label>
-                            Baños por habitación
-                            <input
-                                type="number"
-                                name="bathroom_count"
-                                min="0"
-                                t-att-value="accommodation_type.bathroom_count if accommodation_type else 1"
-                            />
-                        </label>
-                        <label>
-                            Superficie por habitación (m²)
-                            <input
-                                type="number"
-                                name="area"
-                                min="0"
-                                step="0.01"
-                                t-att-value="accommodation_type.area if accommodation_type else ''"
-                            />
-                        </label>
-                        <fieldset class="ts-wide ts-amenities">
-                            <legend>Servicios de las habitaciones</legend>
-                            <label t-foreach="room_amenities" t-as="amenity">
-                                <input
-                                    type="checkbox"
-                                    name="room_amenity_ids"
-                                    t-att-value="amenity.id"
-                                    t-att-checked="accommodation_type and amenity in accommodation_type.amenity_ids"
-                                />
-                                <span t-out="amenity.name" />
-                            </label>
-                        </fieldset>
-                        <div class="ts-wide ts-form-actions">
-                            <button type="submit" class="ts-btn">Continuar</button>
-                        </div>
+                        <input
+                            type="hidden"
+                            name="inventory_action"
+                            value="continue"
+                        />
+                        <button
+                            type="submit"
+                            class="ts-btn"
+                            t-att-disabled="not accommodation_types"
+                        >Continuar</button>
                     </form>
-                    <div class="ts-wizard-note" t-if="accommodation_types">
-                        <strong>Tipos configurados:</strong>
-                        <ul>
-                            <li t-foreach="accommodation_types" t-as="item">
-                                <span t-out="item.name"/> —
-                                <span t-out="item.room_count"/> habitaciones
-                            </li>
-                        </ul>
-                    </div>
-                    <a
-                        t-if="accommodation_type"
-                        t-attf-href="/my/rooms/new?property_id=#{prop.id}"
-                        class="ts-btn ts-btn-ghost"
-                    >Agregar habitaciones</a>
-                    <a
-                        t-if="accommodation_type"
-                        t-attf-href="/my/accommodation-types/new?property_id=#{prop.id}"
-                        class="ts-btn ts-btn-ghost"
-                    >Agregar otro tipo de alojamiento</a>
                 </t>
 
                 <t t-if="wizard_step == 'rate'">
@@ -425,16 +412,6 @@
                     <p t-else="" class="ts-muted">
                         Define el precio por noche de la propiedad.
                     </p>
-                    <div t-if="prop.property_type == 'hotel'" class="ts-action-row ts-wide">
-                        <a
-                            t-attf-href="/my/rooms/new?property_id=#{prop.id}"
-                            class="ts-btn ts-btn-ghost"
-                        >Agregar habitaciones</a>
-                        <a
-                            t-attf-href="/my/accommodation-types/new?property_id=#{prop.id}"
-                            class="ts-btn ts-btn-ghost"
-                        >Agregar otro tipo de alojamiento</a>
-                    </div>
                     <form
                         class="ts-form"
                         method="post"

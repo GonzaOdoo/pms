@@ -159,31 +159,95 @@ class TestProviderPortal(HttpCase):
                 "max_nights": "30",
             },
         )
-        self._post(
-            f"/my/properties/{prop.id}/wizard/inventory/save",
+        inventory_page = self._get(
+            f"/my/properties/{prop.id}/wizard/inventory"
+        )
+        self.assertEqual(inventory_page.status_code, 200)
+        self.assertIn("Agregar tipo de habitación", inventory_page.text)
+        type_form = self._get(
+            f"/my/accommodation-types/new?property_id={prop.id}&return_wizard=1"
+        )
+        self.assertIn('name="quantity"', type_form.text)
+        self.assertIn('name="return_wizard" value="1"', type_form.text)
+        invalid_response = self._post(
+            "/my/accommodation-types/save",
             {
-                "accommodation_name": "Doble",
+                "property_id": prop.id,
+                "return_wizard": "1",
+                "name": "Sin habitaciones",
                 "capacity": "2",
                 "bedroom_count": "1",
                 "bathroom_count": "1",
                 "area": "25",
+                "quantity": "0",
             },
         )
-        accommodation_type = prop.accommodation_type_ids
+        self.assertIn(
+            "return_wizard=1&msg=error",
+            invalid_response.headers["Location"],
+        )
+        self.assertFalse(prop.accommodation_type_ids)
+        type_response = self._post(
+            "/my/accommodation-types/save",
+            {
+                "property_id": prop.id,
+                "return_wizard": "1",
+                "name": "Doble",
+                "capacity": "2",
+                "bedroom_count": "1",
+                "bathroom_count": "1",
+                "area": "25",
+                "quantity": "2",
+            },
+        )
+        self.assertIn(
+            f"/my/properties/{prop.id}/wizard/inventory",
+            type_response.headers["Location"],
+        )
+        prop.invalidate_recordset()
+        accommodation_type = prop.accommodation_type_ids.filtered(
+            lambda item: item.name == "Doble"
+        )
         self.assertEqual(accommodation_type.name, "Doble")
-        self.assertFalse(accommodation_type.room_ids)
-        for room_name in ("201", "202"):
-            self._post(
-                "/my/rooms/save",
-                {
-                    "name": room_name,
-                    "property_id": prop.id,
-                    "type_id": self.rtype.id,
-                    "accommodation_type_id": accommodation_type.id,
-                    "capacity": "99",
-                    "area": "1",
-                },
-            )
+        self.assertEqual(
+            accommodation_type.room_ids.filtered("active").mapped("name"),
+            ["Doble 1", "Doble 2"],
+        )
+        inventory_page = self._get(
+            f"/my/properties/{prop.id}/wizard/inventory"
+        )
+        self.assertIn("Doble", inventory_page.text)
+        self.assertIn("Doble 1", self._get("/my/rooms?property_id=%s" % prop.id).text)
+        second_type_response = self._post(
+            "/my/accommodation-types/save",
+            {
+                "property_id": prop.id,
+                "return_wizard": "1",
+                "name": "Suite",
+                "capacity": "3",
+                "bedroom_count": "1",
+                "bathroom_count": "1",
+                "area": "35",
+                "quantity": "1",
+            },
+        )
+        self.assertIn(
+            f"/my/properties/{prop.id}/wizard/inventory",
+            second_type_response.headers["Location"],
+        )
+        prop.invalidate_recordset()
+        self.assertEqual(
+            len(prop.accommodation_type_ids.filtered("active")),
+            2,
+        )
+        self.assertEqual(
+            len(prop.room_ids.filtered("active")),
+            3,
+        )
+        self._post(
+            f"/my/properties/{prop.id}/wizard/inventory/save",
+            {"inventory_action": "continue"},
+        )
         self._post(
             f"/my/properties/{prop.id}/wizard/rate/save",
             {"reservation_name": "Tarifa doble", "price": "150"},
@@ -214,6 +278,7 @@ class TestProviderPortal(HttpCase):
                 "bedroom_count": "2",
                 "bathroom_count": "1",
                 "area": "40",
+                "quantity": "1",
                 "amenity_ids": [str(amenity.id)],
             },
         )
@@ -226,16 +291,8 @@ class TestProviderPortal(HttpCase):
                 lambda offer: offer.accommodation_type_id == accommodation_type
             )
         )
-        self._post(
-            "/my/rooms/save",
-            {
-                "name": "Suite 1",
-                "property_id": prop.id,
-                "type_id": self.rtype.id,
-                "accommodation_type_id": accommodation_type.id,
-            },
-        )
         room = self.env["pms.room"].search([("name", "=", "Suite 1")])
+        self.assertEqual(room.accommodation_type_id, accommodation_type)
         self.assertEqual(room.capacity, 3)
         self.assertEqual(room.area, 40)
         self.assertIn(amenity, room.amenity_ids)
