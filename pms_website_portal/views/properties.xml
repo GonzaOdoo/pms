@@ -5,6 +5,7 @@
             <form class="ts-search" method="get" action="/my/properties">
                 <input type="search" name="q" t-att-value="q" placeholder="Buscar por nombre"/>
                 <button type="submit" class="ts-btn ts-btn-ghost">Buscar</button>
+                <a href="/my/properties/new" class="ts-btn">Nueva propiedad</a>
             </form>
             <section class="ts-card">
                 <p t-if="not properties" class="ts-empty">No hay propiedades. Creá la primera con “Nueva propiedad”.</p>
