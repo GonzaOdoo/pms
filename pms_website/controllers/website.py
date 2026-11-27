@@ -29,7 +29,7 @@ class Website(Website):
             [
                 [("is_published", "=", True)],
                 [("setup_state", "=", "ready")],
-                request.website.website_domain(),
+                request.env.website.website_domain(),
             ]
         )
 
@@ -91,7 +91,7 @@ class Website(Website):
             }.items()
             if value
         }
-        pager = request.website.pager(
+        pager = request.env.website.pager(
             url="/properties",
             url_args=url_args,
             total=properties_count,
