@@ -212,23 +212,39 @@ class ProviderPanel(http.Controller):
         env = request.env
         Reservation = env["pms.reservation"].sudo()
         today = fields.Datetime.now()
-        open_domain = [("stage_id.is_closed", "=", False)]
+    
+        owner_id = env.user.partner_id.id
+    
+        open_domain = [
+            ("stage_id.is_closed", "=", False),
+            ("property_id.owner_id", "=", owner_id),
+        ]
+    
         pending = Reservation.search_count(
             open_domain + [("stage_id.sequence", "<=", 20)]
         )
+    
         soon = Reservation.search_count(
-            open_domain
-            + [("start", ">=", today), ("start", "<=", today + timedelta(days=7))]
+            open_domain + [
+                ("start", ">=", today),
+                ("start", "<=", today + timedelta(days=7)),
+            ]
         )
+    
         values = self._values(
             "dashboard",
             "Panel",
-            n_properties=env["pms.property"].search_count([]),
-            n_rooms=env["pms.room"].search_count([]),
+            n_properties=env["pms.property"].search_count([
+                ("owner_id", "=", owner_id),
+            ]),
+            n_rooms=env["pms.room"].search_count([
+                ("property_id.owner_id", "=", owner_id),
+            ]),
             n_pending=pending,
             n_soon=soon,
             upcoming=Reservation.search(open_domain, limit=8),
         )
+    
         return request.render("pms_website_portal.page_dashboard", values)
 
     # ------------------------------------------------------------- propiedades
