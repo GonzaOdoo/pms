@@ -66,6 +66,43 @@ class Website(Website):
             "tags": tags,
         }
 
+    def _get_property_card_prices(self, properties):
+        prices = {}
+        reservation_model = "pms.property.reservation"
+        reservation_model_available = (
+            reservation_model in request.env.registry.models
+        )
+        general_offers = global_offers = None
+        if reservation_model_available:
+            reservation_offers = request.env[reservation_model].sudo()
+            general_offers = reservation_offers.search(
+                [
+                    ("property_id", "in", [False] + properties.ids),
+                    ("accommodation_type_id", "=", False),
+                ]
+            )
+            global_offers = general_offers.filtered(
+                lambda offer: not offer.property_id
+            )
+        for prop in properties:
+            accommodation_types = prop.sudo().accommodation_type_ids.filtered(
+                "active"
+            )
+            custom_types = accommodation_types.filtered("has_custom_price")
+            price_options = list(custom_types)
+            needs_general_rate = (
+                not accommodation_types
+                or len(custom_types) < len(accommodation_types)
+            )
+            if needs_general_rate and reservation_model_available:
+                property_offers = general_offers.filtered(
+                    lambda offer: offer.property_id == prop
+                )
+                price_options.extend(property_offers or global_offers)
+            if price_options:
+                prices[prop.id] = min(price_options, key=lambda item: item.price)
+        return prices
+
     def _prepare_properties_values(
         self, page=0, city=None, bedrooms=None, category=None, tag=None, **kwargs
     ):
@@ -118,6 +155,7 @@ class Website(Website):
             "selected_bedrooms": bedrooms or "",
             "selected_category": category or "",
             "selected_tag": tag or "",
+            "property_prices": self._get_property_card_prices(properties),
             **display_flags,
         }
 

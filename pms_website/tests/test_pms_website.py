@@ -306,6 +306,14 @@ class TestPmsWebsiteController(PmsBaseCase):
     def test_properties_list_render(self):
         from ..controllers import website as website_module
 
+        accommodation_type = self.env["pms.accommodation.type"].create(
+            {
+                "name": "Standard Room",
+                "property_id": self.property.id,
+                "price": 125,
+                "has_custom_price": True,
+            }
+        )
         controller = Website()
         with patch("odoo.http.Response.load", lambda result: result):
             with self._mock_request(website_module, render=True) as mock_request:
@@ -315,6 +323,10 @@ class TestPmsWebsiteController(PmsBaseCase):
                 self.assertEqual(args[0], "pms_website.properties")
                 self.assertIn(self.property, args[1]["properties"])
                 self.assertIn("cities", args[1])
+                self.assertEqual(
+                    args[1]["property_prices"][self.property.id],
+                    accommodation_type,
+                )
                 self.assertEqual(result.status_code, 200)
 
     def test_properties_filter_by_city(self):

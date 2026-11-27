@@ -873,37 +873,65 @@
                                                 class="w-100 h-100 object-fit-cover"
                                             />
                                         </div>
-                                        <div class="card-body">
-                                            <h5
-                                                class="card-title mb-2"
+                                    </a>
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title mb-2">
+                                            <a
+                                                t-att-href="property.website_url"
+                                                class="text-decoration-none text-reset"
                                                 t-field="property.name"
                                             />
-                                            <p
-                                                class="card-text text-muted mb-2"
-                                                t-if="property.city"
+                                        </h5>
+                                        <p
+                                            class="card-text text-muted mb-2"
+                                            t-if="property.city"
+                                        >
+                                            <i class="fa fa-map-marker me-1" />
+                                            <span t-field="property.city" />
+                                        </p>
+                                        <div
+                                            class="d-flex flex-wrap gap-2 text-muted small"
+                                        >
+                                            <span
+                                                t-if="show_rooms and property.qty_bedroom"
                                             >
-                                                <i class="fa fa-map-marker me-1" />
-                                                <span t-field="property.city" />
-                                            </p>
-                                            <div
-                                                class="d-flex flex-wrap gap-2 text-muted small"
-                                            >
-                                                <span
-                                                    t-if="show_rooms and property.qty_bedroom"
-                                                >
-                                                    <i class="fa fa-bed me-1" />
-                                                    <t
+                                                <i class="fa fa-bed me-1" />
+                                                <t
                                                     t-esc="property.qty_bedroom"
                                                 /> bedrooms
-                                                </span>
-                                                <span t-if="property.area">
-                                                    <i class="fa fa-home me-1" />
-                                                    <span t-field="property.area" />
-                                                    m²
-                                                </span>
-                                            </div>
+                                            </span>
+                                            <span t-if="property.area">
+                                                <i class="fa fa-home me-1" />
+                                                <span t-field="property.area" />
+                                                m²
+                                            </span>
                                         </div>
-                                    </a>
+                                        <t
+                                            t-set="card_price"
+                                            t-value="property_prices.get(property.id)"
+                                        />
+                                        <div
+                                            t-if="card_price"
+                                            class="pms-property-card-price mt-auto"
+                                        >
+                                            <span class="pms-property-card-price-label">
+                                                Desde
+                                            </span>
+                                            <span
+                                                t-field="card_price.price"
+                                                t-options="{'widget': 'monetary', 'display_currency': card_price.currency_id}"
+                                                class="pms-property-card-price-amount"
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary w-100 pms-property-card-book"
+                                            disabled="disabled"
+                                            aria-disabled="true"
+                                        >
+                                            Reservar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </t>

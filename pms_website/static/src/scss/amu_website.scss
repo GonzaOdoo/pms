@@ -1647,6 +1647,39 @@ body{
     color: var(--amu-sea);
 }
 
+.pms-property-card-price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid var(--amu-line);
+}
+
+.pms-property-card-price-label {
+    color: #62676b;
+    font-size: 13px;
+}
+
+.pms-property-card-price-amount {
+    color: var(--amu-ink);
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.pms-property-card-book {
+    margin-top: 12px;
+    border: 1px solid var(--amu-nature);
+    border-radius: 0;
+    background: var(--amu-nature);
+    font-family: "AMU Oswald", sans-serif;
+    letter-spacing: 0.05em;
+}
+
+.pms-property-card-book:disabled {
+    opacity: 0.75;
+}
+
 @media (max-width: 900px) {
     .amu-property-detail-layout {
         grid-template-columns: minmax(0, 1fr);
