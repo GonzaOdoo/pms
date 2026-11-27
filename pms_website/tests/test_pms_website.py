@@ -508,6 +508,10 @@ class TestPmsWebsiteHttp(HttpCase):
         self.assertIn(b'data-occupancy-stepper="adults"', response.content)
         self.assertIn(b'name="adults"', response.content)
         self.assertIn(b"amu-footer", response.content)
+        self.assertIn(b'aria-labelledby="amu-destinations-title"', response.content)
+        self.assertIn(b"/pms_website/static/img/ciudad.JPG", response.content)
+        self.assertIn(b"El Calafate", response.content)
+        self.assertIn(b"/properties?city=Mar%20del%20Plata", response.content)
 
     def test_property_page_public(self):
         response = self.url_open(self.property.website_url)

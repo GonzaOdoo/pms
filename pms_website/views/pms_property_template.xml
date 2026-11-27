@@ -461,7 +461,7 @@
             <main id="wrap" class="amu-property-detail">
                 <div class="amu-property-detail-container">
                     <nav class="amu-property-breadcrumb" aria-label="Migas de pan">
-                        <a href="/properties">Alojamientos</a>
+                        <a href="/property">Alojamientos</a>
                         <i class="fa fa-angle-right" aria-hidden="true" />
                         <span t-out="property.city or property.name" />
                     </nav>

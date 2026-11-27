@@ -10,7 +10,9 @@ from odoo.http import request
 from odoo.addons.pms_website.controllers.website import Website as PmsPropertyWebsite
 from odoo.addons.website.controllers.main import QueryURL
 from odoo.addons.website_sale.controllers.main import WebsiteSale
+import logging
 
+_logger = logging.getLogger(__name__)
 
 class PropertyTableCompute:
     def __init__(self):
@@ -883,6 +885,9 @@ class PmsWebsiteSale(PmsPropertyWebsite):
         accommodations=None,
         **kwargs,
     ):
+        _logger.info(property_id)
+        _logger.info(reservation_type_id)
+        _logger.info(accommodation_type_id)
         if not date_start or not date_end:
             return {"available": False, "error": _("Missing dates")}
         try:
@@ -897,7 +902,8 @@ class PmsWebsiteSale(PmsPropertyWebsite):
             }
 
         property_rec = request.env["pms.property"].sudo().browse(property_id).exists()
-        if not property_rec or not property_rec.can_access_from_current_website():
+        #if not property_rec or not property_rec.can_access_from_current_website():
+        if not property_rec:
             return {"available": False, "error": _("Property not found")}
         if property_rec.setup_state != "ready":
             return {"available": False, "error": _("Property setup is not complete")}
@@ -975,7 +981,7 @@ class PmsWebsiteSale(PmsPropertyWebsite):
         if (
             not pms_property.exists()
             or pms_property.setup_state != "ready"
-            or not pms_property.can_access_from_current_website()
+            #or not pms_property.can_access_from_current_website()
         ):
             return {"error": _("Property not found"), "redirect": "/property"}
 

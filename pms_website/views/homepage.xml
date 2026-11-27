@@ -149,6 +149,82 @@
                         Del paisaje que imaginás al lugar que vas a recordar.
                     </p>
                 </section>
+                <section
+                    class="amu-destinations"
+                    aria-labelledby="amu-destinations-title"
+                >
+                    <div class="amu-destinations-heading">
+                        <div>
+                            <p class="amu-eyebrow">LUGARES PARA DESCUBRIR</p>
+                            <h2 id="amu-destinations-title">Destinos</h2>
+                        </div>
+                        <p>Elegí un paisaje y empezá a imaginar tu próximo viaje.</p>
+                    </div>
+                    <div class="amu-destination-list">
+                        <div class="amu-destination-grid">
+                            <a
+                                class="amu-destination-card"
+                                href="/properties?city=Buenos%20Aires"
+                            >
+                                <img
+                                    src="/pms_website/static/img/ciudad.JPG"
+                                    alt="Vista panorámica de la ciudad de Buenos Aires"
+                                    loading="lazy"
+                                />
+                                <span class="amu-destination-details">
+                                    <span class="amu-destination-type">CIUDAD</span>
+                                    <span class="amu-destination-name">Buenos Aires</span>
+                                    <i class="fa fa-arrow-right" aria-hidden="true"/>
+                                </span>
+                            </a>
+                            <a
+                                class="amu-destination-card"
+                                href="/properties?city=El%20Calafate"
+                            >
+                                <img
+                                    src="/pms_website/static/img/glaciar.jpg"
+                                    alt="Glaciar en El Calafate"
+                                    loading="lazy"
+                                />
+                                <span class="amu-destination-details">
+                                    <span class="amu-destination-type">PATAGONIA</span>
+                                    <span class="amu-destination-name">El Calafate</span>
+                                    <i class="fa fa-arrow-right" aria-hidden="true"/>
+                                </span>
+                            </a>
+                            <a
+                                class="amu-destination-card"
+                                href="/properties?city=Mar%20del%20Plata"
+                            >
+                                <img
+                                    src="/pms_website/static/img/mar.jpg"
+                                    alt="Costa y mar en Mar del Plata"
+                                    loading="lazy"
+                                />
+                                <span class="amu-destination-details">
+                                    <span class="amu-destination-type">COSTA</span>
+                                    <span class="amu-destination-name">Mar del Plata</span>
+                                    <i class="fa fa-arrow-right" aria-hidden="true"/>
+                                </span>
+                            </a>
+                            <a
+                                class="amu-destination-card"
+                                href="/properties?city=Mendoza"
+                            >
+                                <img
+                                    src="/pms_website/static/img/mountain.jpg"
+                                    alt="Montañas de los Andes en Mendoza"
+                                    loading="lazy"
+                                />
+                                <span class="amu-destination-details">
+                                    <span class="amu-destination-type">MONTAÑA</span>
+                                    <span class="amu-destination-name">Mendoza</span>
+                                    <i class="fa fa-arrow-right" aria-hidden="true"/>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
             </main>
         </xpath>
     </template>
