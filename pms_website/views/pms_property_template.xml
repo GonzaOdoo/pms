@@ -634,6 +634,31 @@
                                                 t-out="amenity.name"
                                             />
                                         </div>
+                                        <t
+                                            t-set="accommodation_price"
+                                            t-value="accommodation_type_prices.get(accommodation_type.id)"
+                                        />
+                                        <div
+                                            t-if="accommodation_price"
+                                            class="amu-accommodation-price"
+                                        >
+                                            <span class="amu-accommodation-price-label">
+                                                Precio
+                                            </span>
+                                            <span
+                                                t-field="accommodation_price.price"
+                                                t-options="{'widget': 'monetary', 'display_currency': accommodation_price.currency_id}"
+                                                class="amu-accommodation-price-amount"
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            class="amu-accommodation-book"
+                                            disabled="disabled"
+                                            aria-disabled="true"
+                                        >
+                                            Reservar
+                                        </button>
                                     </article>
                                 </div>
                             </section>

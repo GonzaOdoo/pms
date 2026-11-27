@@ -1528,6 +1528,44 @@ body{
     color: var(--amu-sea);
 }
 
+.amu-accommodation-price {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--amu-line);
+}
+
+.amu-accommodation-price-label {
+    color: #62676b;
+    font-size: 13px;
+}
+
+.amu-accommodation-price-amount {
+    color: var(--amu-ink);
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.amu-accommodation-book {
+    width: 100%;
+    margin-top: 12px;
+    padding: 11px 14px;
+    border: 1px solid var(--amu-nature);
+    border-radius: 0;
+    background: var(--amu-nature);
+    color: #fff;
+    font-family: "AMU Oswald", sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+}
+
+.amu-accommodation-book:disabled {
+    opacity: 0.75;
+}
+
 .amu-detail-amenities {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

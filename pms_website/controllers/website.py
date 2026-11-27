@@ -66,24 +66,32 @@ class Website(Website):
             "tags": tags,
         }
 
+    def _get_general_property_offers(self, properties):
+        reservation_model = "pms.property.reservation"
+        if reservation_model not in request.env.registry.models:
+            return {}
+        reservation_offers = request.env[reservation_model].sudo().search(
+            [
+                ("property_id", "in", [False] + properties.ids),
+                ("accommodation_type_id", "=", False),
+            ]
+        )
+        global_offers = reservation_offers.filtered(
+            lambda offer: not offer.property_id
+        )
+        return {
+            prop.id: (
+                reservation_offers.filtered(
+                    lambda offer: offer.property_id == prop
+                )
+                or global_offers
+            )
+            for prop in properties
+        }
+
     def _get_property_card_prices(self, properties):
         prices = {}
-        reservation_model = "pms.property.reservation"
-        reservation_model_available = (
-            reservation_model in request.env.registry.models
-        )
-        general_offers = global_offers = None
-        if reservation_model_available:
-            reservation_offers = request.env[reservation_model].sudo()
-            general_offers = reservation_offers.search(
-                [
-                    ("property_id", "in", [False] + properties.ids),
-                    ("accommodation_type_id", "=", False),
-                ]
-            )
-            global_offers = general_offers.filtered(
-                lambda offer: not offer.property_id
-            )
+        general_offers_by_property = self._get_general_property_offers(properties)
         for prop in properties:
             accommodation_types = prop.sudo().accommodation_type_ids.filtered(
                 "active"
@@ -94,13 +102,25 @@ class Website(Website):
                 not accommodation_types
                 or len(custom_types) < len(accommodation_types)
             )
-            if needs_general_rate and reservation_model_available:
-                property_offers = general_offers.filtered(
-                    lambda offer: offer.property_id == prop
-                )
-                price_options.extend(property_offers or global_offers)
+            if needs_general_rate:
+                price_options.extend(general_offers_by_property.get(prop.id, []))
             if price_options:
                 prices[prop.id] = min(price_options, key=lambda item: item.price)
+        return prices
+
+    def _get_accommodation_type_prices(self, property_rec):
+        general_offers_by_property = self._get_general_property_offers(property_rec)
+        general_offers = general_offers_by_property.get(property_rec.id, [])
+        prices = {}
+        for accommodation_type in property_rec.accommodation_type_ids.filtered(
+            "active"
+        ):
+            if accommodation_type.has_custom_price:
+                prices[accommodation_type.id] = accommodation_type
+            elif general_offers:
+                prices[accommodation_type.id] = min(
+                    general_offers, key=lambda offer: offer.price
+                )
         return prices
 
     def _prepare_properties_values(
@@ -213,5 +233,8 @@ class Website(Website):
             "property": pms_property,
             "main_object": pms_property,
             "keep": keep,
+            "accommodation_type_prices": self._get_accommodation_type_prices(
+                pms_property
+            ),
             **self._get_pms_display_flags(),
         }

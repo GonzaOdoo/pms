@@ -150,6 +150,14 @@ class TestPmsWebsiteController(PmsBaseCase):
     def test_prepare_property_values(self):
         from ..controllers import website as website_module
 
+        accommodation_type = self.env["pms.accommodation.type"].create(
+            {
+                "name": "Standard Room",
+                "property_id": self.property.id,
+                "price": 125,
+                "has_custom_price": True,
+            }
+        )
         controller = Website()
         with self._mock_request(website_module):
             values = controller._prepare_property_values(
@@ -158,6 +166,10 @@ class TestPmsWebsiteController(PmsBaseCase):
         self.assertEqual(values["property"], self.property)
         self.assertEqual(values["main_object"], self.property)
         self.assertEqual(values["keep"].path, "/properties")
+        self.assertEqual(
+            values["accommodation_type_prices"][accommodation_type.id],
+            accommodation_type,
+        )
         self.assertIn("show_rooms", values)
         self.assertIn("show_amenities", values)
         self.assertIn("show_services", values)

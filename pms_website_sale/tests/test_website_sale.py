@@ -90,7 +90,7 @@ class TestWebsiteSaleControllers(HttpCase):
         self.assertIn(b'data-results-view="grid"', response.content)
         self.assertIn(b"class=\"amu-property-grid\"", response.content)
 
-    def test_properties_directory_uses_general_rate(self):
+    def test_property_rates_use_general_fallback_on_directory_and_detail(self):
         self.env["pms.accommodation.type"].create(
             [
                 {
@@ -108,6 +108,12 @@ class TestWebsiteSaleControllers(HttpCase):
         self.authenticate(None, None)
         response = self.url_open("/properties")
         self.assertEqual(response.status_code, 200)
+        self.assertIn(b"120", response.content)
+        self.assertIn(b"Reservar", response.content)
+
+        response = self.url_open(self.property.website_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"150", response.content)
         self.assertIn(b"120", response.content)
         self.assertIn(b"Reservar", response.content)
 
