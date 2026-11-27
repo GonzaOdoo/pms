@@ -1706,16 +1706,133 @@ body{
 }
 
 .pms-property-card-book {
+    display: block;
     margin-top: 12px;
     border: 1px solid var(--amu-nature);
     border-radius: 0;
     background: var(--amu-nature);
     font-family: "AMU Oswald", sans-serif;
     letter-spacing: 0.05em;
+    text-align: center;
+    text-decoration: none;
 }
 
-.pms-property-card-book:disabled {
-    opacity: 0.75;
+.amu-booking-modal .modal-content {
+    border: 0;
+    border-radius: 0;
+    color: var(--amu-ink);
+    font-family: "AMU Oswald", sans-serif;
+}
+
+.amu-booking-modal .modal-header,
+.amu-booking-modal .modal-footer {
+    border-color: var(--amu-line);
+}
+
+.amu-booking-modal .modal-title {
+    color: var(--amu-ink);
+    font-family: "AMU Gravitas", Georgia, serif;
+    font-weight: 400;
+}
+
+.amu-booking-modal .form-label {
+    color: var(--amu-ink);
+    font-weight: 500;
+}
+
+.amu-hotel-room-list {
+    display: grid;
+    gap: 12px;
+}
+
+.amu-hotel-room-option {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 150px;
+    gap: 14px 20px;
+    padding: 18px;
+    border: 1px solid var(--amu-line);
+    background: #fff;
+}
+
+.amu-hotel-room-option-info h6 {
+    margin: 0;
+    color: var(--amu-ink);
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.amu-hotel-room-option-info p {
+    margin: 6px 0;
+    color: #62676b;
+}
+
+.amu-hotel-room-option-info strong {
+    margin-right: 5px;
+    color: var(--amu-ink);
+    font-size: 18px;
+}
+
+.amu-hotel-room-option-info small,
+.amu-hotel-general-rate {
+    color: #62676b;
+    font-size: 12px;
+}
+
+.amu-hotel-room-quantity label {
+    margin-bottom: 5px;
+    color: var(--amu-ink);
+    font-size: 13px;
+}
+
+.amu-hotel-room-assignments {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 10px;
+}
+
+.amu-hotel-room-assignments[hidden] {
+    display: none;
+}
+
+.amu-hotel-room-guest-card {
+    padding: 14px;
+    border-top: 1px solid var(--amu-line);
+}
+
+.amu-hotel-room-guest-card h6 {
+    margin: 0 0 10px;
+    color: var(--amu-sea);
+}
+
+.amu-hotel-guest {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.amu-hotel-add-guest,
+.amu-hotel-guest-remove {
+    border: 0;
+    background: transparent;
+    color: var(--amu-sea);
+    font-family: "AMU Oswald", sans-serif;
+}
+
+.amu-hotel-guest-remove {
+    color: var(--amu-clay);
+    font-size: 21px;
+}
+
+@media (max-width: 640px) {
+    .amu-hotel-room-option {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 14px;
+    }
+
+    .amu-hotel-guest {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 @media (max-width: 900px) {

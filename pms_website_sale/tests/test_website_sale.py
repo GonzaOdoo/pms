@@ -388,13 +388,13 @@ class TestWebsiteSaleControllers(HttpCase):
         self.assertEqual(result["error"], "Property not found")
         self.assertEqual(result["redirect"], "/property")
 
-    def test_property_detail_includes_reservation_types(self):
+    def test_house_detail_uses_property_reservation_only(self):
         self.authenticate("admin", "admin")
         slug = self.env["ir.http"]._slug(self.property)
         response = self.url_open(f"/property/{slug}")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Nightly Rate", response.content)
-        self.assertIn(b"Global Rate", response.content)
+        self.assertIn(b"Reserva de la propiedad", response.content)
+        self.assertNotIn(b"Global Rate", response.content)
 
     def test_hotel_uses_general_rates_for_types_without_a_specific_rate(self):
         self.property.property_type = "hotel"
@@ -407,7 +407,7 @@ class TestWebsiteSaleControllers(HttpCase):
         )
         self.env["pms.room"].create(
             {
-                "name": "Room 201",
+                "name": "Double Room 1",
                 "property_id": self.property.id,
                 "type_id": self.env.ref("pms_base.pms_room_type_bed").id,
                 "accommodation_type_id": accommodation_type.id,
@@ -418,6 +418,9 @@ class TestWebsiteSaleControllers(HttpCase):
         response = self.url_open(f"/property/{slug}")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Double Room - Nightly Rate", response.content)
-        self.assertIn(b"Double Room - Global Rate", response.content)
-        self.assertIn(b"tarifa general", response.content)
+        self.assertIn(b"Double Room", response.content)
+        self.assertIn(b"120", response.content)
+        self.assertIn(b"Aplica tarifa general", response.content)
+        self.assertIn(b'data-booking-flow="hotel"', response.content)
+        self.assertIn(b"data-hotel-type-row", response.content)
+        self.assertIn(b"data-hotel-room-quantity", response.content)

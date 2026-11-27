@@ -527,6 +527,23 @@ class PmsWebsiteSale(PmsPropertyWebsite):
         def scoped_offers(domain):
             return Offer.search(property_scope + domain, order="property_id desc, id")
 
+        if property_rec.property_type != "hotel":
+            general_offer_domain = [("accommodation_type_id", "=", False)]
+            property_offers = scoped_offers(
+                general_offer_domain + [("property_id", "=", property_rec.id)]
+            )
+            offers = property_offers or scoped_offers(
+                general_offer_domain + [("property_id", "=", False)]
+            )
+            return [
+                {
+                    "offer": offer,
+                    "accommodation_type": request.env["pms.accommodation.type"],
+                    "is_fallback": False,
+                }
+                for offer in offers
+            ]
+
         accommodation_types = property_rec.sudo().accommodation_type_ids.filtered(
             "active"
         )
@@ -547,17 +564,7 @@ class PmsWebsiteSale(PmsPropertyWebsite):
                         }
                     )
             return options
-        if property_rec.property_type == "hotel":
-            return options
-
-        return [
-            {
-                "offer": offer,
-                "accommodation_type": request.env["pms.accommodation.type"],
-                "is_fallback": False,
-            }
-            for offer in scoped_offers([("accommodation_type_id", "=", False)])
-        ]
+        return options
 
     def _resolve_reservation_offer(
         self, property_rec, reservation_type_id, accommodation_type_id=None
@@ -569,6 +576,12 @@ class PmsWebsiteSale(PmsPropertyWebsite):
             .exists()
         )
         if not offer or (offer.property_id and offer.property_id != property_rec):
+            return None, None
+
+        if (
+            property_rec.property_type != "hotel"
+            and offer.accommodation_type_id
+        ):
             return None, None
 
         if offer.accommodation_type_id:
@@ -618,8 +631,240 @@ class PmsWebsiteSale(PmsPropertyWebsite):
             pms_property, category, search, **kwargs
         )
         values["reservation_types"] = self._effective_reservation_types(pms_property)
+        values["hotel_room_options"] = self._get_hotel_room_options(
+            pms_property, values["reservation_types"]
+        )
         values["is_public_user"] = request.env.user._is_public()
         return values
+
+    def _get_hotel_room_options(self, property_rec, reservation_types=None):
+        if property_rec.property_type != "hotel":
+            return []
+        reservation_types = reservation_types or self._effective_reservation_types(
+            property_rec
+        )
+        options = []
+        for accommodation_type in property_rec.sudo().accommodation_type_ids.filtered(
+            "active"
+        ):
+            matching_rates = [
+                item
+                for item in reservation_types
+                if item["accommodation_type"] == accommodation_type
+            ]
+            if not matching_rates:
+                continue
+            room_count = len(accommodation_type.room_ids.filtered("active"))
+            if not room_count:
+                continue
+            offer = matching_rates[0]["offer"]
+            has_custom_price = accommodation_type.has_custom_price
+            options.append(
+                {
+                    "accommodation_type": accommodation_type,
+                    "offer": offer,
+                    "price": (
+                        accommodation_type.price
+                        if has_custom_price
+                        else offer.price
+                    ),
+                    "currency": (
+                        accommodation_type.currency_id
+                        if has_custom_price
+                        else offer.currency_id
+                    ),
+                    "room_count": room_count,
+                    "max_guests": (
+                        accommodation_type.capacity or property_rec.no_of_guests
+                    ),
+                    "is_fallback": (
+                        matching_rates[0]["is_fallback"] and not has_custom_price
+                    ),
+                }
+            )
+        return options
+
+    def _get_hotel_room_availability(
+        self, property_rec, accommodation_type, start, end
+    ):
+        Reservation = request.env["pms.reservation"].sudo()
+        if not Reservation.is_accommodation_type_available(
+            property_rec.id, accommodation_type.id, start, end
+        ):
+            return 0
+        physical_room_count = request.env["pms.room"].sudo().search_count(
+            [
+                ("property_id", "=", property_rec.id),
+                ("accommodation_type_id", "=", accommodation_type.id),
+                ("active", "=", True),
+            ]
+        )
+        booked_room_count = Reservation.search_count(
+            Reservation._get_active_overlap_domain(property_rec.id, start, end)
+            + [("accommodation_type_id", "=", accommodation_type.id)]
+        )
+        return max(physical_room_count - booked_room_count, 0)
+
+    def _resolve_hotel_room_selection(
+        self, property_rec, accommodation_type_id, reservation_type_id=None
+    ):
+        try:
+            accommodation_type_id = int(accommodation_type_id)
+        except (TypeError, ValueError):
+            return None
+        room_option = next(
+            (
+                option
+                for option in self._get_hotel_room_options(property_rec)
+                if option["accommodation_type"].id == accommodation_type_id
+            ),
+            None,
+        )
+        if not room_option:
+            return None
+        if reservation_type_id:
+            try:
+                reservation_type_id = int(reservation_type_id)
+            except (TypeError, ValueError):
+                return None
+            if room_option["offer"].id != reservation_type_id:
+                return None
+        return room_option
+
+    def _check_hotel_availability(self, property_rec, accommodations, start, end):
+        if not isinstance(accommodations, list) or not accommodations:
+            return {"available": False, "error": _("Select at least one room type")}
+        seen_types = set()
+        for selection in accommodations:
+            if not isinstance(selection, dict):
+                return {"available": False, "error": _("Invalid room selection")}
+            option = self._resolve_hotel_room_selection(
+                property_rec,
+                selection.get("accommodation_type_id"),
+                selection.get("reservation_type_id"),
+            )
+            try:
+                quantity = int(selection.get("quantity") or 0)
+            except (TypeError, ValueError):
+                return {"available": False, "error": _("Invalid room quantity")}
+            if (
+                not option
+                or quantity < 1
+                or option["accommodation_type"].id in seen_types
+            ):
+                return {"available": False, "error": _("Invalid room selection")}
+            seen_types.add(option["accommodation_type"].id)
+            available_count = self._get_hotel_room_availability(
+                property_rec, option["accommodation_type"], start, end
+            )
+            if available_count < quantity:
+                return {"available": False}
+        return {"available": True}
+
+    def _create_hotel_booking(self, property_rec, accommodations, start, end):
+        if not isinstance(accommodations, list) or not accommodations:
+            return {"error": _("Select at least one room type")}
+        booking_plan = []
+        seen_types = set()
+        for selection in accommodations:
+            if not isinstance(selection, dict):
+                return {"error": _("Invalid room selection")}
+            room_option = self._resolve_hotel_room_selection(
+                property_rec,
+                selection.get("accommodation_type_id"),
+                selection.get("reservation_type_id"),
+            )
+            rooms = selection.get("rooms")
+            if (
+                not room_option
+                or not isinstance(rooms, list)
+                or not rooms
+                or room_option["accommodation_type"].id in seen_types
+            ):
+                return {"error": _("Invalid room selection")}
+            if len(rooms) > room_option["room_count"]:
+                return {"error": _("Not enough rooms are available for those dates")}
+            seen_types.add(room_option["accommodation_type"].id)
+            accommodation_type = room_option["accommodation_type"]
+            available_count = self._get_hotel_room_availability(
+                property_rec, accommodation_type, start, end
+            )
+            if available_count < len(rooms):
+                return {"error": _("Not enough rooms are available for those dates")}
+            max_guests = room_option["max_guests"]
+            for room in rooms:
+                if not isinstance(room, dict):
+                    return {"error": _("Invalid guest details")}
+                room_guests = room.get("guests")
+                if not isinstance(room_guests, list):
+                    return {"error": _("Invalid guest details")}
+                guests = []
+                for guest in room_guests:
+                    if not (
+                        isinstance(guest, dict)
+                        and isinstance(guest.get("name"), str)
+                        and guest["name"].strip()
+                    ):
+                        continue
+                    guests.append(
+                        {
+                            "name": guest["name"].strip(),
+                            "phone": (
+                                guest.get("phone")
+                                if isinstance(guest.get("phone"), str)
+                                else False
+                            ),
+                            "email": (
+                                guest.get("email")
+                                if isinstance(guest.get("email"), str)
+                                else False
+                            ),
+                        }
+                    )
+                if not guests:
+                    return {"error": _("At least one guest is required per room")}
+                if max_guests and len(guests) > max_guests:
+                    return {"error": _("Too many guests for this room type")}
+                booking_plan.append(
+                    {
+                        "option": room_option,
+                        "guests": guests,
+                    }
+                )
+
+        Reservation = request.env["pms.reservation"].sudo()
+        stage_booked = request.env.ref("pms_sale.pms_stage_booked")
+        reservations = []
+        duration = (end - start).days
+        for booking in booking_plan:
+            room_option = booking["option"]
+            reservation = Reservation.create(
+                {
+                    "property_id": property_rec.id,
+                    "reservation_type_id": room_option["offer"].id,
+                    "accommodation_type_id": room_option["accommodation_type"].id,
+                    "start": start,
+                    "stop": end,
+                    "stage_id": stage_booked.id,
+                    "guest_ids": [(0, 0, guest) for guest in booking["guests"]],
+                    "partner_id": request.env.user.partner_id.id,
+                }
+            )
+            reservations.append((reservation, room_option, duration))
+
+        website = request.env.website
+        order = request.cart or website._create_cart()
+        for reservation, room_option, nights in reservations:
+            request.env["sale.order.line"].sudo().create(
+                {
+                    "order_id": order.id,
+                    "product_id": room_option["offer"].product_id.id,
+                    "product_uom_qty": nights,
+                    "price_unit": room_option["price"],
+                    "pms_reservation_id": reservation.id,
+                }
+            )
+        return {"redirect": "/shop/checkout"}
 
     @http.route(
         ["/property/<int:property_id>/check_availability"],
@@ -635,6 +880,7 @@ class PmsWebsiteSale(PmsPropertyWebsite):
         date_end=None,
         reservation_type_id=None,
         accommodation_type_id=None,
+        accommodations=None,
         **kwargs,
     ):
         if not date_start or not date_end:
@@ -655,6 +901,22 @@ class PmsWebsiteSale(PmsPropertyWebsite):
             return {"available": False, "error": _("Property not found")}
         if property_rec.setup_state != "ready":
             return {"available": False, "error": _("Property setup is not complete")}
+
+        duration = (end - start).days
+        if property_rec.min_nights and duration < property_rec.min_nights:
+            return {
+                "available": False,
+                "error": _("Reservation does not meet the minimum stay"),
+            }
+        if property_rec.max_nights and duration > property_rec.max_nights:
+            return {
+                "available": False,
+                "error": _("Reservation exceeds the maximum stay"),
+            }
+        if property_rec.property_type == "hotel" and accommodations is not None:
+            return self._check_hotel_availability(
+                property_rec, accommodations, start, end
+            )
 
         Reservation = request.env["pms.reservation"].sudo()
         if reservation_type_id:
@@ -685,14 +947,6 @@ class PmsWebsiteSale(PmsPropertyWebsite):
             )
         elif property_rec.property_type == "hotel":
             available = False
-        elif property_rec.accommodation_type_ids:
-            available = any(
-                Reservation.is_accommodation_type_available(
-                    property_rec.id, accommodation_type.id, start, end
-                )
-                for accommodation_type in property_rec.accommodation_type_ids
-                if accommodation_type.active
-            )
         else:
             available = Reservation.is_accommodation_type_available(
                 property_rec.id, False, start, end
@@ -714,6 +968,7 @@ class PmsWebsiteSale(PmsPropertyWebsite):
         reservation_type_id=None,
         accommodation_type_id=None,
         guests=None,
+        accommodations=None,
         **kwargs,
     ):
         pms_property = request.env["pms.property"].sudo().browse(property_id)
@@ -737,6 +992,16 @@ class PmsWebsiteSale(PmsPropertyWebsite):
             return {"error": _("Invalid dates")}
         if start >= end:
             return {"error": _("Check-out must be after check-in")}
+
+        duration = (end - start).days
+        if pms_property.min_nights and duration < pms_property.min_nights:
+            return {"error": _("Reservation does not meet the minimum stay")}
+        if pms_property.max_nights and duration > pms_property.max_nights:
+            return {"error": _("Reservation exceeds the maximum stay")}
+        if pms_property.property_type == "hotel" and accommodations is not None:
+            return self._create_hotel_booking(
+                pms_property, accommodations, start, end
+            )
 
         try:
             reservation_type_id = int(reservation_type_id or 0)
@@ -768,12 +1033,6 @@ class PmsWebsiteSale(PmsPropertyWebsite):
         )
         if max_guests and len(guests) > max_guests:
             return {"error": _("Too many guests for this accommodation")}
-        duration = (end - start).days
-        if pms_property.min_nights and duration < pms_property.min_nights:
-            return {"error": _("Reservation does not meet the minimum stay")}
-        if pms_property.max_nights and duration > pms_property.max_nights:
-            return {"error": _("Reservation exceeds the maximum stay")}
-
         Reservation = request.env["pms.reservation"].sudo()
         if not Reservation.is_accommodation_type_available(
             pms_property.id,
@@ -813,4 +1072,4 @@ class PmsWebsiteSale(PmsPropertyWebsite):
                 "pms_reservation_id": reservation.id,
             }
         )
-        return {"redirect": "/shop/cart"}
+        return {"redirect": "/shop/checkout"}

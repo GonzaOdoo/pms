@@ -948,14 +948,12 @@
                                                 class="pms-property-card-price-amount"
                                             />
                                         </div>
-                                        <button
-                                            type="button"
+                                        <a
+                                            t-att-href="property.website_url"
                                             class="btn btn-primary w-100 pms-property-card-book"
-                                            disabled="disabled"
-                                            aria-disabled="true"
                                         >
                                             Reservar
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>

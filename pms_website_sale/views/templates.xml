@@ -373,7 +373,7 @@
                                 />
                                 <h2>Filtros</h2>
                                 <fieldset class="amu-filter-group">
-                                    <legend>Tipo de alojamiento</legend>
+                                    <legend>Tipo de Habitación</legend>
                                     <label class="amu-filter-option">
                                         <input
                                             type="radio"
@@ -582,16 +582,20 @@
         <!-- Book Now button in property details -->
         <xpath expr="//div[@id='product_details']" position="inside">
             <div class="mt-3">
-                <t t-if="is_public_user">
+                <t
+                    t-if="is_public_user and ((property.property_type == 'hotel' and hotel_room_options) or (property.property_type != 'hotel' and reservation_types))"
+                >
                     <a
                         t-attf-href="/web/login?redirect=#{property.website_url}"
                         class="btn btn-primary btn-lg"
                     >
                         <i class="fa fa-sign-in" />
-                        Log in to Book
+                        Inicia sesión para reservar
                     </a>
                 </t>
-                <t t-elif="reservation_types">
+                <t
+                    t-elif="(property.property_type == 'hotel' and hotel_room_options) or (property.property_type != 'hotel' and reservation_types)"
+                >
                     <button
                         type="button"
                         class="btn btn-primary btn-lg"
@@ -599,7 +603,7 @@
                         data-bs-target="#pmsBookingModal"
                     >
                         <i class="fa fa-calendar" />
-                        Book Now
+                        Reservar
                     </button>
                 </t>
             </div>
@@ -610,7 +614,9 @@
             expr="//div[hasclass('modal','fade','right') and @id='exampleModalPreview']"
             position="before"
         >
-            <t t-if="not is_public_user and reservation_types">
+            <t
+                t-if="not is_public_user and ((property.property_type == 'hotel' and hotel_room_options) or (property.property_type != 'hotel' and reservation_types))"
+            >
                 <div
                     class="modal fade"
                     id="pmsBookingModal"
@@ -618,12 +624,13 @@
                     aria-labelledby="pmsBookingModalLabel"
                     aria-hidden="true"
                     t-att-data-property-id="property.id"
+                    t-att-data-booking-flow="'hotel' if property.property_type == 'hotel' else 'property'"
                 >
-                    <div class="modal-dialog modal-lg">
+                    <div class="modal-dialog modal-lg amu-booking-modal">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="pmsBookingModalLabel">
-                                    Book <span t-field="property.name" />
+                                    Reservar <span t-field="property.name" />
                                 </h5>
                                 <button
                                     type="button"
@@ -639,7 +646,7 @@
                                             <label
                                                 for="date_start"
                                                 class="form-label"
-                                            >Check-in</label>
+                                            >Entrada</label>
                                             <input
                                                 type="date"
                                                 class="form-control"
@@ -652,7 +659,7 @@
                                             <label
                                                 for="date_end"
                                                 class="form-label"
-                                            >Check-out</label>
+                                            >Salida</label>
                                             <input
                                                 type="date"
                                                 class="form-control"
@@ -664,39 +671,101 @@
                                         <div class="col-md-4">
                                             <label
                                                 class="form-label"
-                                            >Availability</label>
+                                            >Disponibilidad</label>
                                             <div
                                                 id="pms_availability_status"
                                                 class="mt-2 text-muted small"
-                                            >Select dates to check</div>
+                                            >Seleccioná las fechas para consultar</div>
                                         </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div
+                                        t-if="property.property_type == 'hotel'"
+                                        class="mb-3"
+                                    >
+                                        <label class="form-label">
+                                            Elegí los tipos y la cantidad de habitaciones
+                                        </label>
+                                        <div
+                                            id="pms_hotel_room_types"
+                                            class="amu-hotel-room-list"
+                                        >
+                                            <article
+                                                t-foreach="hotel_room_options"
+                                                t-as="room_option"
+                                                class="amu-hotel-room-option"
+                                                data-hotel-type-row=""
+                                                t-att-data-type-id="room_option['accommodation_type'].id"
+                                                t-att-data-offer-id="room_option['offer'].id"
+                                                t-att-data-max-guests="room_option['max_guests']"
+                                                t-att-data-room-count="room_option['room_count']"
+                                            >
+                                                <div class="amu-hotel-room-option-info">
+                                                    <h6 t-out="room_option['accommodation_type'].name" />
+                                                    <p t-if="room_option['max_guests']">
+                                                        Hasta <t t-out="room_option['max_guests']" /> huéspedes por habitación
+                                                    </p>
+                                                    <span
+                                                        t-if="room_option['is_fallback']"
+                                                        class="amu-hotel-general-rate"
+                                                    >Aplica tarifa general</span>
+                                                    <strong
+                                                        t-out="room_option['price']"
+                                                        t-options="{'widget': 'monetary', 'display_currency': room_option['currency']}"
+                                                    />
+                                                    <small>por noche</small>
+                                                </div>
+                                                <div class="amu-hotel-room-quantity">
+                                                    <label
+                                                        t-att-for="'hotel_room_quantity_' + str(room_option['accommodation_type'].id)"
+                                                    >Habitaciones</label>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="1"
+                                                        value="0"
+                                                        class="form-control"
+                                                        data-hotel-room-quantity=""
+                                                        t-att-max="room_option['room_count']"
+                                                        t-att-id="'hotel_room_quantity_' + str(room_option['accommodation_type'].id)"
+                                                    />
+                                                </div>
+                                                <div
+                                                    class="amu-hotel-room-assignments"
+                                                    data-hotel-room-assignments=""
+                                                    hidden="hidden"
+                                                />
+                                            </article>
+                                        </div>
+                                    </div>
+                                    <div
+                                        t-if="property.property_type != 'hotel'"
+                                        class="mb-3"
+                                    >
                                         <label
                                             for="reservation_type_id"
                                             class="form-label"
-                                        >Reservation Type</label>
+                                        >
+                                            Reserva
+                                        </label>
                                         <select
                                             class="form-select"
                                             id="reservation_type_id"
                                             name="reservation_type_id"
                                             required="required"
                                         >
-                                            <option value="">-- Select --</option>
-                                            <t t-foreach="reservation_types" t-as="rt">
+                                            <t
+                                                t-foreach="reservation_types"
+                                                t-as="rt"
+                                            >
                                                 <option
                                                     t-att-value="rt['offer'].id"
+                                                    t-att-selected="property.property_type != 'hotel' and rt_index == 0"
                                                     t-att-data-accommodation-type-id="rt['accommodation_type'].id or ''"
                                                     t-att-data-max-guests="rt['accommodation_type'].capacity or property.no_of_guests or 0"
                                                 >
                                                     <t
-                                                        t-if="rt['accommodation_type']"
-                                                        t-esc="rt['accommodation_type'].name + ' - '"
-                                                    />
-                                                    <t t-esc="rt['offer'].name" />
-                                                    <t t-if="rt['is_fallback']">
-                                                        (tarifa general)
-                                                    </t>
+                                                        t-if="property.property_type != 'hotel'"
+                                                    >Reserva de la propiedad</t>
                                                     <t t-if="rt['offer'].price">
                                                         (<t
                                                         t-esc="rt['offer'].price"
@@ -709,9 +778,12 @@
                                             </t>
                                         </select>
                                     </div>
-                                    <div class="mb-3">
+                                    <div
+                                        t-if="property.property_type != 'hotel'"
+                                        class="mb-3"
+                                    >
                                         <label class="form-label">
-                                            Guests
+                                            Huéspedes
                                             <t t-if="property.no_of_guests">
                                             <span class="text-muted small">(max
                                                     <t
@@ -729,7 +801,7 @@
                                                         class="form-control"
                                                         name="guest_name_0"
                                                         data-guest-field="name"
-                                                        placeholder="Full Name"
+                                                        placeholder="Nombre completo"
                                                         required="required"
                                                     />
                                                 </div>
@@ -739,7 +811,7 @@
                                                         class="form-control"
                                                         name="guest_phone_0"
                                                         data-guest-field="phone"
-                                                        placeholder="Phone"
+                                                        placeholder="Teléfono"
                                                     />
                                                 </div>
                                                 <div class="col-md-4">
@@ -748,7 +820,7 @@
                                                         class="form-control"
                                                         name="guest_email_0"
                                                         data-guest-field="email"
-                                                        placeholder="Email"
+                                                        placeholder="Correo electrónico"
                                                     />
                                                 </div>
                                             </div>
@@ -761,7 +833,7 @@
                                             t-att-data-property-max="property.no_of_guests or 0"
                                         >
                                             <i class="fa fa-plus" />
-                                            Add Guest
+                                            Agregar huésped
                                         </button>
                                     </div>
                                 </form>
@@ -771,14 +843,13 @@
                                     type="button"
                                     class="btn btn-secondary"
                                     data-bs-dismiss="modal"
-                                >Cancel</button>
+                                >Cancelar</button>
                                 <button
                                     type="button"
                                     id="pmsAddToCart"
                                     class="btn btn-primary"
                                 >
-                                    <i class="fa fa-shopping-cart" />
-                                    Add to Cart
+                                    Continuar
                                 </button>
                             </div>
                         </div>
